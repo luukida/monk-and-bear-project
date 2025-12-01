@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum State { CHASE, ATTACK }
+enum State { CHASE, PREPARE, ATTACK }
 var current_state = State.CHASE
 
 @export_group("Stats")
@@ -8,28 +8,33 @@ var current_state = State.CHASE
 @export var hp = 30.0
 @export var damage = 10.0
 
-@export_group("Visual")
+@export_group("Combate")
 @export var max_rotation_degrees: float = 30.0
 @export var attack_impact_frame: int = 1 
+@export var telegraph_duration: float = 0.6 
 
 # Referências
 var player_ref: Node2D = null
 var bear_ref: CharacterBody2D = null
 var target: Node2D = null
 
-# Variáveis Internas
 var default_shape_x: float = 0.0
-var knockback_velocity: Vector2 = Vector2.ZERO # Vetor de empurrão
+var default_telegraph_x: float = 0.0
+var knockback_velocity: Vector2 = Vector2.ZERO
 
 @onready var sprite = $AnimatedSprite2D
 @onready var hitbox = $EnemyHitbox
 @onready var hitbox_shape = $EnemyHitbox/CollisionShape2D
+@onready var telegraph = $EnemyHitbox/TelegraphSprite 
 
 func _ready():
 	add_to_group("enemy")
 	
-	# Memoriza posição inicial para o flip funcionar corretamente
 	default_shape_x = hitbox_shape.position.x
+	
+	if telegraph:
+		default_telegraph_x = telegraph.position.x
+		telegraph.visible = false
 	
 	sprite.animation_finished.connect(_on_animation_finished)
 	sprite.frame_changed.connect(_on_frame_changed)
@@ -48,13 +53,12 @@ func _physics_process(delta):
 	match current_state:
 		State.CHASE:
 			behavior_chase()
+		State.PREPARE:
+			velocity = Vector2.ZERO # Parado e TRAVADO (Não gira)
 		State.ATTACK:
-			velocity = Vector2.ZERO
+			velocity = Vector2.ZERO # Parado batendo
 			
-	# --- FÍSICA DE EMPURRÃO ---
-	# Soma o empurrão ao movimento atual
 	velocity += knockback_velocity
-	# Reduz o empurrão gradualmente (Atrito)
 	knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 500 * delta)
 			
 	move_and_slide()
@@ -76,14 +80,12 @@ func behavior_chase():
 		velocity = Vector2.ZERO
 		return
 	
-	# Se o empurrão for muito forte, perde o controle (Stun momentâneo)
 	if knockback_velocity.length() > 50:
 		sprite.play("idle")
 		return
 
-	# Gatilho de Ataque por Colisão
 	if hitbox.overlaps_body(target):
-		start_attack()
+		start_telegraph()
 	else:
 		var dir = global_position.direction_to(target.global_position)
 		velocity = dir * speed
@@ -93,15 +95,16 @@ func behavior_chase():
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
 	
-	# Flip Horizontal
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
+		
 		if dir.x < 0:
 			hitbox_shape.position.x = -default_shape_x
+			if telegraph: telegraph.position.x = -default_telegraph_x
 		else:
 			hitbox_shape.position.x = default_shape_x
+			if telegraph: telegraph.position.x = default_telegraph_x
 
-	# Rotação Vertical
 	var rotation_angle = 0.0
 	if dir.x < 0:
 		rotation_angle = atan2(dir.y, -dir.x)
@@ -115,14 +118,40 @@ func update_orientation(target_pos: Vector2):
 	sprite.rotation = rotation_angle
 	hitbox.rotation = rotation_angle
 
+# --- SISTEMA DE TELEGRAPH (Correção de Mira) ---
+
+func start_telegraph():
+	current_state = State.PREPARE
+	sprite.play("idle")
+	
+	# A CORREÇÃO:
+	# Miramos no alvo AGORA (no início do preparo) e nunca mais mexemos.
+	if is_instance_valid(target):
+		update_orientation(target.global_position)
+	
+	if telegraph:
+		telegraph.visible = true
+		var tween = create_tween()
+		telegraph.modulate.a = 0.0
+		tween.tween_property(telegraph, "modulate:a", 0.8, telegraph_duration)
+	
+	await get_tree().create_timer(telegraph_duration).timeout
+	
+	if current_state == State.PREPARE:
+		start_attack()
+
 # --- COMBATE ---
 
 func start_attack():
 	current_state = State.ATTACK
+	
+	if telegraph: telegraph.visible = false
+	
 	sprite.play("attack")
 	sprite.frame = 0
-	if is_instance_valid(target):
-		update_orientation(target.global_position)
+	
+	# REMOVIDO: update_orientation(target)
+	# Não atualizamos a mira aqui! Ele bate onde estava mirando antes.
 
 func _on_frame_changed():
 	if sprite.animation == "attack" and sprite.frame == attack_impact_frame:
@@ -139,7 +168,7 @@ func _on_animation_finished():
 	if sprite.animation == "attack":
 		current_state = State.CHASE
 
-# --- VIDA E FÍSICA ---
+# --- VIDA/KNOCKBACK ---
 
 func take_damage(amount):
 	hp -= amount
@@ -152,3 +181,6 @@ func take_damage(amount):
 
 func apply_knockback(force_vector: Vector2):
 	knockback_velocity = force_vector
+	if current_state == State.PREPARE or current_state == State.ATTACK:
+		current_state = State.CHASE
+		if telegraph: telegraph.visible = false

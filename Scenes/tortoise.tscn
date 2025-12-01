@@ -291,23 +291,36 @@ animations = [{
 radius = 65.03076
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0wdb2"]
-size = Vector2(112, 38)
+size = Vector2(112, 52)
 
 [node name="Tortoise" instance=ExtResource("1_0wdb2")]
+collision_layer = 4
+collision_mask = 7
 speed = 40.0
-hp = 150.0
+hp = 120.0
 damage = 40.0
-max_rotation_degrees = 40.0
+max_rotation_degrees = 60.0
 attack_impact_frame = 5
+telegraph_duration = 1.0
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_si7rp")
 autoplay = "idle"
+frame = 9
+frame_progress = 1.0
 
 [node name="CollisionShape2D" parent="." index="1"]
 rotation = 1.5707964
 shape = SubResource("CircleShape2D_0wdb2")
 
+[node name="EnemyHitbox" parent="." index="2"]
+collision_layer = 0
+collision_mask = 3
+
 [node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
 position = Vector2(82, 8)
 shape = SubResource("RectangleShape2D_0wdb2")
+
+[node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
+position = Vector2(82.5, 7.999999)
+scale = Vector2(1.828125, 0.90625)

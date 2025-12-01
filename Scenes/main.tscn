@@ -22,7 +22,7 @@ position = Vector2(287, 191)
 
 [node name="Bear" parent="." instance=ExtResource("3_kry3j")]
 position = Vector2(422, 294)
-damage = 75.0
+attack_impact_frame = 6
 
 [node name="SpawnTimer" type="Timer" parent="."]
 autostart = true

@@ -153,25 +153,35 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_x02g4"]
 radius = 38.013157
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_er7r5"]
-radius = 39.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q0ja6"]
+size = Vector2(75, 60)
 
 [node name="Thief" instance=ExtResource("1_q0ja6")]
+collision_layer = 4
+collision_mask = 7
 script = ExtResource("2_xgawa")
 speed = 140.0
-hp = 20.0
+hp = 15.0
 damage = 15.0
 attack_impact_frame = 2
+telegraph_duration = 0.3
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_cjs2h")
 autoplay = "idle"
-frame = 5
-frame_progress = 1.0
+frame = 2
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource("CircleShape2D_x02g4")
 
+[node name="EnemyHitbox" parent="." index="2"]
+collision_layer = 0
+collision_mask = 3
+
 [node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
-position = Vector2(41, 0)
-shape = SubResource("CircleShape2D_er7r5")
+position = Vector2(41.5, 0)
+shape = SubResource("RectangleShape2D_q0ja6")
+
+[node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
+position = Vector2(41.5, 0)
+scale = Vector2(1.234375, 1)

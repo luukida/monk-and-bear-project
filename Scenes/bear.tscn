@@ -42,9 +42,9 @@ region = Rect2(1792, 0, 256, 256)
 atlas = ExtResource("2_elcei")
 region = Rect2(2048, 0, 256, 256)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2imu7"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_elcei"]
 atlas = ExtResource("2_elcei")
-region = Rect2(768, 0, 256, 256)
+region = Rect2(496, 0, 257, 198)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bck8s"]
 atlas = ExtResource("3_mlyxe")
@@ -134,7 +134,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2imu7")
+"texture": SubResource("AtlasTexture_elcei")
 }],
 "loop": false,
 "name": &"death",
@@ -276,7 +276,7 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gbb2i"]
-radius = 37.0
+radius = 54.037025
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4wmed"]
 radius = 300.0
@@ -299,6 +299,8 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [node name="Bear" type="CharacterBody2D" groups=["bear"]]
+collision_layer = 2
+collision_mask = 4
 script = ExtResource("1_2imu7")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -319,7 +321,7 @@ shape = SubResource("CircleShape2D_gbb2i")
 
 [node name="DetectionArea" type="Area2D" parent="."]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 4
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
@@ -327,14 +329,14 @@ shape = SubResource("CircleShape2D_4wmed")
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 4
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 position = Vector2(41.5, 0)
 shape = SubResource("RectangleShape2D_2imu7")
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="HpBar" type="ProgressBar" parent="."]
 z_index = 5
 offset_left = -55.0
 offset_top = 56.79
@@ -344,5 +346,19 @@ theme_override_styles/background = SubResource("StyleBoxFlat_2imu7")
 theme_override_styles/fill = SubResource("StyleBoxFlat_elcei")
 value = 52.74
 show_percentage = false
+
+[node name="ReviveLabel" type="Label" parent="."]
+visible = false
+z_index = 6
+offset_left = -34.0
+offset_top = -42.0
+offset_right = 35.0
+offset_bottom = 127.0
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 60
+text = "10
+"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="body_entered" from="AttackArea" to="." method="_on_attack_area_body_entered"]

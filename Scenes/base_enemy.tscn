@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cquhbsnjgo5dd"]
+[gd_scene load_steps=5 format=3 uid="uid://cquhbsnjgo5dd"]
 
 [ext_resource type="Script" uid="uid://i7dnqvqe4pwd" path="res://Scripts/base_enemy.gd" id="1_wsate"]
 
@@ -20,7 +20,15 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_wsate"]
+colors = PackedColorArray(1, 0, 0, 0.39215687, 1, 0, 0, 0.39215687)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kjpuc"]
+gradient = SubResource("Gradient_wsate")
+
 [node name="BaseEnemy" type="CharacterBody2D"]
+light_mask = 4
+visibility_layer = 7
 z_index = 5
 collision_layer = 2
 script = ExtResource("1_wsate")
@@ -35,3 +43,6 @@ animation = &"attack"
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHitbox"]
+
+[node name="TelegraphSprite" type="Sprite2D" parent="EnemyHitbox"]
+texture = SubResource("GradientTexture2D_kjpuc")

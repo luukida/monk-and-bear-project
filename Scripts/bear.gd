@@ -7,27 +7,32 @@ var current_state = State.FOLLOW
 @export var move_speed = 180.0
 @export var max_hp = 200.0
 @export var damage = 35.0
+@export var auto_revive_time: float = 10.0
 
 @export_group("Visual")
 @export var max_rotation_degrees: float = 30.0 
-@export var attack_impact_frame: int = 2 
+@export var attack_impact_frame: int = 6 # Mantido seu valor 6
+@export var heal_animation_name: String = "healVFX" 
 
 var current_hp = max_hp
 var is_downed = false
-var is_invincible = false
+var is_invincible = false 
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
 var default_shape_x: float = 0.0
+var current_revive_timer: float = 0.0
 
 @onready var sprite = $AnimatedSprite2D
+# REFERÊNCIA NOVA: O colisor do CORPO do urso (para desligar quando morrer)
+@onready var body_shape = $CollisionShape2D
+
 @onready var detection_area = $DetectionArea
 @onready var attack_area = $AttackArea 
 @onready var attack_shape = $AttackArea/CollisionShape2D
-@onready var hp_bar = $ProgressBar
-
-# REFERÊNCIA NOVA: O Sprite de Efeito Especial
+@onready var hp_bar = $HpBar 
 @onready var heal_vfx = $HealVFX
+@onready var revive_label = $ReviveLabel
 
 func _ready():
 	add_to_group("bear")
@@ -37,21 +42,26 @@ func _ready():
 	
 	default_shape_x = attack_shape.position.x
 	
-	# Conexões do Sprite Principal
 	sprite.animation_finished.connect(_on_animation_finished)
 	sprite.frame_changed.connect(_on_frame_changed)
 	
-	# CONEXÃO NOVA: Quando o efeito visual acabar, queremos saber
 	if not heal_vfx.animation_finished.is_connected(_on_vfx_finished):
 		heal_vfx.animation_finished.connect(_on_vfx_finished)
-	
-	# Garante que o efeito comece invisível
 	heal_vfx.visible = false
+	revive_label.visible = false 
 	
 	detection_area.monitoring = true
 	detection_area.monitorable = false
 	attack_area.monitoring = true
 	attack_area.monitorable = false
+
+func _process(delta):
+	if is_downed:
+		current_revive_timer -= delta
+		revive_label.text = "%d" % ceil(max(0.0, current_revive_timer))
+		
+		if current_revive_timer <= 0:
+			revive_complete()
 
 func _physics_process(delta):
 	if is_downed: return
@@ -165,7 +175,7 @@ func _on_animation_finished():
 	if sprite.animation == "attack":
 		current_state = State.CHASE
 
-# --- VIDA, MORTE E REVIVE ---
+# --- VIDA, MORTE ---
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
@@ -173,39 +183,51 @@ func take_damage(amount):
 	current_hp -= amount
 	hp_bar.value = current_hp
 	
-	sprite.modulate = Color.RED
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
-	
 	if current_hp <= 0:
 		go_down()
+	else:
+		sprite.modulate = Color.RED
+		var tween = create_tween()
+		tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
 
 func go_down():
 	is_downed = true
 	current_state = State.DOWNED
 	target_enemy = null
 	
+	# AQUI: Desliga a colisão do corpo físico para inimigos atravessarem
+	# Usamos set_deferred para evitar erros de física durante o frame
+	body_shape.set_deferred("disabled", true)
+	
 	hp_bar.visible = false
 	
-	# Se quiser tocar efeito de morte no VFX também, pode adicionar aqui
-	sprite.modulate = Color(0.3, 0.3, 0.3)
+	current_revive_timer = auto_revive_time
+	revive_label.visible = true
+	revive_label.text = str(int(auto_revive_time))
+	
+	sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
+	
 	sprite.rotation = 0
 	sprite.play("death")
-	print("Urso Caiu!")
+	print("Urso Caiu! Fantasma ativado.")
 
-func revive(amount_hp):
+# --- AUTO-REVIVE ---
+
+func revive_complete():
 	is_downed = false
-	current_hp = amount_hp
+	current_hp = max_hp
+	
+	# AQUI: Liga a colisão de volta
+	body_shape.set_deferred("disabled", false)
 	
 	hp_bar.value = current_hp
 	hp_bar.visible = true
+	revive_label.visible = false
+	
 	sprite.modulate = Color.WHITE
 	
 	is_invincible = true
-	print("Urso voltou FURIOSO!")
-	
-	# TOCA O EFEITO DE CURA/REVIVE AQUI TAMBÉM
-	play_heal_vfx()
+	print("Urso Revivido!")
 	
 	var blink_tween = create_tween()
 	for i in range(10): 
@@ -213,7 +235,10 @@ func revive(amount_hp):
 		blink_tween.tween_property(sprite, "modulate", Color.WHITE, 0.15)
 	blink_tween.finished.connect(func(): is_invincible = false)
 	
+	# Empurrão com seus valores (150 força, 15 dano)
 	push_enemies_away()
+	
+	await get_tree().create_timer(0.1).timeout
 	scan_for_enemies()
 	
 	if is_instance_valid(target_enemy):
@@ -222,38 +247,39 @@ func revive(amount_hp):
 		current_state = State.FOLLOW
 		sprite.play("idle")
 
+# --- CURA E VFX ---
+
+func receive_heal_tick(amount):
+	if is_downed: return 
+	
+	current_hp = min(current_hp + amount, max_hp)
+	hp_bar.value = current_hp
+	
+	play_continuous_heal_vfx()
+	sprite.modulate = Color(0.7, 1.0, 0.7) 
+
+func play_continuous_heal_vfx():
+	if heal_vfx:
+		heal_vfx.visible = true
+		if not heal_vfx.is_playing() or heal_vfx.animation != heal_animation_name:
+			heal_vfx.play(heal_animation_name)
+
+func stop_heal_vfx():
+	if heal_vfx:
+		heal_vfx.visible = false
+		heal_vfx.stop()
+	if not is_downed:
+		sprite.modulate = Color.WHITE
+
+func _on_vfx_finished():
+	pass 
+
 func push_enemies_away():
 	var bodies = detection_area.get_overlapping_bodies()
 	for body in bodies:
 		if body.is_in_group("enemy") and body.has_method("apply_knockback"):
 			var push_dir = global_position.direction_to(body.global_position)
-			var push_force = 400.0
+			var push_force = 150.0
 			body.apply_knockback(push_dir * push_force)
 			if body.has_method("take_damage"):
-				body.take_damage(10)
-
-# --- SISTEMA DE CURA E VFX ---
-
-func receive_heal(amount):
-	if is_downed: return
-	current_hp = min(current_hp + amount, max_hp)
-	hp_bar.value = current_hp
-	
-	# TOCA O EFEITO
-	play_heal_vfx()
-	
-	sprite.modulate = Color.GREEN
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.5)
-
-# Função auxiliar para tocar o efeito
-func play_heal_vfx():
-	if heal_vfx:
-		heal_vfx.visible = true
-		heal_vfx.frame = 0 # Garante que começa do inicio
-		heal_vfx.play("healVFX") # Use o nome que você deu na animação (default ou heal)
-
-# Função chamada quando a animação do VFX acaba
-func _on_vfx_finished():
-	heal_vfx.visible = false # Esconde de novo
-	heal_vfx.stop()
+				body.take_damage(15)

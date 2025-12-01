@@ -174,10 +174,13 @@ animations = [{
 radius = 31.016125
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pegji"]
-size = Vector2(81, 66)
+size = Vector2(70, 66)
 
 [node name="Skeleton" instance=ExtResource("1_pegji")]
+collision_layer = 4
+collision_mask = 7
 attack_impact_frame = 2
+telegraph_duration = 0.5
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_t1o88")
@@ -188,6 +191,14 @@ frame_progress = 1.0
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource("CircleShape2D_lhll6")
 
+[node name="EnemyHitbox" parent="." index="2"]
+collision_layer = 0
+collision_mask = 3
+
 [node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
-position = Vector2(30.5, 0)
+position = Vector2(36, 0)
 shape = SubResource("RectangleShape2D_pegji")
+
+[node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
+position = Vector2(36, 0)
+scale = Vector2(1.125, 1.0624999)

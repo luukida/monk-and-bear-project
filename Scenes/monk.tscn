@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=31 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
@@ -125,7 +125,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_h2jhv")
 }],
-"loop": false,
+"loop": true,
 "name": &"heal",
 "speed": 10.0
 }, {
@@ -188,7 +188,15 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xnol8"]
+bg_color = Color(0, 0.19215687, 0.83137256, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
+collision_mask = 4
 script = ExtResource("1_eeelv")
 
 [node name="HealCooldown" type="Timer" parent="."]
@@ -198,13 +206,13 @@ one_shot = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_a5f3m")
-animation = &"idle"
+animation = &"heal"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_rxlox")
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="HpBar" type="ProgressBar" parent="."]
 z_index = 5
 offset_left = -30.0
 offset_top = 49.349987
@@ -213,4 +221,14 @@ offset_bottom = 63.0
 theme_override_styles/background = SubResource("StyleBoxFlat_eeelv")
 theme_override_styles/fill = SubResource("StyleBoxFlat_71f2a")
 value = 52.74
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="."]
+z_index = 5
+offset_left = -29.0
+offset_top = 64.0
+offset_right = 33.0
+offset_bottom = 70.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_xnol8")
+value = 45.07
 show_percentage = false

@@ -3,38 +3,91 @@ extends CharacterBody2D
 @export_group("Stats")
 @export var speed = 150.0
 @export var max_hp = 100.0
-@export var heal_amount = 30.0
-@export var heal_cooldown_time = 3.0
+
+@export_group("Mana & Cura")
+@export var max_mana = 100.0
+@export var mana_regen = 10.0       # Quanto recupera por segundo
+@export var mana_cost = 20.0        # Quanto gasta por segundo
+@export var heal_amount = 30.0      # Cura por segundo (HPS)
 
 var current_hp = max_hp
-var can_heal = true
-var is_casting_heal = false 
+var current_mana = max_mana
+var is_healing = false # Estado atual
 
+# Referência ao Pet
 var bear_node: CharacterBody2D = null
 
 @onready var sprite = $AnimatedSprite2D
-@onready var heal_timer = $HealCooldown
-# REFERÊNCIA NOVA: A Barra de Vida
-@onready var hp_bar = $ProgressBar
+@onready var hp_bar = $HpBar
+@onready var mana_bar = $ManaBar # A nova barra azul
 
 func _ready():
 	add_to_group("player")
 	
-	# CONFIGURAÇÃO INICIAL DA BARRA
+	# Setup das Barras
 	hp_bar.max_value = max_hp
 	hp_bar.value = current_hp
-	hp_bar.visible = true # Garante que está visível
 	
-	heal_timer.wait_time = heal_cooldown_time
-	if not heal_timer.timeout.is_connected(_on_heal_timer_timeout):
-		heal_timer.timeout.connect(_on_heal_timer_timeout)
-	
-	if not sprite.animation_finished.is_connected(_on_animation_finished):
-		sprite.animation_finished.connect(_on_animation_finished)
+	mana_bar.max_value = max_mana
+	mana_bar.value = current_mana
+	mana_bar.visible = true
 
 func _physics_process(delta):
-	if is_casting_heal: return
+	# 1. GERENCIAMENTO DE MANA (Passivo)
+	if not is_healing and current_mana < max_mana:
+		current_mana += mana_regen * delta
+		current_mana = min(current_mana, max_mana)
+		mana_bar.value = current_mana
 
+	# 2. INPUT DE CURA (Canalização)
+	# Se segurar o botão E tiver mana
+	if Input.is_action_pressed("action") and current_mana > 0:
+		start_healing(delta)
+	else:
+		stop_healing()
+		
+	# 3. MOVIMENTO (Só se não estiver curando)
+	if not is_healing:
+		handle_movement()
+	
+	move_and_slide()
+
+func start_healing(delta):
+	is_healing = true
+	velocity = Vector2.ZERO
+	
+	if sprite.animation != "heal":
+		sprite.play("heal")
+	
+	current_mana -= mana_cost * delta
+	mana_bar.value = current_mana
+	
+	var heal_tick = heal_amount * delta
+	heal_self(heal_tick)
+	
+	if is_instance_valid(bear_node):
+		var dist = global_position.distance_to(bear_node.global_position)
+		
+		# REVIVE: Ainda exige estar perto (100px) ou você quer global também?
+		# Mantive perto pois reviver à distância tira o risco do jogo.
+		if bear_node.is_downed and dist < 100.0:
+			bear_node.receive_revive_tick(heal_tick * 2.0)
+			
+		# CURA: Global (Removemos o 'dist < 250')
+		elif not bear_node.is_downed:
+			bear_node.receive_heal_tick(heal_tick)
+
+func stop_healing():
+	if is_healing:
+		is_healing = false
+		# Volta para idle se soltou o botão
+		sprite.play("idle")
+		
+		# Avisa o urso para cortar o efeito
+		if is_instance_valid(bear_node):
+			bear_node.stop_heal_vfx()
+
+func handle_movement():
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = input_dir * speed
 	
@@ -44,61 +97,23 @@ func _physics_process(delta):
 			sprite.flip_h = input_dir.x < 0
 	else:
 		sprite.play("idle")
-		
-	move_and_slide()
-	
-	if Input.is_action_just_pressed("action") and can_heal:
-		perform_heal_action()
-
-func perform_heal_action():
-	can_heal = false
-	is_casting_heal = true 
-	velocity = Vector2.ZERO
-	
-	sprite.play("heal")
-	heal_timer.start()
-	
-	heal_self(heal_amount)
-	
-	if is_instance_valid(bear_node):
-		var dist = global_position.distance_to(bear_node.global_position)
-		
-		if bear_node.is_downed and dist < 100.0:
-			# Revive com vida cheia (Opção A que discutimos)
-			bear_node.revive(bear_node.max_hp)
-			print("Monge reviveu o Urso!")
-			
-		elif not bear_node.is_downed and dist < 250.0:
-			bear_node.receive_heal(heal_amount)
-
-func _on_animation_finished():
-	if sprite.animation == "heal":
-		is_casting_heal = false
 
 func heal_self(amount):
-	current_hp = min(current_hp + amount, max_hp)
-	# ATUALIZA A BARRA
-	hp_bar.value = current_hp
-	
-	sprite.modulate = Color.GREEN
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.5)
+	if current_hp < max_hp:
+		current_hp = min(current_hp + amount, max_hp)
+		hp_bar.value = current_hp
+		# Feedback visual sutil (não pisca mais loucamente)
+		sprite.modulate = Color(0.8, 1.0, 0.8) # Levemente verde
 
 func take_damage(amount):
 	current_hp -= amount
-	# ATUALIZA A BARRA
 	hp_bar.value = current_hp
-	
 	sprite.modulate = Color.RED
+	
+	# Pequeno tween para voltar a cor normal
 	var tween = create_tween()
 	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
 	
 	if current_hp <= 0:
 		print("GAME OVER")
 		get_tree().reload_current_scene()
-
-func _on_heal_timer_timeout():
-	can_heal = true
-	sprite.modulate = Color(0.7, 0.7, 1.0)
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.2)

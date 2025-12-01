@@ -1,0 +1,27 @@
+[gd_scene load_steps=7 format=3 uid="uid://dmse571xmjc01"]
+
+[ext_resource type="Script" uid="uid://d2k0etq0cgs43" path="res://Scripts/main.gd" id="1_8gbba"]
+[ext_resource type="PackedScene" uid="uid://d1r7n8jp0qu0a" path="res://Scenes/monk.tscn" id="2_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://brt2e0larbfgd" path="res://Scenes/skeleton.tscn" id="2_kry3j"]
+[ext_resource type="PackedScene" uid="uid://d2hc74fdahntj" path="res://Scenes/tortoise.tscn" id="3_21xkr"]
+[ext_resource type="PackedScene" uid="uid://daiupkstu66ag" path="res://Scenes/bear.tscn" id="3_kry3j"]
+[ext_resource type="Texture2D" uid="uid://dgp3h51j6seqg" path="res://Assets/Terrain/Tilemap_color1.png" id="4_21xkr"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_8gbba")
+enemy_scenes = Array[PackedScene]([ExtResource("2_kry3j"), ExtResource("3_21xkr")])
+
+[node name="TilemapColor1" type="Sprite2D" parent="."]
+position = Vector2(1046, 691)
+scale = Vector2(3.6354167, 3.6354167)
+texture = ExtResource("4_21xkr")
+
+[node name="Monk" parent="." instance=ExtResource("2_jjvhh")]
+position = Vector2(287, 191)
+
+[node name="Bear" parent="." instance=ExtResource("3_kry3j")]
+position = Vector2(422, 294)
+damage = 75.0
+
+[node name="SpawnTimer" type="Timer" parent="."]
+autostart = true

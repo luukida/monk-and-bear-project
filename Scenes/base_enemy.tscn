@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://cquhbsnjgo5dd"]
+
+[ext_resource type="Script" uid="uid://i7dnqvqe4pwd" path="res://Scripts/base_enemy.gd" id="1_wsate"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rnv5g"]
+animations = [{
+"frames": [],
+"loop": false,
+"name": &"attack",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"run",
+"speed": 10.0
+}]
+
+[node name="BaseEnemy" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_wsate")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_rnv5g")
+animation = &"attack"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="EnemyHitbox" type="Area2D" parent="."]
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHitbox"]

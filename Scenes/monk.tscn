@@ -1,6 +1,6 @@
 [gd_scene load_steps=28 format=3 uid="uid://d1r7n8jp0qu0a"]
 
-[ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://monk.gd" id="1_eeelv"]
+[ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
 [ext_resource type="Texture2D" uid="uid://b3figbdeo2jwe" path="res://Assets/Monk/Idle.png" id="3_xnol8"]
 [ext_resource type="Texture2D" uid="uid://b85owu5ndrjf3" path="res://Assets/Monk/Run.png" id="4_g8mav"]

@@ -1,0 +1,177 @@
+[gd_scene load_steps=27 format=3 uid="uid://t0mw1xp8yc5i"]
+
+[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_q0ja6"]
+[ext_resource type="Script" uid="uid://dqovi70g4qmrf" path="res://thief.gd" id="2_xgawa"]
+[ext_resource type="Texture2D" uid="uid://b1d0pgmyjiw0n" path="res://Assets/Enemies/Thief/Thief_Attack.png" id="3_5gijj"]
+[ext_resource type="Texture2D" uid="uid://c4ldej6axhbdd" path="res://Assets/Enemies/Thief/Thief_Idle.png" id="4_ptjg1"]
+[ext_resource type="Texture2D" uid="uid://bbicuomxvm6li" path="res://Assets/Enemies/Thief/Thief_Run.png" id="5_ib4di"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_skx8i"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_baqrd"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_68dm3"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5svfp"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gywku"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nove3"]
+atlas = ExtResource("3_5gijj")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ibu5l"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w52hx"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8b5l"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aths4"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_foxag"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wq20x"]
+atlas = ExtResource("4_ptjg1")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ton7l"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cmnsu"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x6t8y"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7x86k"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_35461"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mxa7m"]
+atlas = ExtResource("5_ib4di")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cjs2h"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_skx8i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_baqrd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_68dm3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5svfp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gywku")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nove3")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ibu5l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w52hx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a8b5l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aths4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_foxag")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wq20x")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ton7l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cmnsu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x6t8y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7x86k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_35461")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mxa7m")
+}],
+"loop": true,
+"name": &"run",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_x02g4"]
+radius = 38.013157
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_er7r5"]
+radius = 39.0
+
+[node name="Thief" instance=ExtResource("1_q0ja6")]
+script = ExtResource("2_xgawa")
+speed = 140.0
+hp = 20.0
+damage = 15.0
+attack_impact_frame = 2
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = SubResource("SpriteFrames_cjs2h")
+autoplay = "idle"
+frame = 5
+frame_progress = 1.0
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("CircleShape2D_x02g4")
+
+[node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
+position = Vector2(41, 0)
+shape = SubResource("CircleShape2D_er7r5")

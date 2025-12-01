@@ -21,6 +21,7 @@ animations = [{
 }]
 
 [node name="BaseEnemy" type="CharacterBody2D"]
+z_index = 5
 collision_layer = 2
 script = ExtResource("1_wsate")
 

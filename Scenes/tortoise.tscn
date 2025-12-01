@@ -297,6 +297,7 @@ size = Vector2(112, 38)
 speed = 40.0
 hp = 150.0
 damage = 40.0
+max_rotation_degrees = 40.0
 attack_impact_frame = 5
 
 [node name="AnimatedSprite2D" parent="." index="0"]

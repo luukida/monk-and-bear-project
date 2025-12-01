@@ -17,18 +17,18 @@ var player_ref: Node2D = null
 var bear_ref: CharacterBody2D = null
 var target: Node2D = null
 
-# Variável para memorizar a distância do SHAPE
+# Variáveis Internas
 var default_shape_x: float = 0.0
+var knockback_velocity: Vector2 = Vector2.ZERO # Vetor de empurrão
 
 @onready var sprite = $AnimatedSprite2D
 @onready var hitbox = $EnemyHitbox
-# PEGA O FILHO DIRETO PARA MOVER ELE
 @onready var hitbox_shape = $EnemyHitbox/CollisionShape2D
 
 func _ready():
 	add_to_group("enemy")
 	
-	# Memoriza posição inicial
+	# Memoriza posição inicial para o flip funcionar corretamente
 	default_shape_x = hitbox_shape.position.x
 	
 	sprite.animation_finished.connect(_on_animation_finished)
@@ -51,6 +51,12 @@ func _physics_process(delta):
 		State.ATTACK:
 			velocity = Vector2.ZERO
 			
+	# --- FÍSICA DE EMPURRÃO ---
+	# Soma o empurrão ao movimento atual
+	velocity += knockback_velocity
+	# Reduz o empurrão gradualmente (Atrito)
+	knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 500 * delta)
+			
 	move_and_slide()
 
 func select_target() -> Node2D:
@@ -70,6 +76,11 @@ func behavior_chase():
 		velocity = Vector2.ZERO
 		return
 	
+	# Se o empurrão for muito forte, perde o controle (Stun momentâneo)
+	if knockback_velocity.length() > 50:
+		sprite.play("idle")
+		return
+
 	# Gatilho de Ataque por Colisão
 	if hitbox.overlaps_body(target):
 		start_attack()
@@ -82,16 +93,15 @@ func behavior_chase():
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
 	
-	# 1. Flip Horizontal (Mexe no SHAPE)
+	# Flip Horizontal
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
-		
 		if dir.x < 0:
 			hitbox_shape.position.x = -default_shape_x
 		else:
 			hitbox_shape.position.x = default_shape_x
 
-	# 2. Rotação Vertical (Gira a AREA PAI)
+	# Rotação Vertical
 	var rotation_angle = 0.0
 	if dir.x < 0:
 		rotation_angle = atan2(dir.y, -dir.x)
@@ -129,6 +139,8 @@ func _on_animation_finished():
 	if sprite.animation == "attack":
 		current_state = State.CHASE
 
+# --- VIDA E FÍSICA ---
+
 func take_damage(amount):
 	hp -= amount
 	sprite.modulate = Color.RED
@@ -137,3 +149,6 @@ func take_damage(amount):
 	
 	if hp <= 0:
 		queue_free()
+
+func apply_knockback(force_vector: Vector2):
+	knockback_velocity = force_vector

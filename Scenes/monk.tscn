@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=30 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
@@ -174,6 +174,20 @@ animations = [{
 radius = 19.0
 height = 56.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eeelv"]
+bg_color = Color(0.14044744, 0.14044747, 0.14044738, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_71f2a"]
+bg_color = Color(0.3254902, 0.8156863, 0.21568628, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_eeelv")
 
@@ -189,3 +203,14 @@ autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_rxlox")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+z_index = 5
+offset_left = -30.0
+offset_top = 49.349987
+offset_right = 34.0
+offset_bottom = 63.0
+theme_override_styles/background = SubResource("StyleBoxFlat_eeelv")
+theme_override_styles/fill = SubResource("StyleBoxFlat_71f2a")
+value = 52.74
+show_percentage = false

@@ -196,7 +196,9 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
-collision_mask = 4
+collision_mask = 0
+motion_mode = 1
+wall_min_slide_angle = 0.0
 script = ExtResource("1_eeelv")
 
 [node name="HealCooldown" type="Timer" parent="."]

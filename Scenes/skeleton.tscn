@@ -1,9 +1,12 @@
-[gd_scene load_steps=29 format=3 uid="uid://brt2e0larbfgd"]
+[gd_scene load_steps=30 format=3 uid="uid://brt2e0larbfgd"]
 
 [ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_pegji"]
 [ext_resource type="Texture2D" uid="uid://d18t5r3mj8c2q" path="res://Assets/Enemies/Skeleton/Skull_Attack.png" id="2_5abox"]
 [ext_resource type="Texture2D" uid="uid://v1uudth0qh3a" path="res://Assets/Enemies/Skeleton/Skull_Idle.png" id="3_v8sxu"]
 [ext_resource type="Texture2D" uid="uid://dcjcm207h1pbj" path="res://Assets/Enemies/Skeleton/Skull_Run.png" id="4_ks230"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pegji"]
+size = Vector2(65, 46)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_shq1q"]
 atlas = ExtResource("2_5abox")
@@ -173,32 +176,34 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_lhll6"]
 radius = 31.016125
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_pegji"]
-size = Vector2(70, 66)
+[sub_resource type="CircleShape2D" id="CircleShape2D_pegji"]
+radius = 31.016125
 
 [node name="Skeleton" instance=ExtResource("1_pegji")]
-collision_layer = 4
-collision_mask = 7
+max_rotation_degrees = 40.0
 attack_impact_frame = 2
-telegraph_duration = 0.5
+telegraph_duration = 0.7
 
-[node name="AnimatedSprite2D" parent="." index="0"]
+[node name="EnemyHitbox" parent="." index="0"]
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
+position = Vector2(38.5, 0)
+shape = SubResource("RectangleShape2D_pegji")
+
+[node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
+position = Vector2(39.5, 0)
+scale = Vector2(1.015625, 0.75)
+
+[node name="AnimatedSprite2D" parent="." index="1"]
 sprite_frames = SubResource("SpriteFrames_t1o88")
 autoplay = "idle"
 frame = 6
 frame_progress = 1.0
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="CollisionShape2D" parent="." index="2"]
 shape = SubResource("CircleShape2D_lhll6")
 
-[node name="EnemyHitbox" parent="." index="2"]
-collision_layer = 0
-collision_mask = 3
-
-[node name="CollisionShape2D" parent="EnemyHitbox" index="0"]
-position = Vector2(36, 0)
-shape = SubResource("RectangleShape2D_pegji")
-
-[node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
-position = Vector2(36, 0)
-scale = Vector2(1.125, 1.0624999)
+[node name="CollisionShape2D" parent="ContactArea" index="0"]
+shape = SubResource("CircleShape2D_pegji")

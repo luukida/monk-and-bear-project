@@ -2,6 +2,12 @@
 
 [ext_resource type="Script" uid="uid://i7dnqvqe4pwd" path="res://Scripts/base_enemy.gd" id="1_wsate"]
 
+[sub_resource type="Gradient" id="Gradient_wsate"]
+colors = PackedColorArray(1, 0, 0, 0.39215687, 1, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kjpuc"]
+gradient = SubResource("Gradient_wsate")
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_rnv5g"]
 animations = [{
 "frames": [],
@@ -20,24 +26,15 @@ animations = [{
 "speed": 10.0
 }]
 
-[sub_resource type="Gradient" id="Gradient_wsate"]
-colors = PackedColorArray(1, 0, 0, 0.39215687, 1, 0, 0, 0.39215687)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_kjpuc"]
-gradient = SubResource("Gradient_wsate")
-
 [node name="BaseEnemy" type="CharacterBody2D"]
 light_mask = 4
 visibility_layer = 7
 z_index = 5
-collision_layer = 2
+collision_layer = 4
+collision_mask = 4
+motion_mode = 1
+wall_min_slide_angle = 0.0
 script = ExtResource("1_wsate")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_rnv5g")
-animation = &"attack"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="EnemyHitbox" type="Area2D" parent="."]
 monitorable = false
@@ -46,3 +43,15 @@ monitorable = false
 
 [node name="TelegraphSprite" type="Sprite2D" parent="EnemyHitbox"]
 texture = SubResource("GradientTexture2D_kjpuc")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_rnv5g")
+animation = &"attack"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="ContactArea" type="Area2D" parent="."]
+collision_layer = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactArea"]

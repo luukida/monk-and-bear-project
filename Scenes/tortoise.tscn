@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://d2hc74fdahntj"]
+[gd_scene load_steps=47 format=3 uid="uid://d2hc74fdahntj"]
 
 [ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_0wdb2"]
 [ext_resource type="Texture2D" uid="uid://b82lincepqbgn" path="res://Assets/Enemies/Tortoise/Turtle_Attack.png" id="2_80typ"]
@@ -6,6 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://tigkoikhmmi5" path="res://Assets/Enemies/Tortoise/Turtle_Guard_Out.png" id="4_xfqb0"]
 [ext_resource type="Texture2D" uid="uid://baqe6113abs43" path="res://Assets/Enemies/Tortoise/Turtle_Idle.png" id="5_r5qi6"]
 [ext_resource type="Texture2D" uid="uid://cwv1jpqvsrgo8" path="res://Assets/Enemies/Tortoise/Turtle_Walk.png" id="6_pi7o7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0wdb2"]
+size = Vector2(112, 52)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sl1b7"]
 atlas = ExtResource("2_80typ")
@@ -288,14 +291,12 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0wdb2"]
-radius = 65.03076
+radius = 46.043457
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0wdb2"]
-size = Vector2(112, 52)
+[sub_resource type="CircleShape2D" id="CircleShape2D_80typ"]
+radius = 46.043457
 
 [node name="Tortoise" instance=ExtResource("1_0wdb2")]
-collision_layer = 4
-collision_mask = 7
 speed = 40.0
 hp = 120.0
 damage = 40.0
@@ -303,17 +304,7 @@ max_rotation_degrees = 60.0
 attack_impact_frame = 5
 telegraph_duration = 1.0
 
-[node name="AnimatedSprite2D" parent="." index="0"]
-sprite_frames = SubResource("SpriteFrames_si7rp")
-autoplay = "idle"
-frame = 9
-frame_progress = 1.0
-
-[node name="CollisionShape2D" parent="." index="1"]
-rotation = 1.5707964
-shape = SubResource("CircleShape2D_0wdb2")
-
-[node name="EnemyHitbox" parent="." index="2"]
+[node name="EnemyHitbox" parent="." index="0"]
 collision_layer = 0
 collision_mask = 3
 
@@ -324,3 +315,16 @@ shape = SubResource("RectangleShape2D_0wdb2")
 [node name="TelegraphSprite" parent="EnemyHitbox" index="1"]
 position = Vector2(82.5, 7.999999)
 scale = Vector2(1.828125, 0.90625)
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+sprite_frames = SubResource("SpriteFrames_si7rp")
+autoplay = "idle"
+frame = 9
+frame_progress = 1.0
+
+[node name="CollisionShape2D" parent="." index="2"]
+rotation = 1.5707964
+shape = SubResource("CircleShape2D_0wdb2")
+
+[node name="CollisionShape2D" parent="ContactArea" index="0"]
+shape = SubResource("CircleShape2D_80typ")

@@ -300,6 +300,7 @@ radius = 46.043457
 speed = 40.0
 hp = 120.0
 damage = 40.0
+contact_damage = 10.0
 max_rotation_degrees = 60.0
 attack_impact_frame = 5
 telegraph_duration = 1.0

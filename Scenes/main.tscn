@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dmse571xmjc01"]
+[gd_scene load_steps=12 format=3 uid="uid://dmse571xmjc01"]
 
 [ext_resource type="Script" uid="uid://d2k0etq0cgs43" path="res://Scripts/main.gd" id="1_8gbba"]
 [ext_resource type="PackedScene" uid="uid://d1r7n8jp0qu0a" path="res://Scenes/monk.tscn" id="2_jjvhh"]
@@ -7,7 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://daiupkstu66ag" path="res://Scenes/bear.tscn" id="3_kry3j"]
 [ext_resource type="PackedScene" uid="uid://t0mw1xp8yc5i" path="res://Scenes/thief.tscn" id="4_6bp64"]
 [ext_resource type="Texture2D" uid="uid://dgp3h51j6seqg" path="res://Assets/Terrain/Tilemap_color1.png" id="4_21xkr"]
+[ext_resource type="PackedScene" uid="uid://cjwho8rxy2jok" path="res://Scenes/hud.tscn" id="5_ynf5e"]
 [ext_resource type="PackedScene" uid="uid://bg5r8ll0x3uvc" path="res://Scenes/rope_controller.tscn" id="8_344ge"]
+[ext_resource type="PackedScene" uid="uid://do8ef7onh8fjk" path="res://Scenes/level_up_ui.tscn" id="10_d1ilt"]
+[ext_resource type="PackedScene" uid="uid://hph4f4c84cdr" path="res://Scenes/upgrade_card.tscn" id="11_6iyac"]
 
 [node name="Main" type="Node2D"]
 y_sort_enabled = true
@@ -25,12 +28,7 @@ position = Vector2(287, 191)
 
 [node name="Bear" parent="." instance=ExtResource("3_kry3j")]
 position = Vector2(422, 294)
-max_hp = 250.0
 damage = 40.0
-
-[node name="SpawnTimer" type="Timer" parent="."]
-wait_time = 2.0
-autostart = true
 
 [node name="RopeController" parent="." node_paths=PackedStringArray("player", "bear") instance=ExtResource("8_344ge")]
 z_index = -1
@@ -39,3 +37,12 @@ player = NodePath("../Monk")
 bear = NodePath("../Bear")
 pull_strength = 25.0
 base_width = 300.0
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
+
+[node name="HUD" parent="." instance=ExtResource("5_ynf5e")]
+
+[node name="LevelUpUI" parent="." instance=ExtResource("10_d1ilt")]
+card_template = ExtResource("11_6iyac")

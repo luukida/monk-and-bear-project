@@ -19,6 +19,11 @@ func _ready():
 	if has_node("SpawnTimer"):
 		if not $SpawnTimer.timeout.is_connected(_on_spawn_timer_timeout):
 			$SpawnTimer.timeout.connect(_on_spawn_timer_timeout)
+	
+	# Conecta o sinal de level up do GameManager
+	# (Supondo que vamos criar a UI de Level Up depois, por enquanto vamos testar a lógica)
+	# GameManager.show_upgrade_options.connect(_on_show_upgrade_options) 
+	#pass
 
 func _on_spawn_timer_timeout():
 	# Segurança: Se a lista estiver vazia, não faz nada para não travar o jogo
@@ -43,3 +48,31 @@ func _on_spawn_timer_timeout():
 	
 	# 3. Adiciona à cena
 	add_child(enemy)
+
+# Esta função será chamada pela UI quando o jogador clicar num botão
+func apply_upgrade(upgrade: UpgradeItem):
+	var target_node = null
+	
+	# Descobre quem é o alvo
+	match upgrade.target:
+		"bear":
+			target_node = $Bear
+		"monk":
+			target_node = $Monk
+	
+	if target_node:
+		# LÓGICA DINÂMICA (Reflection)
+		# Verifica se o urso tem a variável "damage"
+		if upgrade.property_name in target_node:
+			var old_val = target_node.get(upgrade.property_name)
+			
+			if upgrade.type == "stat_add":
+				# Soma: 35 + 10 = 45
+				target_node.set(upgrade.property_name, old_val + upgrade.amount)
+				print("Upgrade Aplicado! ", upgrade.property_name, " foi de ", old_val, " para ", target_node.get(upgrade.property_name))
+				
+		else:
+			print("ERRO: Variável ", upgrade.property_name, " não existe no alvo ", upgrade.target)
+	
+	# Retoma o jogo
+	get_tree().paused = false

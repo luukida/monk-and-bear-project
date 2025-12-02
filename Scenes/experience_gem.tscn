@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://c7a0ct48dt58v"]
+
+[ext_resource type="Texture2D" uid="uid://bmy2uuu6s3nyl" path="res://Assets/Icons/GemGreen.png" id="1_8e32x"]
+[ext_resource type="Script" uid="uid://b1jnbqeypa2ew" path="res://Scripts/experience_gem.gd" id="1_26s18"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_26s18"]
+radius = 18.0
+
+[node name="ExperienceGem" type="Area2D"]
+z_index = 5
+collision_layer = 16
+script = ExtResource("1_26s18")
+
+[node name="SpriteShadow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.5254902)
+position = Vector2(0, 2.85)
+scale = Vector2(1.049, 1.049)
+texture = ExtResource("1_8e32x")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_8e32x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_26s18")

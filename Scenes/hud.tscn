@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://cjwho8rxy2jok"]
+
+[ext_resource type="Script" uid="uid://ck1pyjlunahsq" path="res://Scripts/hud.gd" id="1_e0onf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
+bg_color = Color(0.11, 0.11, 0.11, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bjfho"]
+bg_color = Color(0.85, 0.74913335, 0.09350002, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_e0onf")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 27.0
+grow_horizontal = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bjfho")
+value = 20.59
+show_percentage = false
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -27.0
+offset_top = 2.0
+offset_right = 27.0
+offset_bottom = 25.0
+grow_horizontal = 2
+text = "Level 0"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=2 format=3 uid="uid://4l4fpidgg8g4"]
+
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_laxox"]
+
+[resource]
+script = ExtResource("1_laxox")
+title = "Pés ligeiros"
+description = "Aumenta a velocidade do Monge em +20."
+target = "monk"
+property_name = "speed"
+amount = 20.0
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

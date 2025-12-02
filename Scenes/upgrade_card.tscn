@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://hph4f4c84cdr"]
+
+[ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://upgrade_card.gd" id="1_5at7e"]
+[ext_resource type="Texture2D" uid="uid://bmy2uuu6s3nyl" path="res://Assets/Icons/GemGreen.png" id="2_8u55g"]
+
+[node name="UpgradeCard" type="Button"]
+custom_minimum_size = Vector2(200, 300)
+offset_right = 8.0
+offset_bottom = 8.0
+script = ExtResource("1_5at7e")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NameLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Título do upgrade"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = ExtResource("2_8u55g")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DescriptionLabel" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 205)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

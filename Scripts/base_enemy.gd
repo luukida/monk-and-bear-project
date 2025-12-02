@@ -28,9 +28,10 @@ var knockback_velocity: Vector2 = Vector2.ZERO
 @onready var sprite = $AnimatedSprite2D
 @onready var hitbox = $EnemyHitbox
 @onready var hitbox_shape = $EnemyHitbox/CollisionShape2D
-# O TelegraphSprite deve ser filho de EnemyHitbox
 @onready var telegraph = $EnemyHitbox/TelegraphSprite 
 @onready var contact_area = $ContactArea
+
+var gem_scene = preload("res://Scenes/experience_gem.tscn") # Ajuste o caminho da pasta!
 
 func _ready():
 	add_to_group("enemy")
@@ -195,7 +196,7 @@ func _on_animation_finished():
 
 # --- DANO DE CONTATO (Passivo) ---
 
-func apply_contact_damage(delta):
+func apply_contact_damage(_delta):
 	# Verifica quem está tocando no corpo do inimigo
 	var bodies = contact_area.get_overlapping_bodies()
 	
@@ -207,15 +208,6 @@ func apply_contact_damage(delta):
 
 # --- VIDA E FÍSICA ---
 
-func take_damage(amount):
-	hp -= amount
-	sprite.modulate = Color.RED
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
-	
-	if hp <= 0:
-		queue_free()
-
 func apply_knockback(force_vector: Vector2):
 	knockback_velocity = force_vector
 	
@@ -223,3 +215,20 @@ func apply_knockback(force_vector: Vector2):
 	if current_state == State.PREPARE or current_state == State.ATTACK:
 		current_state = State.CHASE
 		if telegraph: telegraph.visible = false
+
+func take_damage(amount):
+	hp -= amount
+	sprite.modulate = Color.RED
+	var tween = create_tween()
+	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	
+	if hp <= 0:
+		spawn_gem()
+		queue_free()
+
+func spawn_gem():
+	if gem_scene:
+		var gem = gem_scene.instantiate()
+		gem.global_position = global_position
+		# Adiciona na cena principal (raiz) para não sumir junto com o inimigo
+		get_tree().current_scene.call_deferred("add_child", gem)

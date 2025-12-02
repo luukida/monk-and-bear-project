@@ -14,6 +14,10 @@ config/name="MonkAndBearProject"
 run/main_scene="uid://dmse571xmjc01"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
+[autoload]
+
+GameManager="*res://Scenes/game_manager.tscn"
+
 [display]
 
 window/size/viewport_width=1280
@@ -52,6 +56,8 @@ action={
 2d_physics/layer_1="Player"
 2d_physics/layer_2="Bear"
 2d_physics/layer_3="Enemies"
+2d_physics/layer_4="World"
+2d_physics/layer_5="Items"
 
 [rendering]
 

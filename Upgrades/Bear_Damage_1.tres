@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=2 format=3 uid="uid://bac1282csqbd5"]
+
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_sx6lr"]
+
+[resource]
+script = ExtResource("1_sx6lr")
+title = "Garras de Titânio"
+description = "Aumenta o dano do Urso em +10."
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

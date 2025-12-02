@@ -8,6 +8,8 @@ var current_state = State.FOLLOW
 @export var max_hp = 200.0
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
+## Se o inimigo fugir para além desta distância, o Urso desiste.
+@export var chase_give_up_range: float = 400.0
 
 @export_group("Berserk Stats")
 @export var frenzy_speed_multiplier: float = 1.5 
@@ -26,14 +28,12 @@ var is_frenzy_active = false
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
-# Variáveis Internas
 var default_shape_x: float = 0.0
 var current_revive_timer: float = 0.0
 var base_speed: float = 0.0
 var base_damage: float = 0.0
 var damage_dealt_this_attack: bool = false
 
-# VARIÁVEIS DE ROAMING
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
 var is_wandering: bool = false
@@ -66,7 +66,6 @@ func _ready():
 	heal_vfx.visible = false
 	revive_label.visible = false 
 	
-	# Assegura monitoramento
 	detection_area.monitoring = true
 	detection_area.monitorable = false
 	attack_area.monitoring = true
@@ -100,7 +99,7 @@ func enter_frenzy():
 	if is_downed: return
 	if is_frenzy_active: return
 	
-	print("URSO ENTROU EM FRENESI! CUIDADO!")
+	print("URSO ENTROU EM FRENESI!")
 	is_frenzy_active = true
 	current_state = State.FRENZY
 	
@@ -108,8 +107,6 @@ func enter_frenzy():
 	damage = base_damage * frenzy_damage_multiplier
 	
 	sprite.modulate = Color(2.0, 0.2, 0.2) 
-	
-	# Reseta alvo e busca um novo imediatamente
 	target_enemy = null
 	scan_for_enemies()
 
@@ -123,16 +120,20 @@ func exit_frenzy():
 	sprite.modulate = Color.WHITE
 
 func behavior_frenzy():
-	# Se perdeu o alvo (morreu ou sumiu), busca outro imediatamente
 	if not is_instance_valid(target_enemy):
 		scan_for_enemies()
 		if not is_instance_valid(target_enemy):
-			# Ninguém na tela? Vaga aleatoriamente
 			velocity = Vector2.ZERO
 			sprite.play("idle")
 			return
 
-	# Comportamento de perseguição agressiva
+	# CHECAGEM DE DESISTÊNCIA (Frenesi)
+	var dist = global_position.distance_to(target_enemy.global_position)
+	if dist > chase_give_up_range:
+		target_enemy = null # Esquece esse alvo que fugiu
+		scan_for_enemies() # Tenta achar outro mais perto
+		return
+
 	if attack_area.overlaps_body(target_enemy):
 		start_attack()
 	else:
@@ -149,15 +150,6 @@ func behavior_follow(delta):
 		current_state = State.CHASE
 		return
 	
-	var dist_to_player = global_position.distance_to(monk_node.global_position)
-	
-	if dist_to_player > 250.0:
-		var dir = global_position.direction_to(monk_node.global_position)
-		velocity = dir * move_speed
-		sprite.play("run")
-		update_orientation(monk_node.global_position)
-		return
-
 	# Roaming
 	if wander_timer > 0:
 		wander_timer -= delta
@@ -168,24 +160,31 @@ func behavior_follow(delta):
 	else:
 		if not is_wandering:
 			var random_angle = randf() * TAU
-			var random_dist = randf_range(50.0, 150.0) 
-			wander_target = monk_node.global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
+			var random_dist = randf_range(100.0, 300.0) 
+			wander_target = global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
 			is_wandering = true
 		
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
 		
-		velocity = dir * (move_speed * 0.3)
+		velocity = dir * (move_speed * 0.4) 
 		sprite.play("run")
 		update_orientation(wander_target)
 		
 		if dist_to_target < 10.0:
 			is_wandering = false
-			wander_timer = randf_range(1.0, 3.0) 
+			wander_timer = randf_range(2.0, 4.0)
 
 func behavior_chase():
 	if not is_instance_valid(target_enemy):
 		current_state = State.FOLLOW
+		return
+	
+	# CHECAGEM DE DESISTÊNCIA (Normal)
+	var dist = global_position.distance_to(target_enemy.global_position)
+	if dist > chase_give_up_range:
+		target_enemy = null # Desiste
+		current_state = State.FOLLOW # Volta a passear
 		return
 		
 	if attack_area.overlaps_body(target_enemy):
@@ -196,42 +195,23 @@ func behavior_chase():
 		sprite.play("run")
 		update_orientation(target_enemy.global_position)
 
-# --- IA DE SELEÇÃO DE ALVO (ATUALIZADA) ---
-
 func scan_for_enemies():
 	var bodies = detection_area.get_overlapping_bodies()
-	var valid_targets = []
-	
+	var valid_enemies = []
 	for body in bodies:
-		if is_frenzy_active:
-			# FRENESI: Aceita Inimigos E Player
-			# (Desde que o player tenha vida para ser atacado)
-			if body.is_in_group("enemy") or body.is_in_group("player"):
-				valid_targets.append(body)
-		else:
-			# NORMAL: Apenas Inimigos
-			if body.is_in_group("enemy"):
-				valid_targets.append(body)
+		if body.is_in_group("enemy"):
+			valid_enemies.append(body)
 			
-	if valid_targets.is_empty():
+	if valid_enemies.is_empty():
 		target_enemy = null
 		return
 
 	if is_frenzy_active:
-		# Lógica de 1 Hit: Tenta pegar um alvo diferente do atual para variar
-		var potential_target = valid_targets.pick_random()
-		
-		# Se sorteou o mesmo e tem mais gente, tenta de novo (tentativa simples de variação)
-		if potential_target == target_enemy and valid_targets.size() > 1:
-			valid_targets.erase(potential_target)
-			potential_target = valid_targets.pick_random()
-			
-		target_enemy = potential_target
+		target_enemy = valid_enemies.pick_random()
 	else:
-		# Normal: Mais próximo
 		var closest_dist = INF
 		var closest_enemy = null
-		for enemy in valid_targets:
+		for enemy in valid_enemies:
 			var dist = global_position.distance_squared_to(enemy.global_position)
 			if dist < closest_dist:
 				closest_dist = dist
@@ -279,19 +259,15 @@ func apply_damage_snapshot():
 	if damage_dealt_this_attack: return 
 	damage_dealt_this_attack = true
 	var bodies = attack_area.get_overlapping_bodies()
-	
 	for body in bodies:
 		var hit_valid = false
-		
 		if is_frenzy_active:
-			# Em Frenesi, bate em Player e Inimigos
 			if body.is_in_group("enemy") or body.is_in_group("player"):
 				hit_valid = true
 		else:
-			# Normal, só bate em inimigos
 			if body.is_in_group("enemy"):
 				hit_valid = true
-				
+		
 		if hit_valid and body.has_method("take_damage"):
 			body.take_damage(damage)
 
@@ -302,8 +278,6 @@ func _on_animation_finished():
 		
 		if is_frenzy_active:
 			current_state = State.FRENZY
-			# IMPORTANTE: Força troca de alvo após CADA ataque
-			# Resetando para null e escaneando de novo, ele obedece a lógica do scan
 			target_enemy = null 
 			scan_for_enemies() 
 		else:
@@ -348,7 +322,6 @@ func revive_complete():
 	revive_label.visible = false
 	sprite.modulate = Color.WHITE
 	is_invincible = true
-	print("Urso Revivido!")
 	var blink_tween = create_tween()
 	for i in range(10): 
 		blink_tween.tween_property(sprite, "modulate", Color(1, 1, 1, 0.5), 0.15)

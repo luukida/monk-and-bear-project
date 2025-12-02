@@ -1,0 +1,11 @@
+[gd_scene load_steps=6 format=3 uid="uid://dt5l1b34lk5us"]
+
+[ext_resource type="Script" uid="uid://dhu4upslm7kyl" path="res://Scripts/GameManager.gd" id="1_fgdfb"]
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="2_yqty0"]
+[ext_resource type="Resource" uid="uid://bac1282csqbd5" path="res://Upgrades/Bear_Damage_1.tres" id="3_71d4j"]
+[ext_resource type="Resource" uid="uid://dsjfnchyu8yyh" path="res://Upgrades/Bear_HP_1.tres" id="4_efn8y"]
+[ext_resource type="Resource" uid="uid://4l4fpidgg8g4" path="res://Upgrades/Monk_Speed_1.tres" id="5_i4mau"]
+
+[node name="GameManager" type="Node"]
+script = ExtResource("1_fgdfb")
+all_upgrades = Array[ExtResource("2_yqty0")]([ExtResource("3_71d4j"), ExtResource("4_efn8y"), ExtResource("5_i4mau")])

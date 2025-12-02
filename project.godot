@@ -52,3 +52,7 @@ action={
 2d_physics/layer_1="Player"
 2d_physics/layer_2="Bear"
 2d_physics/layer_3="Enemies"
+
+[rendering]
+
+textures/canvas_textures/default_texture_repeat=1

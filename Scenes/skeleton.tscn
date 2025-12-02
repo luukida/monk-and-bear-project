@@ -185,6 +185,8 @@ attack_impact_frame = 2
 telegraph_duration = 0.7
 
 [node name="EnemyHitbox" parent="." index="0"]
+y_sort_enabled = true
+position = Vector2(0, -25)
 collision_layer = 0
 collision_mask = 3
 
@@ -197,13 +199,21 @@ position = Vector2(39.5, 0)
 scale = Vector2(1.015625, 0.75)
 
 [node name="AnimatedSprite2D" parent="." index="1"]
+y_sort_enabled = true
+position = Vector2(0, -25)
 sprite_frames = SubResource("SpriteFrames_t1o88")
 autoplay = "idle"
 frame = 6
 frame_progress = 1.0
 
 [node name="CollisionShape2D" parent="." index="2"]
+y_sort_enabled = true
+position = Vector2(0, -25)
 shape = SubResource("CircleShape2D_lhll6")
+
+[node name="ContactArea" parent="." index="3"]
+y_sort_enabled = true
+position = Vector2(0, -25)
 
 [node name="CollisionShape2D" parent="ContactArea" index="0"]
 shape = SubResource("CircleShape2D_pegji")

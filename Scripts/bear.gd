@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum State { FOLLOW, CHASE, ATTACK, DOWNED }
+enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY }
 var current_state = State.FOLLOW
 
 @export_group("Stats")
@@ -9,24 +9,37 @@ var current_state = State.FOLLOW
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
 
+@export_group("Berserk Stats")
+@export var frenzy_speed_multiplier: float = 1.5 
+@export var frenzy_damage_multiplier: float = 2.0 
+
 @export_group("Visual")
 @export var max_rotation_degrees: float = 30.0 
-@export var attack_impact_frame: int = 6 # Mantido seu valor 6
+@export var attack_impact_frame: int = 6 
 @export var heal_animation_name: String = "healVFX" 
 
 var current_hp = max_hp
 var is_downed = false
 var is_invincible = false 
+var is_frenzy_active = false 
+
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
+# Variáveis Internas
 var default_shape_x: float = 0.0
 var current_revive_timer: float = 0.0
+var base_speed: float = 0.0
+var base_damage: float = 0.0
+var damage_dealt_this_attack: bool = false
+
+# VARIÁVEIS DE ROAMING
+var wander_timer: float = 0.0
+var wander_target: Vector2 = Vector2.ZERO
+var is_wandering: bool = false
 
 @onready var sprite = $AnimatedSprite2D
-# REFERÊNCIA NOVA: O colisor do CORPO do urso (para desligar quando morrer)
 @onready var body_shape = $CollisionShape2D
-
 @onready var detection_area = $DetectionArea
 @onready var attack_area = $AttackArea 
 @onready var attack_shape = $AttackArea/CollisionShape2D
@@ -36,6 +49,9 @@ var current_revive_timer: float = 0.0
 
 func _ready():
 	add_to_group("bear")
+	
+	base_speed = move_speed
+	base_damage = damage
 	
 	hp_bar.max_value = max_hp
 	hp_bar.value = current_hp
@@ -50,6 +66,7 @@ func _ready():
 	heal_vfx.visible = false
 	revive_label.visible = false 
 	
+	# Assegura monitoramento
 	detection_area.monitoring = true
 	detection_area.monitorable = false
 	attack_area.monitoring = true
@@ -59,7 +76,6 @@ func _process(delta):
 	if is_downed:
 		current_revive_timer -= delta
 		revive_label.text = "%d" % ceil(max(0.0, current_revive_timer))
-		
 		if current_revive_timer <= 0:
 			revive_complete()
 
@@ -68,17 +84,64 @@ func _physics_process(delta):
 
 	match current_state:
 		State.FOLLOW:
-			behavior_follow()
+			behavior_follow(delta)
 		State.CHASE:
 			behavior_chase()
+		State.FRENZY:
+			behavior_frenzy()
 		State.ATTACK:
 			velocity = Vector2.ZERO
 			
 	move_and_slide()
 
-# --- IA ---
+# --- MODOS E COMPORTAMENTOS ---
 
-func behavior_follow():
+func enter_frenzy():
+	if is_downed: return
+	if is_frenzy_active: return
+	
+	print("URSO ENTROU EM FRENESI! CUIDADO!")
+	is_frenzy_active = true
+	current_state = State.FRENZY
+	
+	move_speed = base_speed * frenzy_speed_multiplier
+	damage = base_damage * frenzy_damage_multiplier
+	
+	sprite.modulate = Color(2.0, 0.2, 0.2) 
+	
+	# Reseta alvo e busca um novo imediatamente
+	target_enemy = null
+	scan_for_enemies()
+
+func exit_frenzy():
+	if not is_frenzy_active: return
+	print("Urso se acalmou.")
+	is_frenzy_active = false
+	current_state = State.FOLLOW
+	move_speed = base_speed
+	damage = base_damage
+	sprite.modulate = Color.WHITE
+
+func behavior_frenzy():
+	# Se perdeu o alvo (morreu ou sumiu), busca outro imediatamente
+	if not is_instance_valid(target_enemy):
+		scan_for_enemies()
+		if not is_instance_valid(target_enemy):
+			# Ninguém na tela? Vaga aleatoriamente
+			velocity = Vector2.ZERO
+			sprite.play("idle")
+			return
+
+	# Comportamento de perseguição agressiva
+	if attack_area.overlaps_body(target_enemy):
+		start_attack()
+	else:
+		var dir = global_position.direction_to(target_enemy.global_position)
+		velocity = dir * move_speed
+		sprite.play("run")
+		update_orientation(target_enemy.global_position)
+
+func behavior_follow(delta):
 	if not is_instance_valid(monk_node): return
 	
 	scan_for_enemies()
@@ -86,18 +149,39 @@ func behavior_follow():
 		current_state = State.CHASE
 		return
 	
-	var dist = global_position.distance_to(monk_node.global_position)
+	var dist_to_player = global_position.distance_to(monk_node.global_position)
 	
-	if dist > 80.0:
+	if dist_to_player > 250.0:
 		var dir = global_position.direction_to(monk_node.global_position)
 		velocity = dir * move_speed
 		sprite.play("run")
 		update_orientation(monk_node.global_position)
-	else:
+		return
+
+	# Roaming
+	if wander_timer > 0:
+		wander_timer -= delta
 		velocity = Vector2.ZERO
 		sprite.play("idle")
 		sprite.rotation = move_toward(sprite.rotation, 0, 0.1)
 		attack_area.rotation = sprite.rotation
+	else:
+		if not is_wandering:
+			var random_angle = randf() * TAU
+			var random_dist = randf_range(50.0, 150.0) 
+			wander_target = monk_node.global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
+			is_wandering = true
+		
+		var dir = global_position.direction_to(wander_target)
+		var dist_to_target = global_position.distance_to(wander_target)
+		
+		velocity = dir * (move_speed * 0.3)
+		sprite.play("run")
+		update_orientation(wander_target)
+		
+		if dist_to_target < 10.0:
+			is_wandering = false
+			wander_timer = randf_range(1.0, 3.0) 
 
 func behavior_chase():
 	if not is_instance_valid(target_enemy):
@@ -112,26 +196,52 @@ func behavior_chase():
 		sprite.play("run")
 		update_orientation(target_enemy.global_position)
 
+# --- IA DE SELEÇÃO DE ALVO (ATUALIZADA) ---
+
 func scan_for_enemies():
 	var bodies = detection_area.get_overlapping_bodies()
-	var closest_dist = INF
-	var closest_enemy = null
+	var valid_targets = []
 	
 	for body in bodies:
-		if body.is_in_group("enemy"):
-			var dist = global_position.distance_squared_to(body.global_position)
+		if is_frenzy_active:
+			# FRENESI: Aceita Inimigos E Player
+			# (Desde que o player tenha vida para ser atacado)
+			if body.is_in_group("enemy") or body.is_in_group("player"):
+				valid_targets.append(body)
+		else:
+			# NORMAL: Apenas Inimigos
+			if body.is_in_group("enemy"):
+				valid_targets.append(body)
+			
+	if valid_targets.is_empty():
+		target_enemy = null
+		return
+
+	if is_frenzy_active:
+		# Lógica de 1 Hit: Tenta pegar um alvo diferente do atual para variar
+		var potential_target = valid_targets.pick_random()
+		
+		# Se sorteou o mesmo e tem mais gente, tenta de novo (tentativa simples de variação)
+		if potential_target == target_enemy and valid_targets.size() > 1:
+			valid_targets.erase(potential_target)
+			potential_target = valid_targets.pick_random()
+			
+		target_enemy = potential_target
+	else:
+		# Normal: Mais próximo
+		var closest_dist = INF
+		var closest_enemy = null
+		for enemy in valid_targets:
+			var dist = global_position.distance_squared_to(enemy.global_position)
 			if dist < closest_dist:
 				closest_dist = dist
-				closest_enemy = body
-	
-	if closest_enemy:
+				closest_enemy = enemy
 		target_enemy = closest_enemy
 
 # --- ORIENTAÇÃO ---
 
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
-	
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
 		if dir.x < 0:
@@ -148,7 +258,6 @@ func update_orientation(target_pos: Vector2):
 	
 	var max_rad = deg_to_rad(max_rotation_degrees)
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
-	
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
 
@@ -156,6 +265,7 @@ func update_orientation(target_pos: Vector2):
 
 func start_attack():
 	current_state = State.ATTACK
+	damage_dealt_this_attack = false
 	sprite.play("attack")
 	sprite.frame = 0 
 	if is_instance_valid(target_enemy):
@@ -166,97 +276,102 @@ func _on_frame_changed():
 		apply_damage_snapshot()
 
 func apply_damage_snapshot():
+	if damage_dealt_this_attack: return 
+	damage_dealt_this_attack = true
 	var bodies = attack_area.get_overlapping_bodies()
+	
 	for body in bodies:
-		if body.is_in_group("enemy") and body.has_method("take_damage"):
+		var hit_valid = false
+		
+		if is_frenzy_active:
+			# Em Frenesi, bate em Player e Inimigos
+			if body.is_in_group("enemy") or body.is_in_group("player"):
+				hit_valid = true
+		else:
+			# Normal, só bate em inimigos
+			if body.is_in_group("enemy"):
+				hit_valid = true
+				
+		if hit_valid and body.has_method("take_damage"):
 			body.take_damage(damage)
 
 func _on_animation_finished():
 	if sprite.animation == "attack":
-		current_state = State.CHASE
+		if not damage_dealt_this_attack:
+			apply_damage_snapshot()
+		
+		if is_frenzy_active:
+			current_state = State.FRENZY
+			# IMPORTANTE: Força troca de alvo após CADA ataque
+			# Resetando para null e escaneando de novo, ele obedece a lógica do scan
+			target_enemy = null 
+			scan_for_enemies() 
+		else:
+			current_state = State.CHASE
 
-# --- VIDA, MORTE ---
+# --- VIDA, MORTE, REVIVE ---
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
-	
 	current_hp -= amount
 	hp_bar.value = current_hp
-	
 	if current_hp <= 0:
 		go_down()
 	else:
+		var return_color = Color(2, 0.2, 0.2) if is_frenzy_active else Color.WHITE
 		sprite.modulate = Color.RED
 		var tween = create_tween()
-		tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+		tween.tween_property(sprite, "modulate", return_color, 0.1)
 
 func go_down():
+	if is_frenzy_active:
+		exit_frenzy()
 	is_downed = true
 	current_state = State.DOWNED
 	target_enemy = null
-	
-	# AQUI: Desliga a colisão do corpo físico para inimigos atravessarem
-	# Usamos set_deferred para evitar erros de física durante o frame
 	body_shape.set_deferred("disabled", true)
-	
 	hp_bar.visible = false
-	
 	current_revive_timer = auto_revive_time
 	revive_label.visible = true
 	revive_label.text = str(int(auto_revive_time))
-	
 	sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
-	
 	sprite.rotation = 0
 	sprite.play("death")
-	print("Urso Caiu! Fantasma ativado.")
-
-# --- AUTO-REVIVE ---
+	print("Urso Caiu!")
 
 func revive_complete():
 	is_downed = false
 	current_hp = max_hp
-	
-	# AQUI: Liga a colisão de volta
 	body_shape.set_deferred("disabled", false)
-	
 	hp_bar.value = current_hp
 	hp_bar.visible = true
 	revive_label.visible = false
-	
 	sprite.modulate = Color.WHITE
-	
 	is_invincible = true
 	print("Urso Revivido!")
-	
 	var blink_tween = create_tween()
 	for i in range(10): 
 		blink_tween.tween_property(sprite, "modulate", Color(1, 1, 1, 0.5), 0.15)
 		blink_tween.tween_property(sprite, "modulate", Color.WHITE, 0.15)
 	blink_tween.finished.connect(func(): is_invincible = false)
-	
-	# Empurrão com seus valores (150 força, 15 dano)
 	push_enemies_away()
-	
 	await get_tree().create_timer(0.1).timeout
 	scan_for_enemies()
-	
 	if is_instance_valid(target_enemy):
 		current_state = State.CHASE
 	else:
 		current_state = State.FOLLOW
 		sprite.play("idle")
 
-# --- CURA E VFX ---
+# --- UTILS ---
 
 func receive_heal_tick(amount):
 	if is_downed: return 
-	
 	current_hp = min(current_hp + amount, max_hp)
 	hp_bar.value = current_hp
-	
 	play_continuous_heal_vfx()
-	sprite.modulate = Color(0.7, 1.0, 0.7) 
+	if not is_frenzy_active:
+		sprite.modulate = Color(0.7, 1.0, 0.7) 
 
 func play_continuous_heal_vfx():
 	if heal_vfx:
@@ -269,10 +384,12 @@ func stop_heal_vfx():
 		heal_vfx.visible = false
 		heal_vfx.stop()
 	if not is_downed:
-		sprite.modulate = Color.WHITE
+		if is_frenzy_active:
+			sprite.modulate = Color(2.0, 0.2, 0.2)
+		else:
+			sprite.modulate = Color.WHITE
 
-func _on_vfx_finished():
-	pass 
+func _on_vfx_finished(): pass 
 
 func push_enemies_away():
 	var bodies = detection_area.get_overlapping_bodies()

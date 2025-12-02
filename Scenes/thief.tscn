@@ -169,6 +169,7 @@ attack_impact_frame = 2
 telegraph_duration = 0.4
 
 [node name="EnemyHitbox" parent="." index="0"]
+position = Vector2(0, -27)
 collision_layer = 0
 collision_mask = 3
 
@@ -181,12 +182,17 @@ position = Vector2(41.5, 0)
 scale = Vector2(1.234375, 1)
 
 [node name="AnimatedSprite2D" parent="." index="1"]
+position = Vector2(0, -27)
 sprite_frames = SubResource("SpriteFrames_cjs2h")
 animation = &"idle"
 autoplay = "idle"
 
 [node name="CollisionShape2D" parent="." index="2"]
+position = Vector2(0, -27)
 shape = SubResource("CircleShape2D_x02g4")
+
+[node name="ContactArea" parent="." index="3"]
+position = Vector2(0, -27)
 
 [node name="CollisionShape2D" parent="ContactArea" index="0"]
 shape = SubResource("CircleShape2D_q0ja6")

@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="UpgradeItem" load_steps=2 format=3 uid="uid://dsjfnchyu8yyh"]
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://dsjfnchyu8yyh"]
 
 [ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_2gikk"]
+[ext_resource type="Texture2D" uid="uid://dbk141h1n1v11" path="res://Assets/Icons/FHD (2).png" id="1_2jd2f"]
 
 [resource]
 script = ExtResource("1_2gikk")
-title = "Gordura extra"
+title = "Gordura Extra"
 description = "Aumenta o HP do urso em +25."
+icon = ExtResource("1_2jd2f")
 property_name = "max_hp"
 amount = 25.0
 metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

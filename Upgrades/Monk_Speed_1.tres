@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="UpgradeItem" load_steps=2 format=3 uid="uid://4l4fpidgg8g4"]
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://4l4fpidgg8g4"]
 
+[ext_resource type="Texture2D" uid="uid://dss56lbnb7scf" path="res://Assets/Icons/FHD (211).png" id="1_fv6jb"]
 [ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_laxox"]
 
 [resource]
 script = ExtResource("1_laxox")
-title = "Pés ligeiros"
+title = "Pés Ligeiros"
 description = "Aumenta a velocidade do Monge em +20."
+icon = ExtResource("1_fv6jb")
 target = "monk"
 property_name = "speed"
 amount = 20.0

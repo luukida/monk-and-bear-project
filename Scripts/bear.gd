@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY }
+enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY, PREPARE }
 var current_state = State.FOLLOW
 
 @export_group("Stats")
@@ -8,12 +8,15 @@ var current_state = State.FOLLOW
 @export var max_hp = 200.0
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
-## Se o inimigo fugir para além desta distância, o Urso desiste.
-@export var chase_give_up_range: float = 400.0
+@export var chase_give_up_range: float = 400.0 
 
 @export_group("Berserk Stats")
 @export var frenzy_speed_multiplier: float = 1.5 
 @export var frenzy_damage_multiplier: float = 2.0 
+## Aumenta o tamanho do Ataque e Detecção no Frenesi (ex: 1.5x)
+@export var frenzy_range_multiplier: float = 1.5 # <--- ESTAVA FALTANDO
+@export var frenzy_switch_target_time: float = 2.0
+@export var telegraph_duration: float = 0.0 
 
 @export_group("Visual")
 @export var max_rotation_degrees: float = 30.0 
@@ -28,11 +31,20 @@ var is_frenzy_active = false
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
+# Variáveis Internas
 var default_shape_x: float = 0.0
+var default_telegraph_x: float = 0.0
 var current_revive_timer: float = 0.0
 var base_speed: float = 0.0
 var base_damage: float = 0.0
+
+# Variáveis para guardar estado original
+var base_attack_scale: Vector2 = Vector2.ONE 
+var base_detection_scale: Vector2 = Vector2.ONE
+var base_chase_give_up_range: float = 0.0
+
 var damage_dealt_this_attack: bool = false
+var current_frenzy_chase_timer: float = 0.0
 
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
@@ -46,6 +58,7 @@ var is_wandering: bool = false
 @onready var hp_bar = $HpBar 
 @onready var heal_vfx = $HealVFX
 @onready var revive_label = $ReviveLabel
+@onready var telegraph = $AttackArea/TelegraphSprite
 
 func _ready():
 	add_to_group("bear")
@@ -53,10 +66,19 @@ func _ready():
 	base_speed = move_speed
 	base_damage = damage
 	
+	# MEMORIZA ESCALAS E RANGES ORIGINAIS
+	base_attack_scale = attack_area.scale
+	base_detection_scale = detection_area.scale
+	base_chase_give_up_range = chase_give_up_range
+	
 	hp_bar.max_value = max_hp
 	hp_bar.value = current_hp
 	
 	default_shape_x = attack_shape.position.x
+	
+	if telegraph:
+		default_telegraph_x = telegraph.position.x
+		telegraph.visible = false
 	
 	sprite.animation_finished.connect(_on_animation_finished)
 	sprite.frame_changed.connect(_on_frame_changed)
@@ -87,7 +109,9 @@ func _physics_process(delta):
 		State.CHASE:
 			behavior_chase()
 		State.FRENZY:
-			behavior_frenzy()
+			behavior_frenzy(delta)
+		State.PREPARE:
+			velocity = Vector2.ZERO 
 		State.ATTACK:
 			velocity = Vector2.ZERO
 			
@@ -103,11 +127,19 @@ func enter_frenzy():
 	is_frenzy_active = true
 	current_state = State.FRENZY
 	
+	# Aplica Buffs de Status
 	move_speed = base_speed * frenzy_speed_multiplier
 	damage = base_damage * frenzy_damage_multiplier
 	
+	# Aplica Buffs de Tamanho (Agora sim!)
+	attack_area.scale = base_attack_scale * frenzy_range_multiplier
+	detection_area.scale = base_detection_scale * frenzy_range_multiplier
+	# Aumenta a tolerância de perseguição para não bugar com o novo radar
+	chase_give_up_range = base_chase_give_up_range * frenzy_range_multiplier * 1.2
+	
 	sprite.modulate = Color(2.0, 0.2, 0.2) 
 	target_enemy = null
+	current_frenzy_chase_timer = 0.0
 	scan_for_enemies()
 
 func exit_frenzy():
@@ -115,26 +147,41 @@ func exit_frenzy():
 	print("Urso se acalmou.")
 	is_frenzy_active = false
 	current_state = State.FOLLOW
+	
+	# Restaura tudo
 	move_speed = base_speed
 	damage = base_damage
+	attack_area.scale = base_attack_scale
+	detection_area.scale = base_detection_scale
+	chase_give_up_range = base_chase_give_up_range
+	
 	sprite.modulate = Color.WHITE
+	if telegraph: telegraph.visible = false
 
-func behavior_frenzy():
+func behavior_frenzy(delta):
 	if not is_instance_valid(target_enemy):
 		scan_for_enemies()
 		if not is_instance_valid(target_enemy):
-			velocity = Vector2.ZERO
-			sprite.play("idle")
+			# Se não achou ninguém, vaga rápido
+			behavior_roam_logic(delta, true)
 			return
 
-	# CHECAGEM DE DESISTÊNCIA (Frenesi)
+	# Lógica de TDAH (Troca alvo se demorar muito)
+	current_frenzy_chase_timer += delta
+	if current_frenzy_chase_timer > frenzy_switch_target_time:
+		current_frenzy_chase_timer = 0.0
+		scan_for_enemies() 
+		if target_enemy == null: return
+
 	var dist = global_position.distance_to(target_enemy.global_position)
 	if dist > chase_give_up_range:
-		target_enemy = null # Esquece esse alvo que fugiu
-		scan_for_enemies() # Tenta achar outro mais perto
+		target_enemy = null 
+		scan_for_enemies() 
 		return
 
-	if attack_area.overlaps_body(target_enemy):
+	# Gatilho de ataque (Via Colisão ou Distância curta de segurança)
+	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
+		current_frenzy_chase_timer = 0.0 # Reseta timer se conseguiu atacar
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
@@ -150,7 +197,10 @@ func behavior_follow(delta):
 		current_state = State.CHASE
 		return
 	
-	# Roaming
+	# Roaming Normal
+	behavior_roam_logic(delta, false)
+
+func behavior_roam_logic(delta, is_frenzy_mode):
 	if wander_timer > 0:
 		wander_timer -= delta
 		velocity = Vector2.ZERO
@@ -167,27 +217,27 @@ func behavior_follow(delta):
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
 		
-		velocity = dir * (move_speed * 0.4) 
+		var speed_factor = 1.0 if is_frenzy_mode else 0.4
+		velocity = dir * (move_speed * speed_factor)
 		sprite.play("run")
 		update_orientation(wander_target)
 		
 		if dist_to_target < 10.0:
 			is_wandering = false
-			wander_timer = randf_range(2.0, 4.0)
+			wander_timer = randf_range(0.5, 1.0) if is_frenzy_mode else randf_range(2.0, 4.0)
 
 func behavior_chase():
 	if not is_instance_valid(target_enemy):
 		current_state = State.FOLLOW
 		return
 	
-	# CHECAGEM DE DESISTÊNCIA (Normal)
 	var dist = global_position.distance_to(target_enemy.global_position)
 	if dist > chase_give_up_range:
-		target_enemy = null # Desiste
-		current_state = State.FOLLOW # Volta a passear
+		target_enemy = null 
+		current_state = State.FOLLOW 
 		return
 		
-	if attack_area.overlaps_body(target_enemy):
+	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
@@ -197,21 +247,30 @@ func behavior_chase():
 
 func scan_for_enemies():
 	var bodies = detection_area.get_overlapping_bodies()
-	var valid_enemies = []
+	var valid_targets = []
+	
 	for body in bodies:
-		if body.is_in_group("enemy"):
-			valid_enemies.append(body)
+		if is_frenzy_active:
+			if body.is_in_group("enemy") or body.is_in_group("player"):
+				valid_targets.append(body)
+		else:
+			if body.is_in_group("enemy"):
+				valid_targets.append(body)
 			
-	if valid_enemies.is_empty():
+	if valid_targets.is_empty():
 		target_enemy = null
 		return
 
 	if is_frenzy_active:
-		target_enemy = valid_enemies.pick_random()
+		var potential_target = valid_targets.pick_random()
+		if potential_target == target_enemy and valid_targets.size() > 1:
+			valid_targets.erase(potential_target)
+			potential_target = valid_targets.pick_random()
+		target_enemy = potential_target
 	else:
 		var closest_dist = INF
 		var closest_enemy = null
-		for enemy in valid_enemies:
+		for enemy in valid_targets:
 			var dist = global_position.distance_squared_to(enemy.global_position)
 			if dist < closest_dist:
 				closest_dist = dist
@@ -222,12 +281,16 @@ func scan_for_enemies():
 
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
+	
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
+		
 		if dir.x < 0:
 			attack_shape.position.x = -default_shape_x
+			if telegraph: telegraph.position.x = -default_telegraph_x
 		else:
 			attack_shape.position.x = default_shape_x
+			if telegraph: telegraph.position.x = default_telegraph_x
 
 	var rotation_angle = 0.0
 	if dir.x < 0:
@@ -238,21 +301,64 @@ func update_orientation(target_pos: Vector2):
 	
 	var max_rad = deg_to_rad(max_rotation_degrees)
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
+	
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
 
 # --- COMBATE ---
 
 func start_attack():
+	if is_frenzy_active:
+		start_telegraph()
+	else:
+		execute_attack_animation()
+
+func start_telegraph():
+	if is_instance_valid(target_enemy):
+		update_orientation(target_enemy.global_position)
+	
+	if telegraph_duration <= 0.05:
+		execute_attack_animation()
+		return
+
+	current_state = State.PREPARE
+	sprite.play("idle")
+	
+	if telegraph:
+		telegraph.visible = true
+		var tween = create_tween()
+		telegraph.modulate.a = 0.0
+		tween.tween_property(telegraph, "modulate:a", 0.8, telegraph_duration)
+		
+	await get_tree().create_timer(telegraph_duration).timeout
+	
+	if current_state == State.PREPARE:
+		execute_attack_animation()
+
+func execute_attack_animation():
 	current_state = State.ATTACK
+	
+	if is_frenzy_active and telegraph:
+		telegraph.visible = true
+		if telegraph_duration <= 0.05:
+			telegraph.modulate.a = 0.0
+			var tween = create_tween()
+			tween.tween_property(telegraph, "modulate:a", 0.8, 0.3)
+		else:
+			telegraph.modulate.a = 0.8
+	elif telegraph:
+		telegraph.visible = false 
+	
 	damage_dealt_this_attack = false
 	sprite.play("attack")
 	sprite.frame = 0 
-	if is_instance_valid(target_enemy):
+	
+	if not is_frenzy_active and is_instance_valid(target_enemy):
 		update_orientation(target_enemy.global_position)
 
 func _on_frame_changed():
 	if sprite.animation == "attack" and sprite.frame == attack_impact_frame:
+		if telegraph: telegraph.visible = false
 		apply_damage_snapshot()
 
 func apply_damage_snapshot():
@@ -281,9 +387,9 @@ func _on_animation_finished():
 			target_enemy = null 
 			scan_for_enemies() 
 		else:
-			current_state = State.CHASE
+			current_state = State.FOLLOW
 
-# --- VIDA, MORTE, REVIVE ---
+# --- VIDA, MORTE ---
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
@@ -305,9 +411,13 @@ func go_down():
 	target_enemy = null
 	body_shape.set_deferred("disabled", true)
 	hp_bar.visible = false
+	
+	if telegraph: telegraph.visible = false
+	
 	current_revive_timer = auto_revive_time
 	revive_label.visible = true
 	revive_label.text = str(int(auto_revive_time))
+	
 	sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
 	sprite.rotation = 0
 	sprite.play("death")

@@ -14,7 +14,6 @@ func _ready():
 	# ATUALIZAÇÃO INICIAL FORÇADA
 	# Garante que ele pegue os valores atuais assim que o jogo começa
 	update_xp_bar(GameManager.current_xp, GameManager.required_xp)
-	update_level_display(GameManager.level)
 
 func update_xp_bar(current, required):
 	xp_bar.max_value = required

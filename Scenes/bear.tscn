@@ -312,6 +312,9 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_2imu7")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.7, 0.7)
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -27)
 shape = SubResource("CircleShape2D_gbb2i")
@@ -345,7 +348,6 @@ position = Vector2(0, -27)
 sprite_frames = SubResource("SpriteFrames_jpid7")
 animation = &"attack"
 autoplay = "idle"
-frame = 6
 
 [node name="HealVFX" type="AnimatedSprite2D" parent="."]
 visible = false
@@ -354,6 +356,7 @@ sprite_frames = SubResource("SpriteFrames_1ukgo")
 animation = &"healVFX"
 frame = 10
 frame_progress = 1.0
+offset = Vector2(0, -20)
 
 [node name="HpBar" type="ProgressBar" parent="."]
 z_index = 10

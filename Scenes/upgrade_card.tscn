@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://hph4f4c84cdr"]
 
-[ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://upgrade_card.gd" id="1_5at7e"]
+[ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://Scripts/upgrade_card.gd" id="1_5at7e"]
 [ext_resource type="Texture2D" uid="uid://dbk141h1n1v11" path="res://Assets/Icons/FHD (2).png" id="2_5at7e"]
 
 [node name="UpgradeCard" type="Button"]

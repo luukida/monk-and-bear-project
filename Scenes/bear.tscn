@@ -285,7 +285,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_w6jqe")
 }],
-"loop": false,
+"loop": true,
 "name": &"healVFX",
 "speed": 10.0
 }]

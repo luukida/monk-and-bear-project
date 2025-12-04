@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cjwho8rxy2jok"]
+[gd_scene load_steps=5 format=3 uid="uid://cjwho8rxy2jok"]
 
 [ext_resource type="Script" uid="uid://ck1pyjlunahsq" path="res://Scripts/hud.gd" id="1_e0onf"]
+[ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/skill_slot.tscn" id="2_fccik"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
 bg_color = Color(0.11, 0.11, 0.11, 1)
@@ -16,26 +17,53 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[node name="HUD" type="CanvasLayer"]
+[node name="HUD" type="CanvasLayer" groups=["hud"]]
 script = ExtResource("1_e0onf")
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
-anchors_preset = 10
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
-offset_bottom = 27.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -21.0
+offset_right = -22.0
+offset_bottom = -8.0
 grow_horizontal = 2
+grow_vertical = 0
 theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
 theme_override_styles/fill = SubResource("StyleBoxFlat_bjfho")
 value = 20.59
 show_percentage = false
 
 [node name="Label" type="Label" parent="."]
-anchors_preset = 5
+anchors_preset = 7
 anchor_left = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
+anchor_bottom = 1.0
 offset_left = -27.0
-offset_top = 2.0
+offset_top = -27.0
 offset_right = 27.0
-offset_bottom = 25.0
+offset_bottom = -4.0
 grow_horizontal = 2
-text = "Level 0"
+grow_vertical = 0
+text = "27"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SkillContainer" type="HBoxContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -158.0
+offset_top = -180.0
+offset_right = 158.0
+offset_bottom = -78.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="SlotHoney" parent="SkillContainer" instance=ExtResource("2_fccik")]
+layout_mode = 2

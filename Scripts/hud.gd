@@ -1,7 +1,8 @@
 extends CanvasLayer
 
 @onready var xp_bar = $ProgressBar
-@onready var level_label = $Label 
+@onready var level_label = $Label
+@onready var slot_honey = $SkillContainer/SlotHoney
 
 func _ready():
 	# Conecta os sinais do GameManager
@@ -26,3 +27,8 @@ func update_level_display(new_level):
 		level_label.text = "Lv. " + str(new_level)
 	else:
 		print("ERRO: HUD não encontrou o nó $Label!")
+
+# Função chamada pelo Monge a cada frame para atualizar a UI
+func update_skill_cooldowns(honey_time, honey_max):
+	if slot_honey:
+		slot_honey.update_cooldown(honey_time, honey_max)

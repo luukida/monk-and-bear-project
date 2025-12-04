@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://bs8rv5p0dbfq0"]
+
+[ext_resource type="Script" uid="uid://8877nk8higmh" path="res://Scripts/skill_slot.gd" id="1_fp0hd"]
+[ext_resource type="Texture2D" uid="uid://hxucwieupo3p" path="res://Assets/Icons/50.png" id="2_hf8wl"]
+
+[sub_resource type="Gradient" id="Gradient_tc2up"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_r7cac"]
+gradient = SubResource("Gradient_tc2up")
+
+[node name="SkillSlot" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_fp0hd")
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 1
+offset_right = 64.0
+offset_bottom = 64.0
+texture = ExtResource("2_hf8wl")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CooldownOverlay" type="TextureProgressBar" parent="."]
+layout_mode = 1
+offset_right = 64.0
+offset_bottom = 64.0
+value = 30.0
+fill_mode = 3
+texture_progress = SubResource("GradientTexture2D_r7cac")
+tint_progress = Color(0.27752772, 0.27752775, 0.27752757, 0.5882353)
+
+[node name="KeyLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 50.0
+offset_right = 39.0
+offset_bottom = 86.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/outline_size = 0
+theme_override_constants/shadow_outline_size = 2
+theme_override_font_sizes/font_size = 26
+text = "1"

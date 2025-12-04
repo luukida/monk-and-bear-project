@@ -1,9 +1,10 @@
-[gd_scene load_steps=31 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=46 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
 [ext_resource type="Texture2D" uid="uid://b3figbdeo2jwe" path="res://Assets/Monk/Idle.png" id="3_xnol8"]
 [ext_resource type="Texture2D" uid="uid://b85owu5ndrjf3" path="res://Assets/Monk/Run.png" id="4_g8mav"]
+[ext_resource type="Texture2D" uid="uid://bptdjxosy5d2m" path="res://Assets/Monk/Heal_Effect.png" id="5_71f2a"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gtfb7"]
 atlas = ExtResource("2_71f2a")
@@ -195,12 +196,107 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
+[sub_resource type="Gradient" id="Gradient_eeelv"]
+offsets = PackedFloat32Array(0.6166667, 0.66333336, 0.7, 0.75)
+colors = PackedColorArray(0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_71f2a"]
+gradient = SubResource("Gradient_eeelv")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xnol8"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g8mav"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5f3m"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rxlox"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e2fsu"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u0i46"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5mjo5"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0rhfe"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(1344, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8rovj"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(1536, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o1b3f"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(1728, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gtrm2"]
+atlas = ExtResource("5_71f2a")
+region = Rect2(1920, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ts77e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xnol8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g8mav")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5f3m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rxlox")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e2fsu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u0i46")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5mjo5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0rhfe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8rovj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o1b3f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gtrm2")
+}],
+"loop": true,
+"name": &"healVFX",
+"speed": 10.0
+}]
+
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
 y_sort_enabled = true
 collision_mask = 32
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_eeelv")
+honey_throw_range = 500.0
 
 [node name="HealCooldown" type="Timer" parent="."]
 one_shot = true
@@ -227,6 +323,7 @@ value = 52.74
 show_percentage = false
 
 [node name="ManaBar" type="ProgressBar" parent="."]
+visible = false
 z_index = 10
 offset_left = -29.0
 offset_top = 40.0
@@ -235,3 +332,15 @@ offset_bottom = 46.0
 theme_override_styles/fill = SubResource("StyleBoxFlat_xnol8")
 value = 45.07
 show_percentage = false
+
+[node name="AbilityIndicator" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="AbilityIndicator"]
+texture = SubResource("GradientTexture2D_71f2a")
+
+[node name="HealVFX" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -15.401)
+scale = Vector2(0.7, 0.7)
+sprite_frames = SubResource("SpriteFrames_ts77e")
+animation = &"healVFX"

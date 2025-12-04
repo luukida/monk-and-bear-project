@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://fb1a1qx6mom8"]
+
+[ext_resource type="Script" uid="uid://bnliohw6tplrb" path="res://Scripts/honey_puddle.gd" id="1_4m2f2"]
+
+[sub_resource type="Gradient" id="Gradient_oo1c5"]
+offsets = PackedFloat32Array(0, 0.69666666, 0.71)
+colors = PackedColorArray(1, 1, 1, 0.29411766, 0.9137255, 0.9137255, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nhj72"]
+gradient = SubResource("Gradient_oo1c5")
+width = 160
+height = 160
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dns54"]
+radius = 80.0
+
+[node name="HoneyPuddle" type="Area2D"]
+z_index = -1
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("1_4m2f2")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_nhj72")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_dns54")

@@ -1,10 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://bg5r8ll0x3uvc"]
+[gd_scene load_steps=4 format=3 uid="uid://bg5r8ll0x3uvc"]
 
 [ext_resource type="Texture2D" uid="uid://b7ko0jgxt7lit" path="res://Assets/Rope/rope_texture.png" id="1_2jh3x"]
 [ext_resource type="Script" uid="uid://cpanqquqosvgb" path="res://Scripts/rope_controller.gd" id="2_beicw"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_2jh3x"]
 
 [node name="RopeController" type="Line2D"]
 z_index = 6
 texture = ExtResource("1_2jh3x")
 texture_mode = 1
 script = ExtResource("2_beicw")
+
+[node name="RopeHurtbox" type="Area2D" parent="." groups=["rope"]]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RopeHurtbox"]
+shape = SubResource("SegmentShape2D_2jh3x")

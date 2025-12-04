@@ -13,8 +13,7 @@ var current_state = State.FOLLOW
 @export_group("Berserk Stats")
 @export var frenzy_speed_multiplier: float = 1.5 
 @export var frenzy_damage_multiplier: float = 2.0 
-## Aumenta o tamanho do Ataque e Detecção no Frenesi (ex: 1.5x)
-@export var frenzy_range_multiplier: float = 1.5 # <--- ESTAVA FALTANDO
+@export var frenzy_range_multiplier: float = 1.5
 @export var frenzy_switch_target_time: float = 2.0
 @export var telegraph_duration: float = 0.0 
 
@@ -37,8 +36,6 @@ var default_telegraph_x: float = 0.0
 var current_revive_timer: float = 0.0
 var base_speed: float = 0.0
 var base_damage: float = 0.0
-
-# Variáveis para guardar estado original
 var base_attack_scale: Vector2 = Vector2.ONE 
 var base_detection_scale: Vector2 = Vector2.ONE
 var base_chase_give_up_range: float = 0.0
@@ -65,8 +62,6 @@ func _ready():
 	
 	base_speed = move_speed
 	base_damage = damage
-	
-	# MEMORIZA ESCALAS E RANGES ORIGINAIS
 	base_attack_scale = attack_area.scale
 	base_detection_scale = detection_area.scale
 	base_chase_give_up_range = chase_give_up_range
@@ -127,17 +122,18 @@ func enter_frenzy():
 	is_frenzy_active = true
 	current_state = State.FRENZY
 	
-	# Aplica Buffs de Status
+	# Aplica Buffs
 	move_speed = base_speed * frenzy_speed_multiplier
 	damage = base_damage * frenzy_damage_multiplier
 	
-	# Aplica Buffs de Tamanho (Agora sim!)
 	attack_area.scale = base_attack_scale * frenzy_range_multiplier
 	detection_area.scale = base_detection_scale * frenzy_range_multiplier
-	# Aumenta a tolerância de perseguição para não bugar com o novo radar
 	chase_give_up_range = base_chase_give_up_range * frenzy_range_multiplier * 1.2
 	
-	sprite.modulate = Color(2.0, 0.2, 0.2) 
+	# CORREÇÃO: Aplica cor vermelha mas PRESERVA o alpha (se estiver piscando)
+	var current_alpha = sprite.modulate.a
+	sprite.modulate = Color(2.0, 0.2, 0.2, current_alpha)
+	
 	target_enemy = null
 	current_frenzy_chase_timer = 0.0
 	scan_for_enemies()
@@ -148,25 +144,26 @@ func exit_frenzy():
 	is_frenzy_active = false
 	current_state = State.FOLLOW
 	
-	# Restaura tudo
+	# Restaura
 	move_speed = base_speed
 	damage = base_damage
 	attack_area.scale = base_attack_scale
 	detection_area.scale = base_detection_scale
 	chase_give_up_range = base_chase_give_up_range
 	
-	sprite.modulate = Color.WHITE
+	# CORREÇÃO: Volta para Branco mas preserva alpha
+	var current_alpha = sprite.modulate.a
+	sprite.modulate = Color(1, 1, 1, current_alpha)
+	
 	if telegraph: telegraph.visible = false
 
 func behavior_frenzy(delta):
 	if not is_instance_valid(target_enemy):
 		scan_for_enemies()
 		if not is_instance_valid(target_enemy):
-			# Se não achou ninguém, vaga rápido
 			behavior_roam_logic(delta, true)
 			return
 
-	# Lógica de TDAH (Troca alvo se demorar muito)
 	current_frenzy_chase_timer += delta
 	if current_frenzy_chase_timer > frenzy_switch_target_time:
 		current_frenzy_chase_timer = 0.0
@@ -179,9 +176,8 @@ func behavior_frenzy(delta):
 		scan_for_enemies() 
 		return
 
-	# Gatilho de ataque (Via Colisão ou Distância curta de segurança)
 	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
-		current_frenzy_chase_timer = 0.0 # Reseta timer se conseguiu atacar
+		current_frenzy_chase_timer = 0.0
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
@@ -197,7 +193,6 @@ func behavior_follow(delta):
 		current_state = State.CHASE
 		return
 	
-	# Roaming Normal
 	behavior_roam_logic(delta, false)
 
 func behavior_roam_logic(delta, is_frenzy_mode):
@@ -237,7 +232,7 @@ func behavior_chase():
 		current_state = State.FOLLOW 
 		return
 		
-	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
+	if attack_area.overlaps_body(target_enemy):
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
@@ -275,6 +270,7 @@ func scan_for_enemies():
 			if dist < closest_dist:
 				closest_dist = dist
 				closest_enemy = enemy
+		
 		target_enemy = closest_enemy
 
 # --- ORIENTAÇÃO ---
@@ -284,7 +280,6 @@ func update_orientation(target_pos: Vector2):
 	
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
-		
 		if dir.x < 0:
 			attack_shape.position.x = -default_shape_x
 			if telegraph: telegraph.position.x = -default_telegraph_x
@@ -389,7 +384,7 @@ func _on_animation_finished():
 		else:
 			current_state = State.FOLLOW
 
-# --- VIDA, MORTE ---
+# --- VIDA, MORTE, REVIVE ---
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
@@ -398,10 +393,16 @@ func take_damage(amount):
 	if current_hp <= 0:
 		go_down()
 	else:
-		var return_color = Color(2, 0.2, 0.2) if is_frenzy_active else Color.WHITE
+		# Efeito de Dano (Vermelho)
+		var base_color = Color(2, 0.2, 0.2) if is_frenzy_active else Color.WHITE
+		
 		sprite.modulate = Color.RED
 		var tween = create_tween()
-		tween.tween_property(sprite, "modulate", return_color, 0.1)
+		# Retorna para a cor correta mas PRESERVANDO O ALPHA ATUAL
+		var target_color = base_color
+		target_color.a = sprite.modulate.a 
+		
+		tween.tween_property(sprite, "modulate", target_color, 0.1)
 
 func go_down():
 	if is_frenzy_active:
@@ -432,14 +433,21 @@ func revive_complete():
 	revive_label.visible = false
 	sprite.modulate = Color.WHITE
 	is_invincible = true
+	
+	print("Urso Revivido!")
+	
+	# TWEEN DE INVENCIBILIDADE (Piscar Alpha apenas)
 	var blink_tween = create_tween()
 	for i in range(10): 
-		blink_tween.tween_property(sprite, "modulate", Color(1, 1, 1, 0.5), 0.15)
-		blink_tween.tween_property(sprite, "modulate", Color.WHITE, 0.15)
+		# Pisca a Transparência (Alpha), não mexe na cor
+		blink_tween.tween_property(sprite, "modulate:a", 0.5, 0.15)
+		blink_tween.tween_property(sprite, "modulate:a", 1.0, 0.15)
 	blink_tween.finished.connect(func(): is_invincible = false)
+	
 	push_enemies_away()
 	await get_tree().create_timer(0.1).timeout
 	scan_for_enemies()
+	
 	if is_instance_valid(target_enemy):
 		current_state = State.CHASE
 	else:
@@ -453,8 +461,12 @@ func receive_heal_tick(amount):
 	current_hp = min(current_hp + amount, max_hp)
 	hp_bar.value = current_hp
 	play_continuous_heal_vfx()
+	
+	# Tintura Verde apenas se não estiver em Frenesi
 	if not is_frenzy_active:
-		sprite.modulate = Color(0.7, 1.0, 0.7) 
+		# Aplica verde preservando alpha
+		var current_alpha = sprite.modulate.a
+		sprite.modulate = Color(0.7, 1.0, 0.7, current_alpha)
 
 func play_continuous_heal_vfx():
 	if heal_vfx:
@@ -466,11 +478,14 @@ func stop_heal_vfx():
 	if heal_vfx:
 		heal_vfx.visible = false
 		heal_vfx.stop()
+	
 	if not is_downed:
+		# Restaura cor base preservando alpha
+		var current_alpha = sprite.modulate.a
 		if is_frenzy_active:
-			sprite.modulate = Color(2.0, 0.2, 0.2)
+			sprite.modulate = Color(2.0, 0.2, 0.2, current_alpha)
 		else:
-			sprite.modulate = Color.WHITE
+			sprite.modulate = Color(1, 1, 1, current_alpha)
 
 func _on_vfx_finished(): pass 
 

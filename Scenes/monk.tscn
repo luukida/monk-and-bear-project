@@ -5,10 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://b3figbdeo2jwe" path="res://Assets/Monk/Idle.png" id="3_xnol8"]
 [ext_resource type="Texture2D" uid="uid://b85owu5ndrjf3" path="res://Assets/Monk/Run.png" id="4_g8mav"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rxlox"]
-radius = 19.0
-height = 56.0
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_gtfb7"]
 atlas = ExtResource("2_71f2a")
 region = Rect2(0, 0, 192, 192)
@@ -174,6 +170,10 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rxlox"]
+radius = 19.0
+height = 52.0
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eeelv"]
 bg_color = Color(0.14044744, 0.14044747, 0.14044738, 1)
 corner_radius_top_left = 5
@@ -197,7 +197,7 @@ corner_radius_bottom_left = 5
 
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
 y_sort_enabled = true
-collision_mask = 0
+collision_mask = 32
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_eeelv")
@@ -205,15 +205,15 @@ script = ExtResource("1_eeelv")
 [node name="HealCooldown" type="Timer" parent="."]
 one_shot = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -24)
-shape = SubResource("CapsuleShape2D_rxlox")
-
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -24)
 sprite_frames = SubResource("SpriteFrames_a5f3m")
 animation = &"heal"
 autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -23)
+shape = SubResource("CapsuleShape2D_rxlox")
 
 [node name="HpBar" type="ProgressBar" parent="."]
 z_index = 10

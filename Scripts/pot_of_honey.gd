@@ -1,12 +1,10 @@
 extends Area2D
 
-@export var instant_heal_amount: float = 100.0 # Valor alto pois é instantâneo
+@export var total_heal: float = 100.0 
+@export var heal_duration: float = 5.0 # Heals over 5 seconds
 
 func _ready():
-	# Conecta o sinal de colisão
 	body_entered.connect(_on_body_entered)
-	
-	# Avisa o urso que tem comida no chão!
 	notify_bear()
 
 func notify_bear():
@@ -14,29 +12,27 @@ func notify_bear():
 	if bears.size() > 0:
 		var bear = bears[0]
 		if bear.has_method("detect_honey"):
-			# Manda a posição do item para o urso
 			bear.detect_honey(global_position)
 
 func _on_body_entered(body):
 	var consumed = false
 	
-	# Se o Monge pegar
-	if body.is_in_group("player") and body.has_method("heal_self"):
-		body.heal_self(instant_heal_amount)
-		consumed = true
-		print("Monge pegou o mel!")
-	
-	# Se o Urso pegar
-	elif body.is_in_group("bear") and body.has_method("heal_self"):
-		body.heal_self(instant_heal_amount)
-		
-		# Avisa o urso que ele já comeu (para parar de correr atrás desse ponto)
-		if body.has_method("stop_eating_honey"):
-			body.stop_eating_honey()
+	# Check if body can receive Heal Over Time
+	if body.has_method("start_heal_over_time"):
+		if body.is_in_group("player"):
+			body.start_heal_over_time(total_heal, heal_duration)
+			consumed = true
+			print("Monk started healing over time!")
 			
-		consumed = true
-		print("Urso comeu o mel!")
-		
+		elif body.is_in_group("bear"):
+			body.start_heal_over_time(total_heal, heal_duration)
+			
+			# Stop chasing this specific pot
+			if body.has_method("stop_eating_honey"):
+				body.stop_eating_honey()
+				
+			consumed = true
+			print("Bear started healing over time!")
+	
 	if consumed:
-		# Aqui você pode tocar um som de "Glulp!"
 		queue_free()

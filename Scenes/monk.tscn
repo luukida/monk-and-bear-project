@@ -285,7 +285,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gtrm2")
 }],
-"loop": true,
+"loop": false,
 "name": &"healVFX",
 "speed": 10.0
 }]
@@ -341,7 +341,10 @@ texture = SubResource("GradientTexture2D_71f2a")
 
 [node name="HealVFX" type="AnimatedSprite2D" parent="."]
 visible = false
+z_index = 6
 position = Vector2(0, -15.401)
 scale = Vector2(0.7, 0.7)
 sprite_frames = SubResource("SpriteFrames_ts77e")
 animation = &"healVFX"
+frame = 10
+frame_progress = 1.0

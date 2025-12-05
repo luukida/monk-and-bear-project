@@ -1,7 +1,7 @@
 extends "res://Scripts/base_enemy.gd"
 
 @export_group("Gnoll Stats")
-@export var attack_range = 400.0   
+@export var attack_range = 280.0   
 @export var projectile_scene: PackedScene 
 
 func behavior_chase():

@@ -195,7 +195,7 @@ radius = 40.112343
 [node name="Gnoll" instance=ExtResource("1_mmpbg")]
 position = Vector2(1, -25)
 script = ExtResource("2_0jsfv")
-attack_range = 400.0
+attack_range = 250.0
 projectile_scene = ExtResource("3_0jsfv")
 hp = 50.0
 speed = 70.0

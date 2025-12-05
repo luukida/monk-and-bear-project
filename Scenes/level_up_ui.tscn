@@ -4,7 +4,7 @@
 
 [node name="LevelUpUI" type="CanvasLayer"]
 process_mode = 3
-layer = 2
+layer = 3
 script = ExtResource("1_qmifi")
 
 [node name="ColorRect" type="ColorRect" parent="."]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://dmse571xmjc01"]
+[gd_scene load_steps=14 format=4 uid="uid://dmse571xmjc01"]
 
 [ext_resource type="Script" uid="uid://d2k0etq0cgs43" path="res://Scripts/main.gd" id="1_8gbba"]
 [ext_resource type="PackedScene" uid="uid://d1r7n8jp0qu0a" path="res://Scenes/monk.tscn" id="2_jjvhh"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://cwlhbf1ig6vm2" path="res://Scripts/WaveManager.gd" id="9_ynf5e"]
 [ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="10_6iyac"]
 [ext_resource type="PackedScene" uid="uid://do8ef7onh8fjk" path="res://Scenes/level_up_ui.tscn" id="10_d1ilt"]
+[ext_resource type="PackedScene" uid="uid://dy53yc6sllkv5" path="res://Scenes/wave_ui.tscn" id="10_fdnlq"]
 [ext_resource type="PackedScene" uid="uid://hph4f4c84cdr" path="res://Scenes/upgrade_card.tscn" id="11_6iyac"]
 [ext_resource type="Resource" uid="uid://dav83j1tjgyqn" path="res://Resources/Waves/Wave1.tres" id="11_fdnlq"]
 [ext_resource type="PackedScene" uid="uid://b3wkshjwwug7t" path="res://Scenes/new_hud.tscn" id="12_6iyac"]
@@ -53,6 +54,8 @@ autostart = true
 card_template = ExtResource("11_6iyac")
 
 [node name="NewHUD" parent="." instance=ExtResource("12_6iyac")]
+
+[node name="WaveUI" parent="." instance=ExtResource("10_fdnlq")]
 
 [node name="Monk" parent="." instance=ExtResource("2_jjvhh")]
 position = Vector2(287, 191)

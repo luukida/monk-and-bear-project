@@ -30,12 +30,12 @@ var is_frenzy_active = false
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
+# Variáveis Internas
 var default_shape_x: float = 0.0
 var default_telegraph_x: float = 0.0
 var current_revive_timer: float = 0.0
 var base_speed: float = 0.0
 var base_damage: float = 0.0
-
 var base_attack_scale: Vector2 = Vector2.ONE 
 var base_detection_scale: Vector2 = Vector2.ONE
 var base_chase_give_up_range: float = 0.0
@@ -47,10 +47,10 @@ var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
 var is_wandering: bool = false
 
-# VARIÁVEIS DO MEL
-var is_eating_honey = false
+# VARIÁVEIS DO MEL (Simplificadas)
+var is_chasing_honey = false
 var honey_target_pos: Vector2 = Vector2.ZERO
-var honey_eat_timer: float = 0.0
+var healing_grace_timer: float = 0.0
 
 @onready var sprite = $AnimatedSprite2D
 @onready var body_shape = $CollisionShape2D
@@ -100,11 +100,6 @@ func _process(delta):
 		revive_label.text = "%d" % ceil(max(0.0, current_revive_timer))
 		if current_revive_timer <= 0:
 			revive_complete()
-			
-	if is_eating_honey:
-		honey_eat_timer -= delta
-		if honey_eat_timer <= 0:
-			stop_eating_honey()
 
 func _physics_process(delta):
 	if is_downed: return
@@ -120,7 +115,13 @@ func _physics_process(delta):
 			velocity = Vector2.ZERO 
 		State.ATTACK:
 			velocity = Vector2.ZERO
-			
+	
+	# LÓGICA NOVA: Desliga efeito
+	if healing_grace_timer > 0:
+		healing_grace_timer -= delta
+		if healing_grace_timer <= 0:
+			stop_heal_vfx()
+	
 	move_and_slide()
 
 # --- MODOS E COMPORTAMENTOS ---
@@ -128,22 +129,25 @@ func _physics_process(delta):
 func behavior_follow(delta):
 	if not is_instance_valid(monk_node): return
 	
-	# MUDANÇA CRÍTICA: PRIORIDADE PARA O MEL
-	# Se está indo pro mel, corre sem olhar pros lados
-	if is_eating_honey:
+	# 1. MODO MEL (Prioridade sobre tudo, exceto Frenesi)
+	if is_chasing_honey:
 		var dist = global_position.distance_to(honey_target_pos)
 		
-		if dist > 10.0:
+		# Se ainda não chegou no mel
+		if dist > 20.0:
 			var dir = global_position.direction_to(honey_target_pos)
 			velocity = dir * move_speed 
 			sprite.play("run")
 			update_orientation(honey_target_pos)
-			return # SAI DAQUI! Não escaneia inimigos enquanto corre pro mel.
 		else:
-			# Chegou no mel: Fica parado (mas pode escanear para virar torreta)
+			# Chegou no local do mel!
+			# Se o item ainda estiver lá, a colisão vai acontecer e chamar heal_self
+			# Se o item já sumiu (monge pegou), paramos de perseguir
 			velocity = Vector2.ZERO
 			sprite.play("idle")
-			# Deixa o código seguir para baixo para escanear e atacar quem chegar perto
+			stop_eating_honey()
+		
+		return # Não faz mais nada enquanto quer mel
 	
 	# 2. Prioridade: Inimigos
 	scan_for_enemies()
@@ -151,36 +155,19 @@ func behavior_follow(delta):
 		current_state = State.CHASE
 		return
 	
-	# 3. Roaming Normal (Só se não estiver comendo mel)
-	if not is_eating_honey:
-		behavior_roam_logic(delta, false)
+	# 3. Roaming Normal
+	behavior_roam_logic(delta, false)
 
 func behavior_chase():
 	if not is_instance_valid(target_enemy):
 		current_state = State.FOLLOW
 		return
 	
-	# SE ESTIVER COMENDO MEL: Torreta
-	if is_eating_honey:
-		var dist = global_position.distance_to(honey_target_pos)
-		
-		# Se saiu do mel, volta pro FOLLOW para correr de volta
-		if dist > 50.0:
-			current_state = State.FOLLOW 
-			return
-		
-		# Só ataca se estiver no alcance FÍSICO
-		if attack_area.overlaps_body(target_enemy):
-			start_attack()
-		else:
-			# Se não alcança, fica parado e encara
-			velocity = Vector2.ZERO
-			sprite.play("idle")
-			update_orientation(target_enemy.global_position)
-			
-		return 
+	# Se viu mel, ignora o combate e vai comer (se não for frenesi)
+	if is_chasing_honey:
+		current_state = State.FOLLOW
+		return
 
-	# Perseguição Normal
 	var dist_target = global_position.distance_to(target_enemy.global_position)
 	if dist_target > chase_give_up_range:
 		target_enemy = null 
@@ -195,8 +182,115 @@ func behavior_chase():
 		sprite.play("run")
 		update_orientation(target_enemy.global_position)
 
-# --- (Mantenha todas as outras funções iguais: Frenzy, Scan, Attack, etc) ---
-# Copie do script anterior ou mantenha se não mudou. A alteração principal foi no behavior_follow.
+# --- MECÂNICA DE MEL (NOVA LÓGICA) ---
+
+func detect_honey(honey_position: Vector2):
+	# Frenesi ignora mel (está muito bravo pra comer)
+	if is_downed or is_frenzy_active: return
+	
+	print("Urso viu mel! Correndo para pegar!")
+	is_chasing_honey = true
+	honey_target_pos = honey_position
+	
+	# Muda estado para movimento imediatamente
+	current_state = State.FOLLOW
+	target_enemy = null # Esquece inimigos
+
+func stop_eating_honey():
+	if is_chasing_honey:
+		is_chasing_honey = false
+		# Volta a vagar
+		wander_timer = 1.0 
+
+# --- CURA (FUNÇÃO NOVA) ---
+func heal_self(amount):
+	if is_downed: return
+	
+	current_hp = min(current_hp + amount, max_hp)
+	hp_bar.value = current_hp
+	
+	# Efeito visual de cura
+	play_continuous_heal_vfx()
+	if not is_frenzy_active:
+		var current_alpha = sprite.modulate.a
+		sprite.modulate = Color(0.7, 1.0, 0.7, current_alpha)
+		# Tween para voltar a cor normal depois de um tempo
+		var tween = create_tween()
+		tween.tween_interval(0.5)
+		tween.tween_property(sprite, "modulate", Color(1,1,1,current_alpha), 0.2)
+
+func receive_heal_tick(amount):
+	if is_downed: return 
+	current_hp = min(current_hp + amount, max_hp)
+	hp_bar.value = current_hp
+	
+	play_continuous_heal_vfx()
+	
+	# REINICIA O TIMER
+	healing_grace_timer = 0.1
+	
+	if not is_frenzy_active:
+		var current_alpha = sprite.modulate.a
+		sprite.modulate = Color(0.7, 1.0, 0.7, current_alpha)
+
+# ... (RESTO DO SCRIPT: enter_frenzy, exit_frenzy, scan_for_enemies, orientation, combat, take_damage, go_down, revive, utils...)
+# O restante das funções permanece IDÊNTICO ao script anterior. Copie daqui pra baixo se precisar, mas a lógica crítica está acima.
+
+func enter_frenzy():
+	if is_downed: return
+	if is_frenzy_active: return
+	print("URSO ENTROU EM FRENESI!")
+	is_frenzy_active = true
+	current_state = State.FRENZY
+	move_speed = base_speed * frenzy_speed_multiplier
+	damage = base_damage * frenzy_damage_multiplier
+	attack_area.scale = base_attack_scale * frenzy_range_multiplier
+	detection_area.scale = base_detection_scale * frenzy_range_multiplier
+	chase_give_up_range = base_chase_give_up_range * frenzy_range_multiplier * 1.2
+	var current_alpha = sprite.modulate.a
+	sprite.modulate = Color(2.0, 0.2, 0.2, current_alpha)
+	target_enemy = null
+	current_frenzy_chase_timer = 0.0
+	scan_for_enemies()
+
+func exit_frenzy():
+	if not is_frenzy_active: return
+	print("Urso se acalmou.")
+	is_frenzy_active = false
+	current_state = State.FOLLOW
+	move_speed = base_speed
+	damage = base_damage
+	attack_area.scale = base_attack_scale
+	detection_area.scale = base_detection_scale
+	chase_give_up_range = base_chase_give_up_range
+	var current_alpha = sprite.modulate.a
+	sprite.modulate = Color(1, 1, 1, current_alpha)
+	if telegraph: telegraph.visible = false
+
+func behavior_frenzy(delta):
+	if not is_instance_valid(target_enemy):
+		scan_for_enemies()
+		if not is_instance_valid(target_enemy):
+			behavior_roam_logic(delta, true)
+			return
+	current_frenzy_chase_timer += delta
+	if current_frenzy_chase_timer > frenzy_switch_target_time:
+		current_frenzy_chase_timer = 0.0
+		scan_for_enemies() 
+		if target_enemy == null: return
+	var dist = global_position.distance_to(target_enemy.global_position)
+	if dist > chase_give_up_range:
+		target_enemy = null 
+		scan_for_enemies() 
+		return
+	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
+		current_frenzy_chase_timer = 0.0 
+		start_attack()
+	else:
+		var dir = global_position.direction_to(target_enemy.global_position)
+		velocity = dir * move_speed
+		sprite.play("run")
+		update_orientation(target_enemy.global_position)
 
 func behavior_roam_logic(delta, is_frenzy_mode):
 	if wander_timer > 0:
@@ -211,88 +305,19 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 			var random_dist = randf_range(100.0, 300.0) 
 			wander_target = global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
 			is_wandering = true
-		
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
-		
 		var speed_factor = 1.0 if is_frenzy_mode else 0.4
 		velocity = dir * (move_speed * speed_factor)
 		sprite.play("run")
 		update_orientation(wander_target)
-		
 		if dist_to_target < 10.0:
 			is_wandering = false
 			wander_timer = randf_range(0.5, 1.0) if is_frenzy_mode else randf_range(2.0, 4.0)
 
-func enter_frenzy():
-	if is_downed: return
-	if is_frenzy_active: return
-	
-	print("URSO ENTROU EM FRENESI!")
-	is_frenzy_active = true
-	current_state = State.FRENZY
-	
-	move_speed = base_speed * frenzy_speed_multiplier
-	damage = base_damage * frenzy_damage_multiplier
-	
-	attack_area.scale = base_attack_scale * frenzy_range_multiplier
-	detection_area.scale = base_detection_scale * frenzy_range_multiplier
-	chase_give_up_range = base_chase_give_up_range * frenzy_range_multiplier * 1.2
-	
-	var current_alpha = sprite.modulate.a
-	sprite.modulate = Color(2.0, 0.2, 0.2, current_alpha)
-	target_enemy = null
-	current_frenzy_chase_timer = 0.0
-	scan_for_enemies()
-
-func exit_frenzy():
-	if not is_frenzy_active: return
-	print("Urso se acalmou.")
-	is_frenzy_active = false
-	current_state = State.FOLLOW
-	
-	move_speed = base_speed
-	damage = base_damage
-	attack_area.scale = base_attack_scale
-	detection_area.scale = base_detection_scale
-	chase_give_up_range = base_chase_give_up_range
-	
-	var current_alpha = sprite.modulate.a
-	sprite.modulate = Color(1, 1, 1, current_alpha)
-	if telegraph: telegraph.visible = false
-
-func behavior_frenzy(delta):
-	if not is_instance_valid(target_enemy):
-		scan_for_enemies()
-		if not is_instance_valid(target_enemy):
-			behavior_roam_logic(delta, true)
-			return
-
-	current_frenzy_chase_timer += delta
-	if current_frenzy_chase_timer > frenzy_switch_target_time:
-		current_frenzy_chase_timer = 0.0
-		scan_for_enemies() 
-		if target_enemy == null: return
-
-	var dist = global_position.distance_to(target_enemy.global_position)
-	if dist > chase_give_up_range:
-		target_enemy = null 
-		scan_for_enemies() 
-		return
-
-	if attack_area.overlaps_body(target_enemy) or dist < 60.0:
-		current_frenzy_chase_timer = 0.0 
-		start_attack()
-	else:
-		var dir = global_position.direction_to(target_enemy.global_position)
-		velocity = dir * move_speed
-		sprite.play("run")
-		update_orientation(target_enemy.global_position)
-
 func scan_for_enemies():
 	var bodies = detection_area.get_overlapping_bodies()
 	var valid_targets = []
-	
 	for body in bodies:
 		if is_frenzy_active:
 			if body.is_in_group("enemy") or body.is_in_group("player"):
@@ -300,11 +325,9 @@ func scan_for_enemies():
 		else:
 			if body.is_in_group("enemy"):
 				valid_targets.append(body)
-			
 	if valid_targets.is_empty():
 		target_enemy = null
 		return
-
 	if is_frenzy_active:
 		var potential_target = valid_targets.pick_random()
 		if potential_target == target_enemy and valid_targets.size() > 1:
@@ -331,17 +354,14 @@ func update_orientation(target_pos: Vector2):
 		else:
 			attack_shape.position.x = default_shape_x
 			if telegraph: telegraph.position.x = default_telegraph_x
-
 	var rotation_angle = 0.0
 	if dir.x < 0:
 		rotation_angle = atan2(dir.y, -dir.x)
 		rotation_angle = -rotation_angle 
 	else:
 		rotation_angle = atan2(dir.y, dir.x)
-	
 	var max_rad = deg_to_rad(max_rotation_degrees)
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
-	
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
 
@@ -403,7 +423,6 @@ func apply_damage_snapshot():
 		else:
 			if body.is_in_group("enemy"):
 				hit_valid = true
-		
 		if hit_valid and body.has_method("take_damage"):
 			body.take_damage(damage)
 
@@ -458,7 +477,6 @@ func revive_complete():
 	revive_label.visible = false
 	sprite.modulate = Color.WHITE
 	is_invincible = true
-	print("Urso Revivido!")
 	var blink_tween = create_tween()
 	for i in range(10): 
 		blink_tween.tween_property(sprite, "modulate:a", 0.5, 0.15)
@@ -472,15 +490,6 @@ func revive_complete():
 	else:
 		current_state = State.FOLLOW
 		sprite.play("idle")
-
-func receive_heal_tick(amount):
-	if is_downed: return 
-	current_hp = min(current_hp + amount, max_hp)
-	hp_bar.value = current_hp
-	play_continuous_heal_vfx()
-	if not is_frenzy_active:
-		var current_alpha = sprite.modulate.a
-		sprite.modulate = Color(0.7, 1.0, 0.7, current_alpha)
 
 func play_continuous_heal_vfx():
 	if heal_vfx:
@@ -510,17 +519,3 @@ func push_enemies_away():
 			body.apply_knockback(push_dir * push_force)
 			if body.has_method("take_damage"):
 				body.take_damage(15)
-
-func detect_honey(honey_position: Vector2, duration: float):
-	if is_downed or is_frenzy_active: return
-	print("Urso sentiu cheiro de mel!")
-	is_eating_honey = true
-	honey_target_pos = honey_position
-	honey_eat_timer = duration 
-	current_state = State.FOLLOW
-	target_enemy = null
-
-func stop_eating_honey():
-	if is_eating_honey:
-		is_eating_honey = false
-		print("Mel acabou.")

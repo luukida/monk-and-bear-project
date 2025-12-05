@@ -58,9 +58,6 @@ func _physics_process(delta):
 		healing_grace_timer -= delta
 		if healing_grace_timer <= 0:
 			stop_heal_vfx()
-			# Se não estiver se movendo, volta para idle
-			if velocity.length() == 0:
-				sprite.play("idle")
 
 	# 3. Máquina de Estados de Input
 	if is_aiming_skill_1:
@@ -188,12 +185,9 @@ func take_damage(amount):
 func receive_heal_tick(amount):
 	heal_self(amount)
 	play_continuous_heal_vfx()
-	# RESET DO TIMER: "Estou sendo curado agora, mantenha o efeito vivo por +0.1s"
-	healing_grace_timer = 0.1 
 	
-	# Se estiver parado, toca animação de receber cura
-	if sprite.animation != "heal" and velocity.length() == 0:
-		sprite.play("heal")
+	# REINICIA O TIMER: "Fui curado agora, mantenha o efeito por mais um pouquinho"
+	healing_grace_timer = 0.1
 
 func heal_self(amount):
 	if current_hp < max_hp:

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WaveData" load_steps=3 format=3 uid="uid://dav83j1tjgyqn"]
 
-[ext_resource type="PackedScene" uid="uid://brt2e0larbfgd" path="res://Scenes/skeleton.tscn" id="1_4q48n"]
+[ext_resource type="PackedScene" uid="uid://dy4vqseeqsgd" path="res://Scenes/gnoll.tscn" id="1_4q48n"]
 [ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="2_1sc38"]
 
 [resource]

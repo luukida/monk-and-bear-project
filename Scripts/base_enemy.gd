@@ -10,7 +10,7 @@ var current_state = State.CHASE
 @export var contact_damage = 10.0 # Dano causado apenas por encostar
 
 @export_group("Combate")
-@export var max_rotation_degrees: float = 30.0
+@export var max_rotation_degrees: float = 40.0
 @export var attack_impact_frame: int = 1 
 @export var telegraph_duration: float = 0.6 
 

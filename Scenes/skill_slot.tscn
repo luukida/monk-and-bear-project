@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bs8rv5p0dbfq0"]
 
 [ext_resource type="Script" uid="uid://8877nk8higmh" path="res://Scripts/skill_slot.gd" id="1_fp0hd"]
-[ext_resource type="Texture2D" uid="uid://hxucwieupo3p" path="res://Assets/Icons/50.png" id="2_hf8wl"]
+[ext_resource type="Texture2D" uid="uid://cpj66psa8oo03" path="res://Assets/Icons/Icon37_withBG.png" id="2_fp0hd"]
 
 [sub_resource type="Gradient" id="Gradient_tc2up"]
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
@@ -23,7 +23,7 @@ offset_left = -24.0
 offset_top = -24.0
 offset_right = 24.0
 offset_bottom = 24.0
-texture = ExtResource("2_hf8wl")
+texture = ExtResource("2_fp0hd")
 expand_mode = 1
 stretch_mode = 5
 

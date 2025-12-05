@@ -1,0 +1,64 @@
+[gd_scene load_steps=9 format=3 uid="uid://cbdj71arjtubh"]
+
+[ext_resource type="Script" uid="uid://bevqlgceh04kl" path="res://Scripts/gnoll_projectile.gd" id="1_6jpcd"]
+[ext_resource type="Texture2D" uid="uid://b0dpxhgffc3vy" path="res://Assets/Enemies/Gnoll/Gnoll_Bone.png" id="2_1nibk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_02jn2"]
+atlas = ExtResource("2_1nibk")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_63504"]
+atlas = ExtResource("2_1nibk")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_adqrn"]
+atlas = ExtResource("2_1nibk")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_muabw"]
+atlas = ExtResource("2_1nibk")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_twgrh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_02jn2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_63504")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_adqrn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_muabw")
+}],
+"loop": true,
+"name": &"bone",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uix14"]
+radius = 20.22375
+
+[node name="GnollProjectile" type="Area2D"]
+collision_layer = 0
+collision_mask = 3
+monitorable = false
+script = ExtResource("1_6jpcd")
+speed = 180.0
+damage = 10.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_twgrh")
+animation = &"bone"
+autoplay = "bone"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_uix14")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-14, -14, 28, 28)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

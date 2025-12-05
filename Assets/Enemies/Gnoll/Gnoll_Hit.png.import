@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clwus6jcy7e03"
-path="res://.godot/imported/Icon37.png-39fb8a30f12243ff89631c23910c98e3.ctex"
+uid="uid://b72hj4ycttp0v"
+path="res://.godot/imported/Gnoll_Hit.png-9bb2d9675a3fee470e42c0038dd6cc5a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Icons/Icon37.png"
-dest_files=["res://.godot/imported/Icon37.png-39fb8a30f12243ff89631c23910c98e3.ctex"]
+source_file="res://Assets/Enemies/Gnoll/Gnoll_Hit.png"
+dest_files=["res://.godot/imported/Gnoll_Hit.png-9bb2d9675a3fee470e42c0038dd6cc5a.ctex"]
 
 [params]
 

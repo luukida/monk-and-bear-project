@@ -359,6 +359,7 @@ frame_progress = 1.0
 offset = Vector2(0, -20)
 
 [node name="HpBar" type="ProgressBar" parent="."]
+visible = false
 z_index = 10
 y_sort_enabled = true
 offset_left = -55.0

@@ -4,8 +4,8 @@ enum State { CHASE, PREPARE, ATTACK }
 var current_state = State.CHASE
 
 @export_group("Stats")
-@export var speed = 80.0
 @export var hp = 30.0
+@export var speed = 80.0
 @export var damage = 10.0
 @export var contact_damage = 10.0 # Dano causado apenas por encostar
 

@@ -20,7 +20,9 @@ var honey_projectile_scene = preload("res://Scenes/honey_pot_projectile.tscn")
 var current_hp = max_hp
 var is_invincible = false
 var is_aiming_skill_1 = false 
-var is_healing = false # Controle interno de cura
+var is_healing = false 
+# Timer para desligar o efeito se parar de curar
+var healing_grace_timer: float = 0.0 
 
 # FÍSICA
 var external_velocity: Vector2 = Vector2.ZERO
@@ -30,7 +32,6 @@ var bear_node: CharacterBody2D = null
 @onready var sprite = $AnimatedSprite2D
 @onready var hp_bar = $HpBar     
 @onready var aim_indicator = $AbilityIndicator 
-# REFERÊNCIA NOVA
 @onready var heal_vfx = $HealVFX
 
 func _ready():
@@ -42,7 +43,6 @@ func _ready():
 	if aim_indicator:
 		aim_indicator.visible = false
 	
-	# Configuração inicial do VFX
 	if heal_vfx:
 		heal_vfx.visible = false
 
@@ -53,7 +53,16 @@ func _physics_process(delta):
 	
 	update_hud_cooldowns()
 
-	# 2. Máquina de Estados de Input
+	# 2. Lógica de parar o efeito de cura ("Keep Alive" check)
+	if healing_grace_timer > 0:
+		healing_grace_timer -= delta
+		if healing_grace_timer <= 0:
+			stop_heal_vfx()
+			# Se não estiver se movendo, volta para idle
+			if velocity.length() == 0:
+				sprite.play("idle")
+
+	# 3. Máquina de Estados de Input
 	if is_aiming_skill_1:
 		handle_aiming_logic(delta)
 	else:
@@ -77,63 +86,23 @@ func handle_movement_logic(delta):
 		if input_dir.x != 0:
 			sprite.flip_h = input_dir.x < 0
 	else:
-		sprite.play("idle")
+		# Só volta pra idle se NÃO estiver recebendo cura (timer zerado)
+		if healing_grace_timer <= 0:
+			sprite.play("idle")
 
 func apply_rope_pull(pull_vector: Vector2):
 	external_velocity = pull_vector
 
-# --- LÓGICA DE SKILLS E CURA ---
+# --- LÓGICA DE SKILLS ---
 
 func handle_skill_activation():
-	# Skill 1 (Mel)
 	if Input.is_action_just_pressed("skill_1"):
 		if honey_current_cooldown <= 0:
 			start_aiming()
 		else:
 			print("Habilidade em Cooldown!")
-	
-	# Ação de Cura (Espaço)
-	if Input.is_action_pressed("action"):
-		start_healing_action()
-	else:
-		stop_healing_action()
 
-func start_healing_action():
-	is_healing = true
-	
-	# Animação do Monge
-	if sprite.animation != "heal":
-		sprite.play("heal")
-	
-	# Efeito Visual de Cura
-	play_continuous_heal_vfx()
-	
-	# Aplica Cura (lógica simulada por frame, idealmente multiplicada por delta se estiver no process)
-	# Como esta função é chamada todo frame pelo _physics_process (via handle_skill_activation),
-	# calculamos o tick aqui.
-	var delta = get_physics_process_delta_time()
-	var heal_tick = 30.0 * delta # Usando valor fixo de heal_amount = 30.0
-	
-	# Cura a si mesmo
-	heal_self(heal_tick)
-	
-	# Cura Urso (se vivo)
-	if is_instance_valid(bear_node):
-		if not bear_node.is_downed:
-			bear_node.receive_heal_tick(heal_tick)
-		else:
-			bear_node.stop_heal_vfx()
-
-func stop_healing_action():
-	if is_healing:
-		is_healing = false
-		sprite.play("idle")
-		stop_heal_vfx()
-		
-		if is_instance_valid(bear_node):
-			bear_node.stop_heal_vfx()
-
-# --- VFX DE CURA (NOVO) ---
+# --- VFX DE CURA (ATUALIZADO) ---
 
 func play_continuous_heal_vfx():
 	if heal_vfx:
@@ -215,15 +184,21 @@ func take_damage(amount):
 	
 	tween.finished.connect(func(): is_invincible = false)
 
+# Função chamada pela Poça de Mel a cada frame
 func receive_heal_tick(amount):
 	heal_self(amount)
 	play_continuous_heal_vfx()
+	# RESET DO TIMER: "Estou sendo curado agora, mantenha o efeito vivo por +0.1s"
+	healing_grace_timer = 0.1 
+	
+	# Se estiver parado, toca animação de receber cura
+	if sprite.animation != "heal" and velocity.length() == 0:
+		sprite.play("heal")
 
 func heal_self(amount):
 	if current_hp < max_hp:
 		current_hp = min(current_hp + amount, max_hp)
 		hp_bar.value = current_hp
-		# Tintura verde suave (se não estiver piscando de dano)
 		if not is_invincible:
 			sprite.modulate = Color(0.8, 1.0, 0.8)
 

@@ -5,8 +5,10 @@
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_2jh3x"]
 
-[node name="RopeController" type="Line2D"]
+[node name="RopeController" type="Line2D" groups=["rope_controller"]]
 z_index = 6
+texture_repeat = 2
+width = 304.645
 texture = ExtResource("1_2jh3x")
 texture_mode = 1
 script = ExtResource("2_beicw")

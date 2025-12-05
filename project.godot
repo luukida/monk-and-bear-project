@@ -89,7 +89,3 @@ skill_4={
 2d_physics/layer_4="Rope"
 2d_physics/layer_5="Items"
 2d_physics/layer_6="World"
-
-[rendering]
-
-textures/canvas_textures/default_texture_repeat=1

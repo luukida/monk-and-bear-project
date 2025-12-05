@@ -312,6 +312,7 @@ position = Vector2(0, -23)
 shape = SubResource("CapsuleShape2D_rxlox")
 
 [node name="HpBar" type="ProgressBar" parent="."]
+visible = false
 z_index = 10
 offset_left = -30.0
 offset_top = 25.349987

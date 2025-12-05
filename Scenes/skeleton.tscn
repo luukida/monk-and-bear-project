@@ -180,8 +180,8 @@ radius = 31.016125
 radius = 31.016125
 
 [node name="Skeleton" instance=ExtResource("1_pegji")]
-speed = 80.0
 hp = 30.0
+speed = 80.0
 damage = 10.0
 contact_damage = 10.0
 max_rotation_degrees = 40.0

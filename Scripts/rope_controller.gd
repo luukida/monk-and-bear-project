@@ -8,52 +8,82 @@ extends Line2D
 @export var max_length: float = 250.0 
 @export var pull_strength: float = 20.0  
 @export var max_durability: float = 100.0
-@export var durability_regen: float = 10.0 # Reduzi um pouco regen
+@export var durability_regen: float = 10.0
 @export var durability_loss: float = 40.0
 
 @export_group("Visual")
 @export var base_width: float = 10.0 
+# Lifts the rope attachment point (Negative Y goes UP)
+@export var rope_attach_offset: Vector2 = Vector2(0, -30) 
+
+@export_group("Shadow Settings")
+@export var shadow_offset: Vector2 = Vector2(0, 10) 
+# Updated Default: Alpha 0.6 (60%)
+@export var shadow_color: Color = Color(0, 0, 0, 0.6) 
+# Updated Default: 0.04
+@export var shadow_width_multiplier: float = 0.04 
 
 var current_durability = max_durability
 var is_broken = false
 var repair_progress = 0.0
 
-# REFERÊNCIA AO SHAPE FÍSICO
+# SHADOW NODE
+var shadow_line: Line2D
+
+# REFERÊNCIAS
 @onready var rope_hurtbox = $RopeHurtbox
 @onready var rope_shape = $RopeHurtbox/CollisionShape2D
 
 func _ready():
-	#z_index = 5 
 	width = base_width
 	
-	# Garante que está no grupo para os inimigos acharem
 	if rope_hurtbox:
 		rope_hurtbox.add_to_group("rope")
+	
+	# --- CREATE SHADOW PROGRAMMATICALLY ---
+	shadow_line = Line2D.new()
+	shadow_line.name = "RopeShadow"
+	shadow_line.show_behind_parent = true 
+	shadow_line.default_color = shadow_color
+	shadow_line.texture = null 
+	
+	shadow_line.width = width * shadow_width_multiplier
+	
+	# Updated: Removed Round Caps
+	shadow_line.begin_cap_mode = Line2D.LINE_CAP_NONE
+	shadow_line.end_cap_mode = Line2D.LINE_CAP_NONE
+	
+	add_child(shadow_line)
+	shadow_line.position = shadow_offset
 
 func _physics_process(delta):
 	if not is_instance_valid(player) or not is_instance_valid(bear):
 		clear_points()
+		shadow_line.clear_points()
 		return
 
 	if is_broken:
 		handle_broken_state(delta)
-		# Se quebrou, desativa o colisor para não apanhar mais
 		if rope_shape: rope_shape.disabled = true
+		update_shadow()
 		return
 	else:
 		if rope_shape: rope_shape.disabled = false
 
-	# --- CÁLCULO DE POSIÇÃO ---
-	var point_a = to_local(player.global_position)
-	var point_b = to_local(bear.global_position)
+	# --- CÁLCULO DE POSIÇÃO (COM OFFSET DE ALTURA) ---
+	# Adds the offset to lift the rope from the feet
+	var point_a = to_local(player.global_position + rope_attach_offset)
+	var point_b = to_local(bear.global_position + rope_attach_offset)
 	
 	# --- VISUAL (Line2D) ---
 	clear_points()
 	add_point(point_a)
 	add_point(point_b)
 	
+	update_shadow()
+	
 	# --- FÍSICA (SegmentShape2D) ---
-	# Atualiza o colisor para bater com o visual
+	# Moves the hitbox up with the rope
 	if rope_shape and rope_shape.shape is SegmentShape2D:
 		rope_shape.shape.a = point_a
 		rope_shape.shape.b = point_b
@@ -64,10 +94,13 @@ func _physics_process(delta):
 	if distance > max_length:
 		apply_smart_tension(distance, delta)
 	else:
-		# Só regenera se não estiver tomando dano (opcional)
 		recover_durability(delta)
 		
 	update_rope_color()
+
+func update_shadow():
+	shadow_line.points = points
+	shadow_line.width = width * shadow_width_multiplier
 
 func apply_smart_tension(distance, delta):
 	var direction_to_bear = player.global_position.direction_to(bear.global_position)
@@ -91,12 +124,10 @@ func update_rope_color():
 	width = base_width * (0.3 + (ratio * 0.7)) 
 
 # --- SISTEMA DE DANO NA CORDA ---
-# Esta função será chamada pelo Inimigo Cortador
 func take_damage(amount):
 	if is_broken: return
 	
 	current_durability -= amount
-	# Feedback visual instantâneo (pisca vermelho escuro)
 	default_color = Color(0.5, 0, 0) 
 	
 	if current_durability <= 0:
@@ -106,6 +137,7 @@ func break_rope():
 	is_broken = true
 	print("CORDA CORTADA!")
 	clear_points()
+	shadow_line.clear_points() 
 	if bear.has_method("enter_frenzy"):
 		bear.enter_frenzy()
 
@@ -121,8 +153,9 @@ func handle_broken_state(delta):
 			default_color = Color.CYAN
 			width = base_width 
 			clear_points()
-			add_point(to_local(player.global_position))
-			add_point(to_local(bear.global_position))
+			# Apply offset here too so the repair blinking looks correct
+			add_point(to_local(player.global_position + rope_attach_offset))
+			add_point(to_local(bear.global_position + rope_attach_offset))
 		else:
 			clear_points()
 			

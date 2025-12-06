@@ -8,10 +8,12 @@
 [node name="RopeController" type="Line2D" groups=["rope_controller"]]
 z_index = 6
 texture_repeat = 2
-width = 304.645
+width = 100.0
 texture = ExtResource("1_2jh3x")
 texture_mode = 1
 script = ExtResource("2_beicw")
+rope_attach_offset = Vector2(0, -20)
+shadow_color = Color(0, 0, 0, 0.23529412)
 
 [node name="RopeHurtbox" type="Area2D" parent="." groups=["rope"]]
 collision_layer = 8

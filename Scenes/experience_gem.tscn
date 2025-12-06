@@ -18,6 +18,7 @@ scale = Vector2(1.049, 1.049)
 texture = ExtResource("1_8e32x")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
 texture = ExtResource("1_8e32x")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

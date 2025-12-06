@@ -1,6 +1,6 @@
 [gd_scene load_steps=32 format=3 uid="uid://dvrapfpt0811l"]
 
-[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_pox6b"]
+[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/Enemies/base_enemy.tscn" id="1_pox6b"]
 [ext_resource type="Script" uid="uid://rvued1n01uyh" path="res://Scripts/snake.gd" id="2_rku0m"]
 [ext_resource type="Texture2D" uid="uid://c1d73p0docslt" path="res://Assets/Enemies/Snake/Snake_Attack.png" id="3_pnn8g"]
 [ext_resource type="Texture2D" uid="uid://0vtholnmtpem" path="res://Assets/Enemies/Snake/Snake_Idle.png" id="4_p48en"]
@@ -190,13 +190,11 @@ size = Vector2(84, 55)
 [node name="Snake" instance=ExtResource("1_pox6b")]
 position = Vector2(0, -17)
 script = ExtResource("2_rku0m")
-speed = 150.0
 hp = 20.0
+speed = 150.0
 damage = 20.0
-contact_damage = 10.0
-max_rotation_degrees = 40.0
+attack_speed = 0.9
 attack_impact_frame = 3
-telegraph_duration = 0.8
 
 [node name="EnemyHitbox" parent="." index="0"]
 collision_layer = 0

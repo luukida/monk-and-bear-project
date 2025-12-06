@@ -1,6 +1,6 @@
 [gd_scene load_steps=30 format=3 uid="uid://brt2e0larbfgd"]
 
-[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_pegji"]
+[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/Enemies/base_enemy.tscn" id="1_pegji"]
 [ext_resource type="Texture2D" uid="uid://d18t5r3mj8c2q" path="res://Assets/Enemies/Skeleton/Skull_Attack.png" id="2_5abox"]
 [ext_resource type="Texture2D" uid="uid://v1uudth0qh3a" path="res://Assets/Enemies/Skeleton/Skull_Idle.png" id="3_v8sxu"]
 [ext_resource type="Texture2D" uid="uid://dcjcm207h1pbj" path="res://Assets/Enemies/Skeleton/Skull_Run.png" id="4_ks230"]
@@ -180,13 +180,7 @@ radius = 31.016125
 radius = 31.016125
 
 [node name="Skeleton" instance=ExtResource("1_pegji")]
-hp = 30.0
-speed = 80.0
-damage = 10.0
-contact_damage = 10.0
-max_rotation_degrees = 40.0
 attack_impact_frame = 2
-telegraph_duration = 0.7
 
 [node name="EnemyHitbox" parent="." index="0"]
 position = Vector2(0, -25)

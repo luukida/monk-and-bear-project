@@ -8,14 +8,18 @@ var current_state = State.FOLLOW
 @export var max_hp = 200.0
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
-@export var chase_give_up_range: float = 400.0 
 
-@export_group("Berserk Stats")
+# --- CHASE LIMITS (Parallel) ---
+@export var chase_give_up_range: float = 400.0 # Limit by Distance (Leash)
+@export var chase_max_duration: float = 2.0    # Limit by Time (Patience)
+
+@export_group("Combat & Frenzy")
+@export var attack_speed: float = 1.0 
+@export var base_telegraph_duration: float = 0.5 
 @export var frenzy_speed_multiplier: float = 1.5 
 @export var frenzy_damage_multiplier: float = 2.0 
 @export var frenzy_range_multiplier: float = 1.5
 @export var frenzy_switch_target_time: float = 2.0
-@export var telegraph_duration: float = 0.0 
 
 @export_group("Visual")
 @export var max_rotation_degrees: float = 30.0 
@@ -49,6 +53,7 @@ var base_chase_give_up_range: float = 0.0
 
 var damage_dealt_this_attack: bool = false
 var current_frenzy_chase_timer: float = 0.0
+var current_chase_timer: float = 0.0 # Timer for the chase logic
 
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
@@ -86,10 +91,7 @@ func _ready():
 	sprite.animation_finished.connect(_on_animation_finished)
 	sprite.frame_changed.connect(_on_frame_changed)
 	
-	if heal_vfx:
-		heal_vfx.visible = false
-		# No need to connect signal for looping animation, 
-		# but keeping it doesn't hurt.
+	if heal_vfx: heal_vfx.visible = false
 	
 	revive_label.visible = false 
 	
@@ -147,19 +149,16 @@ func behavior_follow(delta):
 	if is_chasing_honey:
 		var dist = global_position.distance_to(honey_target_pos)
 		
-		# If far, run to it
 		if dist > 20.0:
 			var dir = global_position.direction_to(honey_target_pos)
 			velocity = dir * move_speed 
 			sprite.play("run")
 			update_orientation(honey_target_pos)
 		else:
-			# Arrived at honey location
 			velocity = Vector2.ZERO
 			sprite.play("idle")
 			stop_eating_honey()
-		
-		return # Stop here, don't look for enemies
+		return 
 	
 	# Priority 2: Look for Enemies
 	scan_for_enemies()
@@ -171,7 +170,6 @@ func behavior_follow(delta):
 	behavior_roam_logic(delta, false)
 
 func behavior_chase():
-	# If detected honey mid-combat (and not frenzy), go for honey
 	if is_chasing_honey:
 		current_state = State.FOLLOW
 		return
@@ -180,14 +178,30 @@ func behavior_chase():
 		current_state = State.FOLLOW
 		return
 	
+	# --- LIMIT 1: TIME (Patience) ---
+	var delta = get_physics_process_delta_time()
+	current_chase_timer -= delta
+	
+	# If time runs out AND we are not attacking
+	if current_chase_timer <= 0 and sprite.animation != "attack":
+		print("Urso cansou de perseguir (Tempo).")
+		target_enemy = null
+		current_state = State.FOLLOW
+		return
+
+	# --- LIMIT 2: DISTANCE (Leash) ---
 	var dist_target = global_position.distance_to(target_enemy.global_position)
 	if dist_target > chase_give_up_range:
+		print("Urso cansou de perseguir (Distância).")
 		target_enemy = null 
 		current_state = State.FOLLOW 
 		return
 		
+	# --- ATTACK LOGIC ---
 	if attack_area.overlaps_body(target_enemy) or dist_target < 60.0:
 		start_attack()
+		# Optional: Reset patience on hit?
+		# current_chase_timer = chase_max_duration 
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
 		velocity = dir * (move_speed * 1.2)
@@ -227,7 +241,6 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 		wander_timer -= delta
 		velocity = Vector2.ZERO
 		sprite.play("idle")
-		# Reset rotation slowly
 		sprite.rotation = move_toward(sprite.rotation, 0, 0.1)
 		attack_area.rotation = sprite.rotation
 	else:
@@ -252,14 +265,10 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 # --- HONEY & HEALING LOGIC ---
 
 func detect_honey(honey_position: Vector2):
-	# ALWAYS detect honey, even if full HP.
-	# Only ignore if dead or berserk.
 	if is_downed or is_frenzy_active: return
-	
 	print("Urso sentiu cheiro de mel!")
 	is_chasing_honey = true
 	honey_target_pos = honey_position
-	
 	current_state = State.FOLLOW
 	target_enemy = null 
 
@@ -270,18 +279,14 @@ func stop_eating_honey():
 
 func start_heal_over_time(total_amount: float, duration: float):
 	if is_downed: return
-	
 	heal_timer = duration
 	heal_rate = total_amount / duration
-	
-	# Green Tint Effect
 	if not is_frenzy_active:
 		sprite.modulate = Color(0.7, 1.0, 0.7)
 
 func _start_vfx_loop():
 	if heal_vfx:
 		heal_vfx.visible = true
-		# Force loop TRUE so it plays continuously while healing
 		heal_vfx.sprite_frames.set_animation_loop(heal_animation_name, true)
 		heal_vfx.play(heal_animation_name)
 
@@ -289,14 +294,11 @@ func _stop_vfx_loop():
 	if heal_vfx:
 		heal_vfx.visible = false
 		heal_vfx.stop()
-	
-	# Reset Color
 	if not is_frenzy_active and not is_downed:
 		sprite.modulate = Color.WHITE
 
-# Keep this for compatibility if instant heal is ever used
 func heal_self(amount):
-	start_heal_over_time(amount, 2.0) # Redirect to HoT
+	start_heal_over_time(amount, 2.0)
 
 # --- COMBAT & TARGETING ---
 
@@ -306,11 +308,9 @@ func scan_for_enemies():
 	
 	for body in bodies:
 		if is_frenzy_active:
-			# Attacks everyone in frenzy
 			if body.is_in_group("enemy") or body.is_in_group("player"):
 				valid_targets.append(body)
 		else:
-			# Only enemies normally
 			if body.is_in_group("enemy"):
 				valid_targets.append(body)
 	
@@ -319,14 +319,12 @@ func scan_for_enemies():
 		return
 		
 	if is_frenzy_active:
-		# Pick random target in frenzy to be chaotic
 		var potential_target = valid_targets.pick_random()
 		if potential_target == target_enemy and valid_targets.size() > 1:
 			valid_targets.erase(potential_target)
 			potential_target = valid_targets.pick_random()
 		target_enemy = potential_target
 	else:
-		# Pick closest enemy normally
 		var closest_dist = INF
 		var closest_enemy = null
 		for enemy in valid_targets:
@@ -334,11 +332,14 @@ func scan_for_enemies():
 			if dist < closest_dist:
 				closest_dist = dist
 				closest_enemy = enemy
+		
+		# FOUND A NEW TARGET
 		target_enemy = closest_enemy
+		# Reset Patience Timer because we found a NEW target or re-acquired one
+		current_chase_timer = chase_max_duration
 
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
-	
 	if dir.x != 0:
 		sprite.flip_h = dir.x < 0
 		if dir.x < 0:
@@ -357,9 +358,10 @@ func update_orientation(target_pos: Vector2):
 	
 	var max_rad = deg_to_rad(max_rotation_degrees)
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
-	
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
+
+# --- COMBAT WITH NEW SYSTEM ---
 
 func start_attack():
 	if is_frenzy_active:
@@ -368,11 +370,13 @@ func start_attack():
 		execute_attack_animation()
 
 func start_telegraph():
-	# Look at target one last time
 	if is_instance_valid(target_enemy):
 		update_orientation(target_enemy.global_position)
-		
-	if telegraph_duration <= 0.05:
+	
+	var actual_duration = base_telegraph_duration / attack_speed
+	if is_frenzy_active: actual_duration = 0.0 
+	
+	if actual_duration <= 0.05:
 		execute_attack_animation()
 		return
 		
@@ -383,9 +387,9 @@ func start_telegraph():
 		telegraph.visible = true
 		var tween = create_tween()
 		telegraph.modulate.a = 0.0
-		tween.tween_property(telegraph, "modulate:a", 0.8, telegraph_duration)
+		tween.tween_property(telegraph, "modulate:a", 0.8, actual_duration)
 	
-	await get_tree().create_timer(telegraph_duration).timeout
+	await get_tree().create_timer(actual_duration).timeout
 	
 	if current_state == State.PREPARE:
 		execute_attack_animation()
@@ -394,13 +398,7 @@ func execute_attack_animation():
 	current_state = State.ATTACK
 	
 	if is_frenzy_active and telegraph:
-		telegraph.visible = true
-		if telegraph_duration <= 0.05:
-			telegraph.modulate.a = 0.0
-			var tween = create_tween()
-			tween.tween_property(telegraph, "modulate:a", 0.8, 0.3)
-		else:
-			telegraph.modulate.a = 0.8
+		telegraph.visible = true 
 	elif telegraph:
 		telegraph.visible = false 
 		
@@ -408,7 +406,9 @@ func execute_attack_animation():
 	sprite.play("attack")
 	sprite.frame = 0 
 	
-	# Only lock orientation if not frenzy (Frenzy tracks aggressively)
+	sprite.speed_scale = attack_speed
+	if is_frenzy_active: sprite.speed_scale *= 1.5
+	
 	if not is_frenzy_active and is_instance_valid(target_enemy):
 		update_orientation(target_enemy.global_position)
 
@@ -420,25 +420,21 @@ func _on_frame_changed():
 func apply_damage_snapshot():
 	if damage_dealt_this_attack: return 
 	damage_dealt_this_attack = true
-	
 	var bodies = attack_area.get_overlapping_bodies()
 	for body in bodies:
 		var hit_valid = false
 		if is_frenzy_active:
-			if body.is_in_group("enemy") or body.is_in_group("player"):
-				hit_valid = true
+			if body.is_in_group("enemy") or body.is_in_group("player"): hit_valid = true
 		else:
-			if body.is_in_group("enemy"):
-				hit_valid = true
-		
+			if body.is_in_group("enemy"): hit_valid = true
 		if hit_valid and body.has_method("take_damage"):
 			body.take_damage(damage)
 
 func _on_animation_finished():
 	if sprite.animation == "attack":
-		if not damage_dealt_this_attack:
-			apply_damage_snapshot()
-			
+		if not damage_dealt_this_attack: apply_damage_snapshot()
+		sprite.speed_scale = 1.0 
+		
 		if is_frenzy_active:
 			current_state = State.FRENZY
 			target_enemy = null 
@@ -451,56 +447,39 @@ func _on_animation_finished():
 func enter_frenzy():
 	if is_downed: return
 	if is_frenzy_active: return
-	
-	print("URSO ENTROU EM FRENESI!")
 	is_frenzy_active = true
 	current_state = State.FRENZY
-	
-	# Apply Buffs
 	move_speed = base_speed * frenzy_speed_multiplier
 	damage = base_damage * frenzy_damage_multiplier
 	attack_area.scale = base_attack_scale * frenzy_range_multiplier
 	detection_area.scale = base_detection_scale * frenzy_range_multiplier
 	chase_give_up_range = base_chase_give_up_range * frenzy_range_multiplier * 1.2
-	
-	# Visual
 	var current_alpha = sprite.modulate.a
 	sprite.modulate = Color(2.0, 0.2, 0.2, current_alpha)
-	
 	target_enemy = null
 	current_frenzy_chase_timer = 0.0
 	scan_for_enemies()
 
 func exit_frenzy():
 	if not is_frenzy_active: return
-	
-	print("Urso se acalmou.")
 	is_frenzy_active = false
 	current_state = State.FOLLOW
-	
-	# Reset Buffs
 	move_speed = base_speed
 	damage = base_damage
 	attack_area.scale = base_attack_scale
 	detection_area.scale = base_detection_scale
 	chase_give_up_range = base_chase_give_up_range
-	
-	# Visual
 	var current_alpha = sprite.modulate.a
 	sprite.modulate = Color(1, 1, 1, current_alpha)
-	
 	if telegraph: telegraph.visible = false
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
-	
 	current_hp -= amount
 	hp_bar.value = current_hp
-	
 	if current_hp <= 0:
 		go_down()
 	else:
-		# Hit flash
 		var return_color = Color(2, 0.2, 0.2) if is_frenzy_active else Color.WHITE
 		sprite.modulate = Color.RED
 		var tween = create_tween()
@@ -509,25 +488,19 @@ func take_damage(amount):
 		tween.tween_property(sprite, "modulate", target_color, 0.1)
 
 func go_down():
-	if is_frenzy_active:
-		exit_frenzy()
-		
+	if is_frenzy_active: exit_frenzy()
 	is_downed = true
 	current_state = State.DOWNED
 	target_enemy = null
-	
 	body_shape.set_deferred("disabled", true)
 	hp_bar.visible = false
 	if telegraph: telegraph.visible = false
-	
 	current_revive_timer = auto_revive_time
 	revive_label.visible = true
 	revive_label.text = str(int(auto_revive_time))
-	
 	sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
 	sprite.rotation = 0
 	sprite.play("death")
-	print("Urso Caiu!")
 
 func revive_complete():
 	is_downed = false
@@ -536,18 +509,14 @@ func revive_complete():
 	hp_bar.value = current_hp
 	hp_bar.visible = true
 	revive_label.visible = false
-	
 	sprite.modulate = Color.WHITE
-	
 	is_invincible = true
 	var blink_tween = create_tween()
 	for i in range(10): 
 		blink_tween.tween_property(sprite, "modulate:a", 0.5, 0.15)
 		blink_tween.tween_property(sprite, "modulate:a", 1.0, 0.15)
 	blink_tween.finished.connect(func(): is_invincible = false)
-	
 	push_enemies_away()
-	
 	await get_tree().create_timer(0.1).timeout
 	scan_for_enemies()
 	if is_instance_valid(target_enemy):

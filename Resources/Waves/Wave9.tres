@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3 uid="uid://vinvv0ifjf3m"]
+
+[ext_resource type="Script" uid="uid://bebjxp5oeovat" path="res://Scripts/SpawnInfo.gd" id="1_7iq8o"]
+[ext_resource type="PackedScene" uid="uid://brt2e0larbfgd" path="res://Scenes/Enemies/skeleton.tscn" id="2_a0xf1"]
+[ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="2_sne0r"]
+
+[sub_resource type="Resource" id="Resource_jshj2"]
+script = ExtResource("1_7iq8o")
+enemy = ExtResource("2_a0xf1")
+metadata/_custom_type_script = "uid://bebjxp5oeovat"
+
+[resource]
+script = ExtResource("2_sne0r")
+spawn_interval = 0.8
+enemies = Array[ExtResource("1_7iq8o")]([SubResource("Resource_jshj2")])
+metadata/_custom_type_script = "uid://c2wkjpup854b0"

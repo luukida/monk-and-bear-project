@@ -13,7 +13,7 @@ extends CharacterBody2D
 @export var heal_animation_name: String = "healVFX" 
 
 var honey_current_cooldown = 0.0
-var honey_projectile_scene = preload("res://Scenes/honey_pot_projectile.tscn")
+var honey_projectile_scene = preload("res://Scenes/Skills/honey_pot_projectile.tscn")
 
 # ESTADOS
 var current_hp = max_hp

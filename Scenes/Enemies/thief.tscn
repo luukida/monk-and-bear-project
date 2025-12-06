@@ -1,6 +1,6 @@
 [gd_scene load_steps=28 format=3 uid="uid://t0mw1xp8yc5i"]
 
-[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/base_enemy.tscn" id="1_q0ja6"]
+[ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/Enemies/base_enemy.tscn" id="1_q0ja6"]
 [ext_resource type="Script" uid="uid://dqovi70g4qmrf" path="res://Scripts/thief.gd" id="2_xgawa"]
 [ext_resource type="Texture2D" uid="uid://b1d0pgmyjiw0n" path="res://Assets/Enemies/Thief/Thief_Attack.png" id="3_5gijj"]
 [ext_resource type="Texture2D" uid="uid://c4ldej6axhbdd" path="res://Assets/Enemies/Thief/Thief_Idle.png" id="4_ptjg1"]
@@ -166,13 +166,11 @@ bear_detection_range = 350.0
 bear_safe_distance = 500.0
 stalk_duration = 2.0
 bravery_chance = 0.25
-speed = 140.0
 hp = 15.0
+speed = 140.0
 damage = 20.0
-contact_damage = 10.0
-max_rotation_degrees = 40.0
+attack_speed = 1.5
 attack_impact_frame = 2
-telegraph_duration = 0.4
 
 [node name="EnemyHitbox" parent="." index="0"]
 position = Vector2(0, -27)

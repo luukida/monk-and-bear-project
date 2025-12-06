@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=7 format=3 uid="uid://b5x55bhl18lcx"]
+
+[ext_resource type="Script" uid="uid://bebjxp5oeovat" path="res://Scripts/SpawnInfo.gd" id="1_mw5a1"]
+[ext_resource type="PackedScene" uid="uid://dy4vqseeqsgd" path="res://Scenes/Enemies/gnoll.tscn" id="2_fpuvi"]
+[ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="2_wj3fc"]
+[ext_resource type="PackedScene" uid="uid://t0mw1xp8yc5i" path="res://Scenes/Enemies/thief.tscn" id="3_l2hi1"]
+
+[sub_resource type="Resource" id="Resource_q8ck4"]
+script = ExtResource("1_mw5a1")
+enemy = ExtResource("2_fpuvi")
+metadata/_custom_type_script = "uid://bebjxp5oeovat"
+
+[sub_resource type="Resource" id="Resource_0tk5u"]
+script = ExtResource("1_mw5a1")
+enemy = ExtResource("3_l2hi1")
+metadata/_custom_type_script = "uid://bebjxp5oeovat"
+
+[resource]
+script = ExtResource("2_wj3fc")
+enemies = Array[ExtResource("1_mw5a1")]([SubResource("Resource_q8ck4"), SubResource("Resource_0tk5u")])
+metadata/_custom_type_script = "uid://c2wkjpup854b0"

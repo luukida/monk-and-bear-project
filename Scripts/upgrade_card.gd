@@ -14,9 +14,9 @@ func set_card_data(item: UpgradeItem):
 	
 	# Preenche os textos e imagens
 	# Ajuste os caminhos ($VBoxContainer/Label...) conforme sua hierarquia real
-	$VBoxContainer/NameLabel.text = item.title
-	$VBoxContainer/Icon.texture = item.icon
-	$VBoxContainer/DescriptionLabel.text = item.description
+	$TitlePath2D.text = item.title
+	$Icon.texture = item.icon
+	$DescriptionLabel.text = item.description
 
 func _on_pressed():
 	# Emite o sinal passando os dados para quem estiver ouvindo (A UI Principal)

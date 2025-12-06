@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dy53yc6sllkv5"]
+[gd_scene load_steps=3 format=3 uid="uid://dy53yc6sllkv5"]
 
 [ext_resource type="Script" uid="uid://bnkomwd57am4d" path="res://Scripts/wave_ui.gd" id="1_jjliy"]
+[ext_resource type="FontFile" uid="uid://she0a0h1u8l6" path="res://Fonts/Baby Bears.ttf" id="2_uhatw"]
 
 [node name="WaveUI" type="CanvasLayer"]
 layer = 2
@@ -24,9 +25,9 @@ offset_top = 15.0
 offset_right = 41.0
 offset_bottom = 60.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 32
+theme_override_fonts/font = ExtResource("2_uhatw")
+theme_override_font_sizes/font_size = 50
 text = "00:00"
-horizontal_alignment = 1
 
 [node name="AnnouncementLabel" type="Label" parent="Container"]
 modulate = Color(1, 1, 1, 0)
@@ -42,6 +43,7 @@ offset_right = 29.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 100
+theme_override_fonts/font = ExtResource("2_uhatw")
+theme_override_font_sizes/font_size = 200
 text = "WAVE 1"
 horizontal_alignment = 1

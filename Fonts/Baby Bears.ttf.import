@@ -1,0 +1,36 @@
+[remap]
+
+importer="font_data_dynamic"
+type="FontFile"
+uid="uid://she0a0h1u8l6"
+path="res://.godot/imported/Baby Bears.ttf-a162e61f132d747ea9e688e727e3cde5.fontdata"
+
+[deps]
+
+source_file="res://Fonts/Baby Bears.ttf"
+dest_files=["res://.godot/imported/Baby Bears.ttf-a162e61f132d747ea9e688e727e3cde5.fontdata"]
+
+[params]
+
+Rendering=null
+antialiasing=1
+generate_mipmaps=false
+disable_embedded_bitmaps=true
+multichannel_signed_distance_field=false
+msdf_pixel_range=8
+msdf_size=48
+allow_system_fallback=true
+force_autohinter=false
+modulate_color_glyphs=false
+hinting=1
+subpixel_positioning=4
+keep_rounding_remainders=true
+oversampling=0.0
+Fallbacks=null
+fallbacks=[]
+Compress=null
+compress=true
+preload=[]
+language_support={}
+script_support={}
+opentype_features={}

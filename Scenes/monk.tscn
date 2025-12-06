@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=47 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
@@ -290,6 +290,9 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_71f2a"]
+radius = 100.0
+
 [node name="Monk" type="CharacterBody2D" groups=["player"]]
 y_sort_enabled = true
 collision_mask = 32
@@ -348,3 +351,13 @@ sprite_frames = SubResource("SpriteFrames_ts77e")
 animation = &"healVFX"
 frame = 10
 frame_progress = 1.0
+
+[node name="MagnetArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MagnetArea"]
+shape = SubResource("CircleShape2D_71f2a")
+debug_color = Color(5.631298e-06, 0.64278364, 0.31714502, 0.41960785)
+
+[connection signal="area_entered" from="MagnetArea" to="." method="_on_magnet_area_entered"]

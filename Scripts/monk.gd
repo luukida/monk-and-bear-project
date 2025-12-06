@@ -15,6 +15,8 @@ extends CharacterBody2D
 var honey_current_cooldown = 0.0
 var honey_projectile_scene = preload("res://Scenes/Skills/honey_pot_projectile.tscn")
 
+@export var magnet_radius: float = 100.0
+
 # ESTADOS
 var current_hp = max_hp
 var is_invincible = false
@@ -33,6 +35,7 @@ var bear_node: CharacterBody2D = null
 @onready var hp_bar = $HpBar     
 @onready var aim_indicator = $AbilityIndicator 
 @onready var heal_vfx = $HealVFX
+@onready var magnet_area = $MagnetArea/CollisionShape2D
 
 func _ready():
 	add_to_group("player")
@@ -41,6 +44,10 @@ func _ready():
 	
 	if aim_indicator: aim_indicator.visible = false
 	if heal_vfx: heal_vfx.visible = false
+	
+	# Update Magnet Size
+	if magnet_area:
+		magnet_area.shape.radius = magnet_radius
 
 func _physics_process(delta):
 	# 1. Process Cooldowns
@@ -175,3 +182,10 @@ func take_damage(amount):
 		tween.tween_property(sprite, "modulate", Color(1, 1, 1, 0.5), 0.1)
 		tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
 	tween.finished.connect(func(): is_invincible = false)
+
+# --- MAGNET LOGIC ---
+# Connect this function to the "area_entered" signal of your MagnetArea
+func _on_magnet_area_entered(area):
+	# Check if the area is an XP Gem
+	if area.has_method("start_magnet"):
+		area.start_magnet(self)

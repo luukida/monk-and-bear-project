@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://do8ef7onh8fjk"]
+[gd_scene load_steps=6 format=3 uid="uid://do8ef7onh8fjk"]
 
 [ext_resource type="Script" uid="uid://wd6xx1jdiw5i" path="res://Scripts/level_up_ui.gd" id="1_qmifi"]
+[ext_resource type="Texture2D" uid="uid://b8sm4btvshj2h" path="res://Assets/UI/UI board Large  stone.png" id="2_3tkv0"]
+[ext_resource type="Texture2D" uid="uid://bkjvcvnwm6wq3" path="res://Assets/UI/UI board Large  parchment.png" id="3_5fr50"]
+[ext_resource type="Texture2D" uid="uid://bqsv4pt5at8sx" path="res://Assets/UI/IRONY TITLE  Large.png" id="4_rnqn3"]
+[ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="5_5fr50"]
 
 [node name="LevelUpUI" type="CanvasLayer"]
 process_mode = 3
@@ -15,6 +19,44 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.5882353)
 
+[node name="StoneBG" type="TextureRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 71.111084
+offset_top = 40.0
+offset_right = -71.111084
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_3tkv0")
+stretch_mode = 5
+
+[node name="PaperBG" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 186.0
+offset_top = 64.0
+offset_right = -186.0
+offset_bottom = -61.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_5fr50")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -308.39453
+offset_top = 43.0
+offset_right = 308.39453
+offset_bottom = 178.0
+grow_horizontal = 2
+texture = ExtResource("4_rnqn3")
+stretch_mode = 5
+
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
@@ -22,9 +64,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -20.0
-offset_top = -20.0
+offset_top = 12.0
 offset_right = 20.0
-offset_bottom = 20.0
+offset_bottom = 52.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 50
@@ -34,10 +76,11 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -212.0
-offset_top = 45.0
+offset_top = 63.0
 offset_right = 212.0
-offset_bottom = 169.00006
+offset_bottom = 171.00006
 grow_horizontal = 2
+theme_override_fonts/font = ExtResource("5_5fr50")
 theme_override_font_sizes/font_size = 90
-text = "LEVEL UP!"
+text = "Level Up!"
 horizontal_alignment = 1

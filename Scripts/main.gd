@@ -2,6 +2,8 @@ extends Node2D
 
 
 func _ready():
+	
+	MusicManager.play_battle_music()
 	# Garante que as referências existam antes de conectar
 	if has_node("Monk") and has_node("Bear"):
 		var monk = $Monk

@@ -1,10 +1,16 @@
-[gd_scene load_steps=47 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=53 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
 [ext_resource type="Texture2D" uid="uid://b3figbdeo2jwe" path="res://Assets/Monk/Idle.png" id="3_xnol8"]
 [ext_resource type="Texture2D" uid="uid://b85owu5ndrjf3" path="res://Assets/Monk/Run.png" id="4_g8mav"]
+[ext_resource type="AudioStream" uid="uid://cpvl5ecn4lqmk" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_37.wav" id="4_vmnho"]
+[ext_resource type="AudioStream" uid="uid://cw7exs1wlb381" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_38.wav" id="5_8guux"]
 [ext_resource type="Texture2D" uid="uid://bptdjxosy5d2m" path="res://Assets/Monk/Heal_Effect.png" id="5_71f2a"]
+[ext_resource type="AudioStream" uid="uid://c3cwlk2oxycas" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_48.wav" id="5_gbuo7"]
+[ext_resource type="AudioStream" uid="uid://dnbt4murxvy5y" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_49.wav" id="6_vmnho"]
+[ext_resource type="AudioStream" uid="uid://cbvjn21mgv1pq" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_39.wav" id="6_yy2sa"]
+[ext_resource type="AudioStream" uid="uid://b50rksm1b60qa" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_50.wav" id="7_8guux"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gtfb7"]
 atlas = ExtResource("2_71f2a")
@@ -300,6 +306,7 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_eeelv")
 honey_throw_range = 500.0
+footstep_sounds = Array[AudioStream]([ExtResource("4_vmnho"), ExtResource("5_8guux"), ExtResource("6_yy2sa"), ExtResource("5_gbuo7"), ExtResource("6_vmnho"), ExtResource("7_8guux")])
 
 [node name="HealCooldown" type="Timer" parent="."]
 one_shot = true
@@ -359,5 +366,9 @@ collision_mask = 16
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MagnetArea"]
 shape = SubResource("CircleShape2D_71f2a")
 debug_color = Color(5.631298e-06, 0.64278364, 0.31714502, 0.41960785)
+
+[node name="FootstepPlayer" type="AudioStreamPlayer2D" parent="."]
+volume_db = -5.0
+bus = &"SFX"
 
 [connection signal="area_entered" from="MagnetArea" to="." method="_on_magnet_area_entered"]

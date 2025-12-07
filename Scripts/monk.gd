@@ -5,17 +5,24 @@ extends CharacterBody2D
 @export var max_hp = 100.0
 @export var invulnerability_duration: float = 1.0
 
+@export_group("Visual")
+@export var heal_animation_name: String = "healVFX" 
+
+@export_group("EXP Gem Collect")
+@export var magnet_radius: float = 100.0
+
 @export_group("Skill 1: Mel Sagrado")
 @export var honey_cooldown_time = 5.0
 @export var honey_throw_range = 300.0
 
-@export_group("Visual")
-@export var heal_animation_name: String = "healVFX" 
-
 var honey_current_cooldown = 0.0
 var honey_projectile_scene = preload("res://Scenes/Skills/honey_pot_projectile.tscn")
 
-@export var magnet_radius: float = 100.0
+@export_group("Audio")
+@export var footstep_sounds: Array[AudioStream] = [] 
+@export var footstep_interval: float = 0.18
+
+var current_step_timer: float = 0.0
 
 # ESTADOS
 var current_hp = max_hp
@@ -36,6 +43,7 @@ var bear_node: CharacterBody2D = null
 @onready var aim_indicator = $AbilityIndicator 
 @onready var heal_vfx = $HealVFX
 @onready var magnet_area = $MagnetArea/CollisionShape2D
+@onready var footstep_player = $FootstepPlayer
 
 func _ready():
 	add_to_group("player")
@@ -115,7 +123,10 @@ func handle_movement_logic(delta):
 	
 	if input_dir.length() > 0:
 		sprite.play("run")
-		if input_dir.x != 0: sprite.flip_h = input_dir.x < 0
+		if input_dir.x != 0: 
+			sprite.flip_h = input_dir.x < 0
+			
+		handle_footsteps(delta)
 	else:
 		sprite.play("idle")
 
@@ -189,3 +200,24 @@ func _on_magnet_area_entered(area):
 	# Check if the area is an XP Gem
 	if area.has_method("start_magnet"):
 		area.start_magnet(self)
+
+func handle_footsteps(delta):
+	if footstep_sounds.is_empty(): return
+	
+	current_step_timer -= delta
+	
+	if current_step_timer <= 0:
+		play_random_footstep()
+		current_step_timer = footstep_interval
+
+func play_random_footstep():
+	if not footstep_player: return
+	
+	# Pick a random sound from the list
+	var random_sound = footstep_sounds.pick_random()
+	footstep_player.stream = random_sound
+	
+	# Randomize pitch slightly for variety
+	footstep_player.pitch_scale = randf_range(0.9, 1.1)
+	
+	footstep_player.play()

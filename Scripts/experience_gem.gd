@@ -12,6 +12,9 @@ extends Area2D
 @export var spawn_shadow_scale: float = 1.05   
 @export var initial_shadow_scale: float = 0.5
 
+@export_group("Audio")
+@export var magnet_sounds: Array[AudioStream] = [] # Drag your 3 sounds here
+
 var target = null
 var current_speed = 0.0 
 var is_chasing = false
@@ -24,6 +27,7 @@ var shadow_tween: Tween
 # References
 @onready var sprite = $Sprite2D
 @onready var shadow = $SpriteShadow
+@onready var sfx_player = $SfxPlayer
 
 func _ready():
 	body_entered.connect(_on_body_entered)
@@ -77,6 +81,13 @@ func start_magnet(new_target):
 	is_chasing = true
 	monitorable = false 
 	
+	# --- PLAY SOUND ---
+	if sfx_player and not magnet_sounds.is_empty():
+		sfx_player.stream = magnet_sounds.pick_random()
+		sfx_player.pitch_scale = randf_range(0.9, 1.1) # Tiny variation
+		sfx_player.play()
+	
+	# --- VISUALS ---
 	var lift_tween = create_tween()
 	lift_tween.set_parallel(true)
 	

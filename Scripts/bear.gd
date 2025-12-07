@@ -10,8 +10,8 @@ var current_state = State.FOLLOW
 @export var auto_revive_time: float = 10.0
 
 # --- CHASE LIMITS (Parallel) ---
-@export var chase_give_up_range: float = 400.0 # Limit by Distance (Leash)
-@export var chase_max_duration: float = 2.0    # Limit by Time (Patience)
+@export var chase_give_up_range: float = 400.0 
+@export var chase_max_duration: float = 2.0    
 
 @export_group("Combat & Frenzy")
 @export var attack_speed: float = 1.0 
@@ -26,7 +26,15 @@ var current_state = State.FOLLOW
 @export var attack_impact_frame: int = 6 
 @export var heal_animation_name: String = "healVFX" 
 
-# --- STATE VARIABLES ---
+@export_group("Audio")
+@export var footstep_sounds: Array[AudioStream] = [] 
+@export var footstep_interval: float = 0.25 
+@export var quadruped_delay: float = 0.20 # Time between front and back paw hits
+@export var attack_sound: AudioStream
+
+var current_step_timer: float = 0.0
+
+# --- VARIABLES ---
 var current_hp = max_hp
 var is_downed = false
 var is_invincible = false 
@@ -35,13 +43,11 @@ var is_frenzy_active = false
 var target_enemy: Node2D = null
 var monk_node: Node2D = null
 
-# --- HONEY & HEALING VARIABLES ---
 var is_chasing_honey = false
 var honey_target_pos: Vector2 = Vector2.ZERO
 var heal_timer: float = 0.0
 var heal_rate: float = 0.0
 
-# --- INTERNAL VARIABLES ---
 var default_shape_x: float = 0.0
 var default_telegraph_x: float = 0.0
 var current_revive_timer: float = 0.0
@@ -53,7 +59,7 @@ var base_chase_give_up_range: float = 0.0
 
 var damage_dealt_this_attack: bool = false
 var current_frenzy_chase_timer: float = 0.0
-var current_chase_timer: float = 0.0 # Timer for the chase logic
+var current_chase_timer: float = 0.0 
 
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
@@ -69,6 +75,8 @@ var is_wandering: bool = false
 @onready var heal_vfx = $HealVFX
 @onready var revive_label = $ReviveLabel
 @onready var telegraph = $AttackArea/TelegraphSprite
+@onready var attack_player = $AttackSoundPlayer
+@onready var footstep_player = $FootstepPlayer
 
 func _ready():
 	add_to_group("bear")
@@ -110,22 +118,18 @@ func _process(delta):
 func _physics_process(delta):
 	if is_downed: return
 
-	# 1. Process Heal Over Time
 	if heal_timer > 0:
 		heal_timer -= delta
 		var heal_amount = heal_rate * delta
 		current_hp = min(current_hp + heal_amount, max_hp)
 		hp_bar.value = current_hp
 		
-		# Ensure VFX is playing while healing
 		if heal_vfx and not heal_vfx.visible:
 			_start_vfx_loop()
 			
-		# Cleanup when timer ends
 		if heal_timer <= 0:
 			_stop_vfx_loop()
 
-	# 2. State Machine
 	match current_state:
 		State.FOLLOW:
 			behavior_follow(delta)
@@ -138,6 +142,12 @@ func _physics_process(delta):
 		State.ATTACK:
 			velocity = Vector2.ZERO
 	
+	# If the bear is trying to move, play sounds
+	if velocity.length() > 0:
+		handle_footsteps(delta)
+	else:
+		current_step_timer = 0.0
+	
 	move_and_slide()
 
 # --- BEHAVIORS ---
@@ -145,10 +155,8 @@ func _physics_process(delta):
 func behavior_follow(delta):
 	if not is_instance_valid(monk_node): return
 	
-	# Priority 1: Chasing Honey (Distraction)
 	if is_chasing_honey:
 		var dist = global_position.distance_to(honey_target_pos)
-		
 		if dist > 20.0:
 			var dir = global_position.direction_to(honey_target_pos)
 			velocity = dir * move_speed 
@@ -160,13 +168,11 @@ func behavior_follow(delta):
 			stop_eating_honey()
 		return 
 	
-	# Priority 2: Look for Enemies
 	scan_for_enemies()
 	if is_instance_valid(target_enemy):
 		current_state = State.CHASE
 		return
 	
-	# Priority 3: Roam / Follow Monk
 	behavior_roam_logic(delta, false)
 
 func behavior_chase():
@@ -178,30 +184,22 @@ func behavior_chase():
 		current_state = State.FOLLOW
 		return
 	
-	# --- LIMIT 1: TIME (Patience) ---
 	var delta = get_physics_process_delta_time()
 	current_chase_timer -= delta
 	
-	# If time runs out AND we are not attacking
 	if current_chase_timer <= 0 and sprite.animation != "attack":
-		print("Urso cansou de perseguir (Tempo).")
 		target_enemy = null
 		current_state = State.FOLLOW
 		return
 
-	# --- LIMIT 2: DISTANCE (Leash) ---
 	var dist_target = global_position.distance_to(target_enemy.global_position)
 	if dist_target > chase_give_up_range:
-		print("Urso cansou de perseguir (Distância).")
 		target_enemy = null 
 		current_state = State.FOLLOW 
 		return
 		
-	# --- ATTACK LOGIC ---
 	if attack_area.overlaps_body(target_enemy) or dist_target < 60.0:
 		start_attack()
-		# Optional: Reset patience on hit?
-		# current_chase_timer = chase_max_duration 
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
 		velocity = dir * (move_speed * 1.2)
@@ -252,7 +250,6 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 			
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
-		
 		var speed_factor = 1.0 if is_frenzy_mode else 0.4
 		velocity = dir * (move_speed * speed_factor)
 		sprite.play("run")
@@ -262,11 +259,26 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 			is_wandering = false
 			wander_timer = randf_range(0.5, 1.0) if is_frenzy_mode else randf_range(2.0, 4.0)
 
-# --- HONEY & HEALING LOGIC ---
+# --- AUDIO LOGIC ---
+
+func play_attack_sound():
+	if not attack_player or not attack_sound: return
+	
+	# --- LOGIC UPDATE: Frenzy = 100% Volume ---
+	# Only roll the dice if we are NOT in frenzy mode.
+	if not is_frenzy_active:
+		# 40% Chance (If random is > 0.4, we skip)
+		if randf() > 0.4: 
+			return 
+	
+	attack_player.stream = attack_sound
+	attack_player.pitch_scale = randf_range(0.8, 1.2)
+	attack_player.play()
+
+# --- OTHER LOGIC ---
 
 func detect_honey(honey_position: Vector2):
 	if is_downed or is_frenzy_active: return
-	print("Urso sentiu cheiro de mel!")
 	is_chasing_honey = true
 	honey_target_pos = honey_position
 	current_state = State.FOLLOW
@@ -300,8 +312,6 @@ func _stop_vfx_loop():
 func heal_self(amount):
 	start_heal_over_time(amount, 2.0)
 
-# --- COMBAT & TARGETING ---
-
 func scan_for_enemies():
 	var bodies = detection_area.get_overlapping_bodies()
 	var valid_targets = []
@@ -332,10 +342,7 @@ func scan_for_enemies():
 			if dist < closest_dist:
 				closest_dist = dist
 				closest_enemy = enemy
-		
-		# FOUND A NEW TARGET
 		target_enemy = closest_enemy
-		# Reset Patience Timer because we found a NEW target or re-acquired one
 		current_chase_timer = chase_max_duration
 
 func update_orientation(target_pos: Vector2):
@@ -360,8 +367,6 @@ func update_orientation(target_pos: Vector2):
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
-
-# --- COMBAT WITH NEW SYSTEM ---
 
 func start_attack():
 	if is_frenzy_active:
@@ -405,9 +410,11 @@ func execute_attack_animation():
 	damage_dealt_this_attack = false
 	sprite.play("attack")
 	sprite.frame = 0 
-	
 	sprite.speed_scale = attack_speed
 	if is_frenzy_active: sprite.speed_scale *= 1.5
+	
+	# PLAY SOUND!
+	play_attack_sound()
 	
 	if not is_frenzy_active and is_instance_valid(target_enemy):
 		update_orientation(target_enemy.global_position)
@@ -434,15 +441,12 @@ func _on_animation_finished():
 	if sprite.animation == "attack":
 		if not damage_dealt_this_attack: apply_damage_snapshot()
 		sprite.speed_scale = 1.0 
-		
 		if is_frenzy_active:
 			current_state = State.FRENZY
 			target_enemy = null 
 			scan_for_enemies() 
 		else:
 			current_state = State.FOLLOW
-
-# --- DAMAGE & REVIVE ---
 
 func enter_frenzy():
 	if is_downed: return
@@ -534,3 +538,36 @@ func push_enemies_away():
 			body.apply_knockback(push_dir * push_force)
 			if body.has_method("take_damage"):
 				body.take_damage(15)
+
+func handle_footsteps(delta):
+	if footstep_sounds.is_empty(): return
+	
+	current_step_timer -= delta
+	
+	if current_step_timer <= 0:
+		# 1. Play First Paw (Front)
+		play_random_footstep()
+		
+		# 2. Schedule Second Paw (Back) with a tiny delay
+		# We use a Tween here to create a "one-shot" timer without adding complex logic
+		var step_tween = create_tween()
+		step_tween.tween_callback(play_random_footstep).set_delay(quadruped_delay)
+		
+		# 3. Reset Timer logic (Same as before)
+		var next_interval = footstep_interval
+		
+		if current_state == State.FRENZY:
+			next_interval = footstep_interval / frenzy_speed_multiplier
+		elif current_state == State.CHASE:
+			next_interval = footstep_interval / 1.2
+			
+		current_step_timer = next_interval
+
+func play_random_footstep():
+	if not footstep_player: return
+	
+	var random_sound = footstep_sounds.pick_random()
+	footstep_player.stream = random_sound
+	# Lower pitch for the Bear to sound heavier/bigger than the Monk
+	footstep_player.pitch_scale = randf_range(0.7, 0.9)
+	footstep_player.play()

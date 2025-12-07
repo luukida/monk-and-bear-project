@@ -1,10 +1,17 @@
-[gd_scene load_steps=49 format=3 uid="uid://daiupkstu66ag"]
+[gd_scene load_steps=56 format=3 uid="uid://daiupkstu66ag"]
 
 [ext_resource type="Script" uid="uid://clqh3mmlp2gbb" path="res://Scripts/bear.gd" id="1_2imu7"]
 [ext_resource type="Texture2D" uid="uid://cn5vp6ciisnpy" path="res://Assets/Bear/Bear_Attack.png" id="2_elcei"]
+[ext_resource type="AudioStream" uid="uid://bn4u01df0v72u" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Land_02.wav" id="2_iwwop"]
+[ext_resource type="AudioStream" uid="uid://bqa4hv6eyvspn" path="res://Audio/SFX/Bear/Bear Sound by Universfield.mp3" id="2_mlyxe"]
+[ext_resource type="AudioStream" uid="uid://7tusjlas6slp" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Land_03.wav" id="3_1n3x6"]
 [ext_resource type="Texture2D" uid="uid://v58dtk3tdkmu" path="res://Assets/Bear/Bear_Idle.png" id="3_mlyxe"]
+[ext_resource type="AudioStream" uid="uid://b8ow66uh1xkf2" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Land_05.wav" id="4_f23w8"]
 [ext_resource type="Texture2D" uid="uid://dv77culqqiv32" path="res://Assets/Bear/Bear_Run.png" id="4_u1wsf"]
+[ext_resource type="AudioStream" uid="uid://10rrc3apxxf1" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Start_02.wav" id="5_1e87v"]
 [ext_resource type="Texture2D" uid="uid://bptdjxosy5d2m" path="res://Assets/Monk/Heal_Effect.png" id="5_elcei"]
+[ext_resource type="AudioStream" uid="uid://w1k1corgg66g" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Start_03.wav" id="6_00y8w"]
+[ext_resource type="AudioStream" uid="uid://dlmyyh2okctjw" path="res://Audio/SFX/Bear/Footsteps_Grass_Jump_Start_04.wav" id="7_bck8s"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gbb2i"]
 radius = 41.0
@@ -311,6 +318,8 @@ collision_mask = 32
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_2imu7")
+footstep_sounds = Array[AudioStream]([ExtResource("2_iwwop"), ExtResource("3_1n3x6"), ExtResource("4_f23w8"), ExtResource("5_1e87v"), ExtResource("6_00y8w"), ExtResource("7_bck8s")])
+attack_sound = ExtResource("2_mlyxe")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.7, 0.7)
@@ -384,5 +393,14 @@ text = "10
 "
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="AttackSoundPlayer" type="AudioStreamPlayer2D" parent="."]
+volume_db = -4.0
+bus = &"SFX"
+
+[node name="FootstepPlayer" type="AudioStreamPlayer2D" parent="."]
+volume_db = -5.0
+max_polyphony = 4
+bus = &"SFX"
 
 [connection signal="body_entered" from="AttackArea" to="." method="_on_attack_area_body_entered"]

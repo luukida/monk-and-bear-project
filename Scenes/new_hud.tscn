@@ -1,86 +1,94 @@
-[gd_scene load_steps=19 format=3 uid="uid://b3wkshjwwug7t"]
+[gd_scene load_steps=20 format=3 uid="uid://b3wkshjwwug7t"]
 
 [ext_resource type="Script" uid="uid://b0bx5ejfkyopg" path="res://Scripts/new_hud.gd" id="1_jd4hw"]
-[ext_resource type="Texture2D" uid="uid://lxd6aypns61l" path="res://Assets/Monk/Screenshot 2025-12-04 172733.png" id="2_6mie3"]
+[ext_resource type="Texture2D" uid="uid://d18ybvjmxbxjc" path="res://Assets/LifeAndEXPBars/BorderBG.png" id="2_e6lij"]
 [ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/Skills/skill_slot.tscn" id="3_0plam"]
-[ext_resource type="Texture2D" uid="uid://dybnvcvndisx0" path="res://Assets/Bear/Screenshot 2025-12-04 173837.png" id="4_k23fw"]
+[ext_resource type="Texture2D" uid="uid://cpsfhdqfv3ykq" path="res://Assets/LifeAndEXPBars/REDColors.png" id="3_dllsv"]
+[ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="4_bcuyj"]
+[ext_resource type="FontFile" uid="uid://she0a0h1u8l6" path="res://Fonts/Baby Bears.ttf" id="5_bcuyj"]
 [ext_resource type="Texture2D" uid="uid://b7ko0jgxt7lit" path="res://Assets/Rope/rope_texture.png" id="5_cdm4t"]
+[ext_resource type="Texture2D" uid="uid://dhn51cepvcdo7" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Border-01.png" id="8_bcuyj"]
+[ext_resource type="Texture2D" uid="uid://b73jrcvydice8" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Under-01.png" id="9_y3i04"]
+[ext_resource type="Texture2D" uid="uid://cte78o7moehfe" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Fill-01.png" id="10_ty2b2"]
+[ext_resource type="Texture2D" uid="uid://b0dc16kbwnjh" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Avatar-01.png" id="11_a6cb5"]
+[ext_resource type="Texture2D" uid="uid://bwgnong3g2vo3" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Border-01.png" id="12_a6cb5"]
+[ext_resource type="Texture2D" uid="uid://rk2081lh1dr3" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Under-01.png" id="13_y8mjb"]
+[ext_resource type="Texture2D" uid="uid://x2lk1c52de4p" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Fill-01.png" id="14_lgw6u"]
+[ext_resource type="Texture2D" uid="uid://ch2cm1gaa7g74" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Avatar-01.png" id="15_olccw"]
 
-[sub_resource type="Gradient" id="Gradient_6mie3"]
-colors = PackedColorArray(0.16078432, 0.16078432, 0.16078432, 1, 0.16206557, 0.1620656, 0.16206554, 1)
+[sub_resource type="AtlasTexture" id="AtlasTexture_y3i04"]
+atlas = ExtResource("2_e6lij")
+region = Rect2(114, 354, 12, 2)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_0plam"]
-gradient = SubResource("Gradient_6mie3")
-height = 10
+[sub_resource type="AtlasTexture" id="AtlasTexture_ty2b2"]
+atlas = ExtResource("3_dllsv")
+region = Rect2(114, 354, 12, 2)
 
-[sub_resource type="Gradient" id="Gradient_k23fw"]
-colors = PackedColorArray(1, 1, 0, 1, 1, 1, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_cdm4t"]
-gradient = SubResource("Gradient_k23fw")
-height = 10
+[sub_resource type="AtlasTexture" id="AtlasTexture_a6cb5"]
+atlas = ExtResource("4_bcuyj")
+region = Rect2(358, 678, 20, 20)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e6lij"]
 atlas = ExtResource("5_cdm4t")
 region = Rect2(0, 123.074, 256, 14.252007)
 
-[sub_resource type="Gradient" id="Gradient_dllsv"]
-colors = PackedColorArray(0.16078432, 0.16078432, 0.16078432, 1, 0.16078432, 0.16078432, 0.16078432, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_x3825"]
-gradient = SubResource("Gradient_dllsv")
-
-[sub_resource type="Gradient" id="Gradient_bcuyj"]
-colors = PackedColorArray(0, 0.4745098, 0, 1, 0, 0.4745098, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_y3i04"]
-gradient = SubResource("Gradient_bcuyj")
-
-[sub_resource type="Gradient" id="Gradient_ty2b2"]
-colors = PackedColorArray(0.16078432, 0.16078432, 0.16078432, 1, 0.16078432, 0.16078432, 0.16078432, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_a6cb5"]
-gradient = SubResource("Gradient_ty2b2")
-
-[sub_resource type="Gradient" id="Gradient_y8mjb"]
-colors = PackedColorArray(0, 0.4745098, 0, 1, 0, 0.4745098, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_lgw6u"]
-gradient = SubResource("Gradient_y8mjb")
-
 [node name="NewHUD" type="CanvasLayer"]
 script = ExtResource("1_jd4hw")
+metadata/_edit_horizontal_guides_ = [461.0]
 
 [node name="XPBar" type="TextureProgressBar" parent="."]
+texture_filter = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 21.0
-offset_top = -21.0
+offset_top = -26.0
 offset_right = -21.0
-offset_bottom = -9.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 value = 36.0
 nine_patch_stretch = true
-texture_under = SubResource("GradientTexture2D_0plam")
-texture_progress = SubResource("GradientTexture2D_cdm4t")
+texture_under = SubResource("AtlasTexture_y3i04")
+texture_progress = SubResource("AtlasTexture_ty2b2")
 
-[node name="LevelLabel" type="Label" parent="XPBar"]
+[node name="TextureRect" type="TextureRect" parent="XPBar"]
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -9.5
-offset_top = -18.0
-offset_right = 9.5
-offset_bottom = 5.0
+offset_left = -17.0
+offset_top = -26.0
+offset_right = 17.0
+offset_bottom = 8.0
 grow_horizontal = 2
 grow_vertical = 0
+texture = SubResource("AtlasTexture_a6cb5")
+stretch_mode = 4
+
+[node name="LevelLabel" type="Label" parent="XPBar"]
+texture_filter = 2
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -11.5
+offset_top = -22.0
+offset_right = 11.5
+offset_bottom = 7.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("5_bcuyj")
+theme_override_font_sizes/font_size = 23
 text = "27"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="RopeBar" type="TextureProgressBar" parent="."]
 anchors_preset = 7
@@ -88,10 +96,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -201.0
-offset_top = -80.0
-offset_right = 201.0
-offset_bottom = -62.0
+offset_left = -199.0
+offset_top = -88.0
+offset_right = 203.0
+offset_bottom = -70.0
 grow_horizontal = 2
 grow_vertical = 0
 value = 100.0
@@ -102,39 +110,60 @@ texture_progress = SubResource("AtlasTexture_e6lij")
 layout_mode = 3
 anchors_preset = 0
 offset_left = 379.0
-offset_top = 620.0
+offset_top = 612.0
 offset_right = 419.0
-offset_bottom = 660.0
-
-[node name="HPBar" type="TextureProgressBar" parent="MonkPanel"]
-layout_mode = 0
-offset_left = -5.0
-offset_top = -174.0
-offset_right = 66.0
-offset_bottom = 62.0
-value = 21.0
-fill_mode = 3
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture2D_x3825")
-texture_progress = SubResource("GradientTexture2D_y3i04")
-
-[node name="TextureRect" type="TextureRect" parent="MonkPanel"]
-layout_mode = 0
-offset_right = 61.0
-offset_bottom = 55.0
-texture = ExtResource("2_6mie3")
-stretch_mode = 5
+offset_bottom = 652.0
 
 [node name="Skills" type="HBoxContainer" parent="MonkPanel"]
 layout_mode = 0
 offset_left = 78.0
-offset_top = -37.0
+offset_top = -81.0
 offset_right = 278.0
-offset_bottom = 56.0
+offset_bottom = 12.0
 alignment = 1
 
 [node name="SlotHoney" parent="MonkPanel/Skills" instance=ExtResource("3_0plam")]
 layout_mode = 2
+
+[node name="HPBar_Border" type="TextureRect" parent="MonkPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = 69.369995
+offset_right = -29.0
+offset_bottom = 512.37
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -1.5707964
+scale = Vector2(0.47, 0.47)
+texture = ExtResource("8_bcuyj")
+expand_mode = 1
+
+[node name="HPBar" type="TextureProgressBar" parent="MonkPanel"]
+layout_mode = 0
+offset_left = -160.0
+offset_top = 69.369995
+offset_right = 11.0
+offset_bottom = 552.37
+rotation = -1.5707964
+scale = Vector2(0.47, 0.47)
+value = 57.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = ExtResource("9_y3i04")
+texture_progress = ExtResource("10_ty2b2")
+
+[node name="Avatar" type="TextureRect" parent="MonkPanel"]
+layout_mode = 0
+offset_left = -13.0
+offset_top = -158.5
+offset_right = 158.0
+offset_bottom = 324.5
+scale = Vector2(0.47, 0.47)
+texture = ExtResource("11_a6cb5")
+stretch_mode = 5
 
 [node name="BearPanel" type="Control" parent="."]
 layout_mode = 3
@@ -144,25 +173,41 @@ offset_top = 612.0
 offset_right = 879.0
 offset_bottom = 652.0
 
-[node name="HPBar" type="TextureProgressBar" parent="BearPanel"]
-layout_mode = 0
-offset_left = -7.0
-offset_top = -160.0
-offset_right = 83.0
-offset_bottom = 75.0
-value = 38.0
-fill_mode = 3
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture2D_a6cb5")
-texture_progress = SubResource("GradientTexture2D_lgw6u")
-
-[node name="TextureRect" type="TextureRect" parent="BearPanel"]
-layout_mode = 0
-offset_right = 76.0
-offset_bottom = 71.0
-texture = ExtResource("4_k23fw")
-
-[node name="SkillsBearContainer" type="HBoxContainer" parent="BearPanel"]
+[node name="Skills" type="HBoxContainer" parent="BearPanel"]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="HPBar_Border" type="TextureRect" parent="BearPanel"]
+layout_mode = 1
+offset_left = 224.59998
+offset_top = -24.0
+offset_right = 451.59998
+offset_bottom = 491.0
+rotation = 1.5707964
+scale = Vector2(0.44, 0.44)
+texture = ExtResource("12_a6cb5")
+
+[node name="HPBar" type="TextureProgressBar" parent="BearPanel"]
+layout_mode = 1
+offset_left = 224.59998
+offset_top = -24.0
+offset_right = 451.59998
+offset_bottom = 491.0
+rotation = 1.5707964
+scale = Vector2(0.44, 0.44)
+value = 80.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = ExtResource("13_y8mjb")
+texture_progress = ExtResource("14_lgw6u")
+
+[node name="Avatar" type="TextureRect" parent="BearPanel"]
+layout_mode = 1
+offset_left = -2.0
+offset_top = -151.0
+offset_right = 225.0
+offset_bottom = 364.0
+scale = Vector2(0.44, 0.44)
+texture = ExtResource("15_olccw")
+stretch_mode = 4

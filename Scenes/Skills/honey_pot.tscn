@@ -12,6 +12,12 @@ collision_layer = 0
 collision_mask = 3
 script = ExtResource("1_eg5o4")
 
+[node name="SpriteShadow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.5254902)
+position = Vector2(0, 3.255)
+scale = Vector2(1.566, 1.566)
+texture = ExtResource("2_1er1y")
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_1er1y")

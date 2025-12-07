@@ -79,12 +79,12 @@ func start_magnet(new_target):
 	
 	target = new_target
 	is_chasing = true
-	monitorable = false 
+	set_deferred("monitorable", false)
 	
 	# --- PLAY SOUND ---
 	if sfx_player and not magnet_sounds.is_empty():
 		sfx_player.stream = magnet_sounds.pick_random()
-		sfx_player.pitch_scale = randf_range(0.9, 1.1) # Tiny variation
+		sfx_player.pitch_scale = randf_range(0.7, 1.3) # Tiny variation
 		sfx_player.play()
 	
 	# --- VISUALS ---

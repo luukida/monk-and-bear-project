@@ -1,10 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://c7a0ct48dt58v"]
+[gd_scene load_steps=5 format=3 uid="uid://c7a0ct48dt58v"]
 
 [ext_resource type="Texture2D" uid="uid://bmy2uuu6s3nyl" path="res://Assets/Icons/GemGreen.png" id="1_8e32x"]
 [ext_resource type="Script" uid="uid://b1jnbqeypa2ew" path="res://Scripts/experience_gem.gd" id="1_26s18"]
-[ext_resource type="AudioStream" uid="uid://dgg111ecktvm7" path="res://Audio/SFX/ExperienceGem/SFX_ExpGem01.wav" id="2_8gui4"]
-[ext_resource type="AudioStream" uid="uid://bow3hcg0yalsp" path="res://Audio/SFX/ExperienceGem/SFX_ExpGem02.wav" id="3_gnwp3"]
-[ext_resource type="AudioStream" uid="uid://flv43ylu58h7" path="res://Audio/SFX/ExperienceGem/SFX_ExpGem03.wav" id="4_ggm5t"]
+[ext_resource type="AudioStream" uid="uid://flv43ylu58h7" path="res://Audio/SFX/ExperienceGem/SFX_ExpGem01.wav" id="4_ggm5t"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_26s18"]
 radius = 18.0
@@ -13,7 +11,7 @@ radius = 18.0
 z_index = -1
 collision_layer = 16
 script = ExtResource("1_26s18")
-magnet_sounds = Array[AudioStream]([ExtResource("2_8gui4"), ExtResource("3_gnwp3"), ExtResource("4_ggm5t")])
+magnet_sounds = Array[AudioStream]([ExtResource("4_ggm5t")])
 
 [node name="SpriteShadow" type="Sprite2D" parent="."]
 modulate = Color(0, 0, 0, 0.5254902)
@@ -22,7 +20,6 @@ scale = Vector2(1.049, 1.049)
 texture = ExtResource("1_8e32x")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture_filter = 1
 texture = ExtResource("1_8e32x")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

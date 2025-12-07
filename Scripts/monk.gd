@@ -179,12 +179,25 @@ func update_hud_cooldowns():
 
 func take_damage(amount):
 	if is_invincible: return
+	
 	current_hp -= amount
 	hp_bar.value = current_hp
+	
 	if current_hp <= 0:
 		print("GAME OVER")
-		get_tree().reload_current_scene()
+		
+		# --- GET CURRENT WAVE ---
+		# We try to find the WaveManager to know which wave we are on.
+		var current_wave = 1
+		var wave_manager = get_tree().current_scene.get_node_or_null("WaveManager")
+		if wave_manager:
+			# wave_index is 0-based, so +1 for display
+			current_wave = wave_manager.current_wave_index + 1
+		
+		# Trigger the Global Game Over
+		GameManager.trigger_game_over(current_wave)
 		return
+
 	is_invincible = true
 	var tween = create_tween()
 	sprite.modulate = Color.RED

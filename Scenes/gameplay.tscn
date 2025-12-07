@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://dmse571xmjc01"]
+[gd_scene load_steps=22 format=4 uid="uid://dmse571xmjc01"]
 
 [ext_resource type="Script" uid="uid://d2k0etq0cgs43" path="res://Scripts/main.gd" id="1_8gbba"]
 [ext_resource type="PackedScene" uid="uid://d1r7n8jp0qu0a" path="res://Scenes/monk.tscn" id="2_jjvhh"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://b3wkshjwwug7t" path="res://Scenes/new_hud.tscn" id="12_6iyac"]
 [ext_resource type="Resource" uid="uid://r7gsfojtqxxd" path="res://Resources/Waves/Wave2.tres" id="12_jkdf5"]
 [ext_resource type="Resource" uid="uid://vinvv0ifjf3m" path="res://Resources/Waves/Wave9.tres" id="13_u50mg"]
+[ext_resource type="PackedScene" uid="uid://wnc7aowlugt1" path="res://Scenes/game_over_ui.tscn" id="21_gb8q7"]
 
 [node name="Main" type="Node2D"]
 y_sort_enabled = true
@@ -78,6 +79,8 @@ player = NodePath("../Monk")
 bear = NodePath("../Bear")
 pull_strength = 25.0
 base_width = 300.0
+
+[node name="GameOverUI" parent="." instance=ExtResource("21_gb8q7")]
 
 [connection signal="timeout" from="WaveManager/SpawnTimer" to="WaveManager" method="_on_spawn_timer_timeout"]
 [connection signal="timeout" from="WaveManager/WaveTimer" to="WaveManager" method="_on_wave_timer_timeout"]

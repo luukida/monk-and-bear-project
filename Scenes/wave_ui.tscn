@@ -1,11 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://dy53yc6sllkv5"]
+[gd_scene load_steps=4 format=3 uid="uid://dy53yc6sllkv5"]
 
 [ext_resource type="Script" uid="uid://bnkomwd57am4d" path="res://Scripts/wave_ui.gd" id="1_jjliy"]
 [ext_resource type="FontFile" uid="uid://she0a0h1u8l6" path="res://Fonts/Baby Bears.ttf" id="2_uhatw"]
+[ext_resource type="AudioStream" uid="uid://bkwibcw8qbtjq" path="res://Audio/SFX/WaveAnnouncement/loud-fanfare-trumpet-effect-01-412045 by AberrantRealities.mp3" id="3_mv7vu"]
 
 [node name="WaveUI" type="CanvasLayer"]
 layer = 2
 script = ExtResource("1_jjliy")
+wave_start_sound = ExtResource("3_mv7vu")
 
 [node name="Container" type="Control" parent="."]
 layout_mode = 3
@@ -47,3 +49,8 @@ theme_override_fonts/font = ExtResource("2_uhatw")
 theme_override_font_sizes/font_size = 200
 text = "WAVE 1"
 horizontal_alignment = 1
+
+[node name="WaveSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_mv7vu")
+volume_db = -2.0
+bus = &"SFX"

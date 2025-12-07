@@ -11,6 +11,6 @@ metadata/_custom_type_script = "uid://bebjxp5oeovat"
 
 [resource]
 script = ExtResource("2_rh52t")
-spawn_interval = 1.5
+spawn_interval = 0.8
 enemies = Array[ExtResource("1_snobo")]([SubResource("Resource_8scoo")])
 metadata/_custom_type_script = "uid://c2wkjpup854b0"

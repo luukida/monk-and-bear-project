@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b0bx5ejfkyopg" path="res://Scripts/new_hud.gd" id="1_jd4hw"]
 [ext_resource type="Texture2D" uid="uid://d18ybvjmxbxjc" path="res://Assets/LifeAndEXPBars/BorderBG.png" id="2_e6lij"]
-[ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/Skills/skill_slot.tscn" id="3_0plam"]
+[ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/MonkSkills/skill_slot.tscn" id="3_0plam"]
 [ext_resource type="Texture2D" uid="uid://cpsfhdqfv3ykq" path="res://Assets/LifeAndEXPBars/REDColors.png" id="3_dllsv"]
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="4_bcuyj"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="5_a6cb5"]

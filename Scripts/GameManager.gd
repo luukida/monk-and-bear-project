@@ -10,7 +10,12 @@ var required_xp = 0
 # To track what wave we died on
 var survived_wave_number: int = 1
 
-@export var all_upgrades: Array[UpgradeItem] = []
+# SEPARATE POOLS
+@export var stat_upgrades: Array[UpgradeItem] = []
+@export var skill_upgrades: Array[UpgradeItem] = []
+
+# Chance for a card slot to become a Skill Card (e.g., 20%)
+@export var skill_card_chance: float = 1.0
 
 signal xp_changed(current, required)
 signal level_up(new_level)
@@ -43,12 +48,33 @@ func level_up_process():
 	show_upgrade_options.emit(options)
 
 func get_random_upgrades(amount: int) -> Array[UpgradeItem]:
-	var pool = all_upgrades.duplicate()
 	var selected: Array[UpgradeItem] = []
-	pool.shuffle()
-	var grab_count = min(amount, pool.size())
-	for i in range(grab_count):
-		selected.append(pool[i])
+	
+	# Create temporary shuffled copies
+	var available_stats = stat_upgrades.duplicate()
+	var available_skills = skill_upgrades.duplicate()
+	available_stats.shuffle()
+	available_skills.shuffle()
+	
+	for i in range(amount):
+		# ROLL THE DICE: Skill or Stat?
+		var pick_skill = false
+		
+		# Condition: We must have skills to pick AND pass the RNG check
+		if available_skills.size() > 0 and randf() <= skill_card_chance:
+			pick_skill = true
+		
+		# Fallback: If we wanted a stat but ran out, pick skill
+		if available_stats.size() == 0 and available_skills.size() > 0:
+			pick_skill = true
+			
+		# SELECT THE CARD
+		if pick_skill:
+			selected.append(available_skills.pop_front())
+		else:
+			if available_stats.size() > 0:
+				selected.append(available_stats.pop_front())
+			
 	return selected
 
 # --- GAME OVER LOGIC ---

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bkwibcw8qbtjq"
+path="res://.godot/imported/loud-fanfare-trumpet-effect-01-412045 by AberrantRealities.mp3-90ede9c8daa740aa5699592750a50a22.mp3str"
+
+[deps]
+
+source_file="res://Audio/SFX/WaveAnnouncement/loud-fanfare-trumpet-effect-01-412045 by AberrantRealities.mp3"
+dest_files=["res://.godot/imported/loud-fanfare-trumpet-effect-01-412045 by AberrantRealities.mp3-90ede9c8daa740aa5699592750a50a22.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

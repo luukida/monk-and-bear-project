@@ -16,7 +16,7 @@ extends CharacterBody2D
 @export var honey_throw_range = 300.0
 
 var honey_current_cooldown = 0.0
-var honey_projectile_scene = preload("res://Scenes/Skills/honey_pot_projectile.tscn")
+var honey_projectile_scene = preload("res://Scenes/MonkSkills/honey_pot_projectile.tscn")
 
 @export_group("Audio")
 @export var footstep_sounds: Array[AudioStream] = [] 

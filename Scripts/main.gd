@@ -28,30 +28,38 @@ func spawn_enemy(enemy_scene: PackedScene):
 	
 	add_child(enemy)
 
-# Esta função será chamada pela UI quando o jogador clicar num botão
 func apply_upgrade(upgrade: UpgradeItem):
+	_apply_upgrade_logic(upgrade)
+	
+	get_tree().paused = false
+
+func _apply_upgrade_logic(upgrade: UpgradeItem):
 	var target_node = null
 	
-	# Descobre quem é o alvo
 	match upgrade.target:
-		"bear":
-			target_node = $Bear
-		"monk":
-			target_node = $Monk
+		"bear": target_node = $Bear
+		"monk": target_node = $Monk
 	
-	if target_node:
-		# LÓGICA DINÂMICA (Reflection)
-		# Verifica se o urso tem a variável "damage"
+	if not target_node: return
+
+	# CHECK TYPE
+	if upgrade.type == UpgradeItem.CardType.STAT:
+		# (Existing Stat Logic...)
 		if upgrade.property_name in target_node:
 			var old_val = target_node.get(upgrade.property_name)
+			target_node.set(upgrade.property_name, old_val + upgrade.amount)
+			print("Applied Stat: ", upgrade.title)
 			
-			if upgrade.type == "stat_add":
-				# Soma: 35 + 10 = 45
-				target_node.set(upgrade.property_name, old_val + upgrade.amount)
-				print("Upgrade Aplicado! ", upgrade.property_name, " foi de ", old_val, " para ", target_node.get(upgrade.property_name))
-				
-		else:
-			print("ERRO: Variável ", upgrade.property_name, " não existe no alvo ", upgrade.target)
-	
-	# Retoma o jogo
-	get_tree().paused = false
+	elif upgrade.type == UpgradeItem.CardType.SKILL:
+		print("!!! UNLOCKING SKILL: ", upgrade.title, " !!!")
+		
+		# --- BEAR SKILLS ---
+		if upgrade.target == "bear":
+			if upgrade.property_name == "unlock_lunge":
+				target_node.can_lunge = true
+				print("Bear learned Lunge!")
+			
+			if upgrade.property_name == "unlock_charge":
+				target_node.can_charge = true
+				print("Bear learned Charge!")
+		

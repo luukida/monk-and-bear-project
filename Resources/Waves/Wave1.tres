@@ -1,15 +1,21 @@
-[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3 uid="uid://dc3eqbrv7f6l"]
+[gd_resource type="Resource" script_class="WaveData" load_steps=7 format=3 uid="uid://dc3eqbrv7f6l"]
 
 [ext_resource type="Script" uid="uid://bebjxp5oeovat" path="res://Scripts/SpawnInfo.gd" id="1_4q48n"]
 [ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="2_1sc38"]
 [ext_resource type="PackedScene" uid="uid://brt2e0larbfgd" path="res://Scenes/Enemies/skeleton.tscn" id="2_jl2wl"]
+[ext_resource type="PackedScene" uid="uid://dy4vqseeqsgd" path="res://Scenes/Enemies/gnoll.tscn" id="3_jl2wl"]
 
 [sub_resource type="Resource" id="Resource_l743t"]
 script = ExtResource("1_4q48n")
 enemy = ExtResource("2_jl2wl")
 metadata/_custom_type_script = "uid://bebjxp5oeovat"
 
+[sub_resource type="Resource" id="Resource_tohge"]
+script = ExtResource("1_4q48n")
+enemy = ExtResource("3_jl2wl")
+metadata/_custom_type_script = "uid://bebjxp5oeovat"
+
 [resource]
 script = ExtResource("2_1sc38")
-enemies = Array[ExtResource("1_4q48n")]([SubResource("Resource_l743t")])
+enemies = Array[ExtResource("1_4q48n")]([SubResource("Resource_l743t"), SubResource("Resource_tohge")])
 metadata/_custom_type_script = "uid://c2wkjpup854b0"

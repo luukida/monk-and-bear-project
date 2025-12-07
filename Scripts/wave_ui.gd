@@ -1,7 +1,10 @@
 extends CanvasLayer
 
+@export var wave_start_sound: AudioStream # Drag your sound here!
+
 @onready var timer_label = $Container/TimerLabel
 @onready var announcement_label = $Container/AnnouncementLabel
+@onready var wave_sfx = $WaveSFX
 
 func _ready():
 	await get_tree().process_frame
@@ -26,6 +29,26 @@ func _on_wave_changed(wave_index: int, wave_name: String):
 	# Reseta transparência (Texto some, Timer some)
 	announcement_label.modulate.a = 0.0
 	timer_label.modulate.a = 0.0
+	
+	# --- PLAY SOUND WITH FADE OUT ---
+	if wave_sfx and wave_start_sound:
+		wave_sfx.stream = wave_start_sound
+		wave_sfx.volume_db = 0.0 # Reset volume to max
+		wave_sfx.play()
+		
+		var audio_len = wave_start_sound.get_length()
+		var fade_duration = 1.5 
+		
+		var audio_tween = create_tween()
+		
+		# If sound is long enough, wait then fade
+		if audio_len > fade_duration:
+			audio_tween.tween_interval(audio_len - fade_duration)
+			# CHANGED: Use TRANS_LINEAR for a consistent volume drop you can actually hear
+			audio_tween.tween_property(wave_sfx, "volume_db", -80.0, fade_duration).set_trans(Tween.TRANS_LINEAR)
+		else:
+			# If sound is short (e.g. 1.0s), fade it over its entire duration so it's smooth
+			audio_tween.tween_property(wave_sfx, "volume_db", -80.0, audio_len).set_trans(Tween.TRANS_LINEAR)
 	
 	# --- SEQUÊNCIA DE ANIMAÇÃO ---
 	var tween = create_tween()

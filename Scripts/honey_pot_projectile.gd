@@ -2,7 +2,7 @@ extends Node2D
 
 var target_pos: Vector2
 # PRELOAD DA POÇA QUE ACABAMOS DE CRIAR
-var puddle_scene = preload("res://Scenes/Skills/honey_pot.tscn") 
+var puddle_scene = preload("res://Scenes/MonkSkills/honey_pot.tscn") 
 
 func launch(start_pos, end_pos):
 	global_position = start_pos

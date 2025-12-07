@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://hph4f4c84cdr"]
 
-[ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://Scripts/upgrade_card.gd" id="1_5at7e"]
+[ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://Scripts/stat_card.gd" id="1_5at7e"]
 [ext_resource type="Texture2D" uid="uid://dbk141h1n1v11" path="res://Assets/Icons/FHD (2).png" id="2_5at7e"]
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="2_8u55g"]
 [ext_resource type="Script" uid="uid://c72kmftn22hui" path="res://Scenes/title_path_2d.gd" id="4_3hbvc"]
@@ -34,7 +34,7 @@ font_size = 21
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
 
-[node name="UpgradeCard" type="Button"]
+[node name="StatCard" type="Button"]
 custom_minimum_size = Vector2(200, 300)
 offset_right = 8.0
 offset_bottom = 8.0

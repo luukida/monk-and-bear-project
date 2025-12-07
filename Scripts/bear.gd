@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY, PREPARE }
+enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY, PREPARE, CHARGE_PREP, CHARGING, CHARGE_STOPPING }
 var current_state = State.FOLLOW
 
 @export_group("Stats")
@@ -8,6 +8,8 @@ var current_state = State.FOLLOW
 @export var max_hp = 200.0
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
+# NEW: Give him better eyes!
+@export var detection_radius: float = 400.0
 
 # --- CHASE LIMITS (Parallel) ---
 @export var chase_give_up_range: float = 400.0 
@@ -33,6 +35,32 @@ var current_state = State.FOLLOW
 @export var attack_sound: AudioStream
 
 var current_step_timer: float = 0.0
+
+@export_group("Skills Config")
+@export var charge_cooldown: float = 8.0
+@export var charge_damage: float = 60.0
+@export var charge_speed: float = 400.0
+@export var charge_overshoot: float = 50.0
+@export var charge_prep_duration: float = 1.5 
+# NEW: Minimum distance to travel, no matter how close the enemy is
+@export var charge_min_distance: float = 300.0
+# NEW: How fast he brakes. Lower = Long slide. Higher = Short slide.
+@export var charge_friction: float = 1000.0
+# NEW: Multiplier for damage taken while charging up (0.3 = takes 30% damage)
+@export var charge_prep_damage_multiplier: float = 0.3
+
+var current_charge_cooldown: float = 0.0
+var charge_velocity: Vector2 = Vector2.ZERO
+var charge_duration_timer: float = 0.0
+var active_target_marker: Node2D = null
+var target_marker_scene = preload("res://Scenes/BearSkills/target_marker.tscn") # Make sure to create this!
+
+# --- SKILL UNLOCKS ---
+var can_lunge: bool = false:
+	set(value):
+		can_lunge = value
+		update_hitbox_scale() # Apply range increase immediately!
+var can_charge: bool = false
 
 # --- VARIABLES ---
 var current_hp = max_hp
@@ -64,6 +92,9 @@ var current_chase_timer: float = 0.0
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
 var is_wandering: bool = false
+
+var lunge_velocity: Vector2 = Vector2.ZERO
+var lunge_friction: float = 2000.0 # How fast he stops
 
 # --- NODES ---
 @onready var sprite = $AnimatedSprite2D
@@ -107,6 +138,12 @@ func _ready():
 	detection_area.monitorable = false
 	attack_area.monitoring = true
 	attack_area.monitorable = false
+	
+	# --- APPLY NEW VISION RANGE ---
+	# We access the CollisionShape2D child of the DetectionArea
+	var detection_shape = detection_area.get_child(0)
+	if detection_shape and detection_shape.shape is CircleShape2D:
+		detection_shape.shape.radius = detection_radius
 
 func _process(delta):
 	if is_downed:
@@ -118,35 +155,45 @@ func _process(delta):
 func _physics_process(delta):
 	if is_downed: return
 
+	# 1. Heal
 	if heal_timer > 0:
 		heal_timer -= delta
 		var heal_amount = heal_rate * delta
 		current_hp = min(current_hp + heal_amount, max_hp)
 		hp_bar.value = current_hp
-		
-		if heal_vfx and not heal_vfx.visible:
-			_start_vfx_loop()
-			
-		if heal_timer <= 0:
-			_stop_vfx_loop()
+		if heal_vfx and not heal_vfx.visible: _start_vfx_loop()
+		if heal_timer <= 0: _stop_vfx_loop()
 
+	# 2. Footsteps (Only if moving)
+	if velocity.length() > 0:
+		handle_footsteps(delta)
+	else:
+		current_step_timer = 0.0
+
+	# 3. Cooldowns
+	if current_charge_cooldown > 0:
+		current_charge_cooldown -= delta
+
+	# 4. State Machine
 	match current_state:
 		State.FOLLOW:
 			behavior_follow(delta)
 		State.CHASE:
-			behavior_chase()
+			behavior_chase() # Now checks for Charge internally!
 		State.FRENZY:
 			behavior_frenzy(delta)
 		State.PREPARE:
 			velocity = Vector2.ZERO 
 		State.ATTACK:
+			# LUNGE LOGIC MERGED HERE
+			velocity = lunge_velocity
+			lunge_velocity = lunge_velocity.move_toward(Vector2.ZERO, lunge_friction * delta)
+		State.CHARGE_PREP:
 			velocity = Vector2.ZERO
-	
-	# If the bear is trying to move, play sounds
-	if velocity.length() > 0:
-		handle_footsteps(delta)
-	else:
-		current_step_timer = 0.0
+		State.CHARGING:
+			behavior_charging(delta)
+		State.CHARGE_STOPPING:
+			behavior_charge_stopping(delta)
 	
 	move_and_slide()
 
@@ -184,6 +231,22 @@ func behavior_chase():
 		current_state = State.FOLLOW
 		return
 	
+	# --- 1. CHARGE LOGIC (Moved here!) ---
+	if can_charge and current_charge_cooldown <= 0:
+		# Option A: Current target is valid for charge?
+		if is_instance_valid(target_enemy) and global_position.distance_to(target_enemy.global_position) > 150.0:
+			start_charge_prep()
+			return
+		
+		# Option B: Find a better distant target?
+		var charge_candidate = find_charge_target()
+		if charge_candidate:
+			target_enemy = charge_candidate
+			print("DEBUG: Switched target to Charge!")
+			start_charge_prep()
+			return
+
+	# --- 2. Standard Chase Limits ---
 	var delta = get_physics_process_delta_time()
 	current_chase_timer -= delta
 	
@@ -198,6 +261,7 @@ func behavior_chase():
 		current_state = State.FOLLOW 
 		return
 		
+	# --- 3. Attack Logic ---
 	if attack_area.overlaps_body(target_enemy) or dist_target < 60.0:
 		start_attack()
 	else:
@@ -258,6 +322,47 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 		if dist_to_target < 10.0:
 			is_wandering = false
 			wander_timer = randf_range(0.5, 1.0) if is_frenzy_mode else randf_range(2.0, 4.0)
+
+func behavior_charging(delta):
+	charge_duration_timer -= delta
+	
+	# Move unstoppable
+	velocity = charge_velocity
+	move_and_slide()
+	
+	# Deal Damage to everyone we touch (Using AttackArea as the "bumper")
+	var bodies = attack_area.get_overlapping_bodies()
+	for body in bodies:
+		if body.is_in_group("enemy") and body.has_method("take_damage"):
+			# Apply massive damage and knockback
+			body.take_damage(charge_damage * delta * 5) # DPS style or one-shot? 
+			# Better: Apply knockback away from charge direction
+			if body.has_method("apply_knockback"):
+				var knock_dir = charge_velocity.normalized().rotated(deg_to_rad(90)) # Push aside
+				body.apply_knockback(knock_dir * 300.0)
+
+	# End Condition CHANGED:
+	if charge_duration_timer <= 0:
+		# Don't stop yet! Start braking.
+		current_state = State.CHARGE_STOPPING
+
+func behavior_charge_stopping(delta):
+	# 1. Apply Friction (Braking)
+	velocity = velocity.move_toward(Vector2.ZERO, charge_friction * delta)
+	move_and_slide()
+	
+	# 2. Visuals: Slow down the animation as he stops
+	# Maps velocity (600 -> 0) to speed scale (2.5 -> 0.5)
+	var speed_ratio = velocity.length() / charge_speed
+	sprite.speed_scale = 0.5 + (2.0 * speed_ratio)
+	
+	# 3. Still deal damage? (Optional - I disabled it to prevent cheap double hits)
+	# You can copy the damage logic here if you want him to crush people while sliding.
+	
+	# 4. Stop Condition
+	if velocity.length() < 10.0:
+		velocity = Vector2.ZERO
+		end_charge()
 
 # --- AUDIO LOGIC ---
 
@@ -345,6 +450,30 @@ func scan_for_enemies():
 		target_enemy = closest_enemy
 		current_chase_timer = chase_max_duration
 
+func find_charge_target() -> Node2D:
+	var bodies = detection_area.get_overlapping_bodies()
+	print("DEBUG: Charge Scan found ", bodies.size(), " bodies.") # DEBUG
+	
+	var best_target = null
+	var max_dist = -1.0
+	
+	for body in bodies:
+		if body.is_in_group("enemy"):
+			var dist = global_position.distance_to(body.global_position)
+			print("DEBUG: Checking Candidate: ", body.name, " Dist: ", dist) # DEBUG
+			
+			if dist > 150.0 and dist < 600.0: # Check these limits!
+				if dist > max_dist:
+					max_dist = dist
+					best_target = body
+	
+	if best_target:
+		print("DEBUG: Charge Target FOUND: ", best_target.name)
+	else:
+		print("DEBUG: No valid charge target found.")
+		
+	return best_target
+
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
 	if dir.x != 0:
@@ -367,6 +496,22 @@ func update_orientation(target_pos: Vector2):
 	rotation_angle = clamp(rotation_angle, -max_rad, max_rad)
 	sprite.rotation = rotation_angle
 	attack_area.rotation = rotation_angle
+
+func update_hitbox_scale():
+	if not attack_area: return
+	
+	# Start fresh from base
+	var final_scale = base_attack_scale
+	
+	# Apply Frenzy Multiplier
+	if is_frenzy_active:
+		final_scale *= frenzy_range_multiplier
+	
+	# Apply Lunge Multiplier (Permanent Range Increase)
+	if can_lunge:
+		final_scale.x *= 2.2
+		
+	attack_area.scale = final_scale
 
 func start_attack():
 	if is_frenzy_active:
@@ -422,6 +567,13 @@ func execute_attack_animation():
 func _on_frame_changed():
 	if sprite.animation == "attack" and sprite.frame == attack_impact_frame:
 		if telegraph: telegraph.visible = false
+		
+		# --- LUNGE MOVEMENT ONLY ---
+		# Range is already handled permanently!
+		if can_lunge and is_instance_valid(target_enemy):
+			var lunge_dir = global_position.direction_to(target_enemy.global_position)
+			lunge_velocity = lunge_dir * 800.0
+		
 		apply_damage_snapshot()
 
 func apply_damage_snapshot():
@@ -440,7 +592,13 @@ func apply_damage_snapshot():
 func _on_animation_finished():
 	if sprite.animation == "attack":
 		if not damage_dealt_this_attack: apply_damage_snapshot()
+		
 		sprite.speed_scale = 1.0 
+		
+		# Scale is permanent, no need to reset it every attack!
+		# Just ensure consistency (optional safety call)
+		update_hitbox_scale()
+		
 		if is_frenzy_active:
 			current_state = State.FRENZY
 			target_enemy = null 
@@ -453,6 +611,10 @@ func enter_frenzy():
 	if is_frenzy_active: return
 	is_frenzy_active = true
 	current_state = State.FRENZY
+	
+	# UPDATE HITBOX using the helper
+	update_hitbox_scale()
+	
 	move_speed = base_speed * frenzy_speed_multiplier
 	damage = base_damage * frenzy_damage_multiplier
 	attack_area.scale = base_attack_scale * frenzy_range_multiplier
@@ -468,6 +630,10 @@ func exit_frenzy():
 	if not is_frenzy_active: return
 	is_frenzy_active = false
 	current_state = State.FOLLOW
+	
+	# UPDATE HITBOX using the helper
+	update_hitbox_scale()
+	
 	move_speed = base_speed
 	damage = base_damage
 	attack_area.scale = base_attack_scale
@@ -479,17 +645,30 @@ func exit_frenzy():
 
 func take_damage(amount):
 	if is_downed or is_invincible: return
-	current_hp -= amount
+	
+	# --- NEW: DAMAGE REDUCTION ---
+	var final_damage = amount
+	
+	if current_state == State.CHARGE_PREP:
+		final_damage *= charge_prep_damage_multiplier
+		# Optional: Play a "Tink" or "Shield" sound here to verify it works visually?
+		print("Charge Armor blocked damage! Taken: ", final_damage)
+	
+	current_hp -= final_damage
 	hp_bar.value = current_hp
+	
 	if current_hp <= 0:
 		go_down()
 	else:
 		var return_color = Color(2, 0.2, 0.2) if is_frenzy_active else Color.WHITE
+		
+		# If charging, return to Red instead of White
+		if current_state == State.CHARGE_PREP:
+			return_color = Color(3.0, 0.2, 0.2)
+			
 		sprite.modulate = Color.RED
 		var tween = create_tween()
-		var target_color = return_color
-		target_color.a = sprite.modulate.a
-		tween.tween_property(sprite, "modulate", target_color, 0.1)
+		tween.tween_property(sprite, "modulate", return_color, 0.1)
 
 func go_down():
 	if is_frenzy_active: exit_frenzy()
@@ -571,3 +750,95 @@ func play_random_footstep():
 	# Lower pitch for the Bear to sound heavier/bigger than the Monk
 	footstep_player.pitch_scale = randf_range(0.7, 0.9)
 	footstep_player.play()
+
+# --- CHARGE SKILL LOGIC ---
+
+func start_charge_prep():
+	current_state = State.CHARGE_PREP
+	print("Bear is winding up a CHARGE!")
+	
+	# --- VISUAL PULSE (Blink Red + Scale Up/Down) ---
+	var tween = create_tween().set_loops()
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	# Step 1: Go Red and Big
+	# Color(3, 0.2, 0.2) is a very bright "Glowing" Red
+	tween.tween_property(sprite, "modulate", Color(3.0, 0.2, 0.2), 0.2)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.2, 1.2), 0.2)
+	
+	# Step 2: Go Normal
+	tween.tween_property(sprite, "modulate", Color.WHITE, 0.2)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.2)
+	
+	# -----------------------------------------------
+	
+	# Highlight Target
+	if is_instance_valid(target_enemy):
+		if target_marker_scene:
+			active_target_marker = target_marker_scene.instantiate()
+			target_enemy.add_child(active_target_marker)
+			active_target_marker.position = Vector2(0, -90) 
+	
+	# Wait for the specific Prep Duration
+	await get_tree().create_timer(charge_prep_duration).timeout
+	
+	# If we are still preparing (didn't get stunned/died), Launch!
+	if current_state == State.CHARGE_PREP:
+		# Kill the pulsing tween so it doesn't fight the Launch visuals
+		if tween: tween.kill()
+		start_charge_launch()
+
+func start_charge_launch():
+	if not is_instance_valid(target_enemy):
+		current_state = State.FOLLOW
+		reset_visuals()
+		return
+
+	current_state = State.CHARGING
+	
+	# --- VISUAL LOCK ---
+	sprite.modulate = Color(3.0, 0.2, 0.2) 
+	sprite.scale = Vector2.ONE 
+	sprite.play("run") 
+	sprite.speed_scale = 2.5 
+	
+	var dir = global_position.direction_to(target_enemy.global_position)
+	var dist = global_position.distance_to(target_enemy.global_position)
+	
+	# --- DISTANCE CALCULATION UPDATE ---
+	# Calculate desired distance (Target + Overshoot)
+	var calculated_dist = dist + charge_overshoot
+	
+	# Force it to be at least 400px (or whatever you set in Inspector)
+	var final_dist = max(calculated_dist, charge_min_distance)
+	
+	charge_velocity = dir * charge_speed
+	charge_duration_timer = final_dist / charge_speed
+	
+	set_collision_mask_value(3, false) 
+	
+	play_attack_sound()
+
+func end_charge():
+	current_state = State.FOLLOW
+	current_charge_cooldown = charge_cooldown
+	
+	# Restore Collision
+	set_collision_mask_value(3, true) # Re-enable enemy collision
+	
+	reset_visuals()
+
+func reset_visuals():
+	# Restore Color
+	var target_color = Color.WHITE
+	if is_frenzy_active: target_color = Color(2.0, 0.2, 0.2)
+	
+	var tween = create_tween()
+	tween.tween_property(sprite, "modulate", target_color, 0.2)
+	
+	# --- NEW: Reset Speed ---
+	sprite.speed_scale = 1.0 
+	
+	# Remove Marker
+	if is_instance_valid(active_target_marker):
+		active_target_marker.queue_free()

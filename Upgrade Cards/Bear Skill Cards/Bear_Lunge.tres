@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://dloaqocvuof2s"]
+
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_0kxqq"]
+[ext_resource type="Texture2D" uid="uid://bfj6w6lo33kpn" path="res://Assets/Icons/15.png" id="1_elyvg"]
+
+[resource]
+script = ExtResource("1_0kxqq")
+title = "Bear Lunge"
+description = "Increases the Bear's attack range, lunging forward when attacking."
+icon = ExtResource("1_elyvg")
+type = 1
+property_name = "unlock_lunge"
+amount = 1.0
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

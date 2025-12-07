@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://do8ef7onh8fjk" path="res://Scenes/level_up_ui.tscn" id="10_d1ilt"]
 [ext_resource type="Resource" uid="uid://cvjc45q1k8jbg" path="res://Resources/Waves/Wave6.tres" id="10_ee4r6"]
 [ext_resource type="PackedScene" uid="uid://dy53yc6sllkv5" path="res://Scenes/wave_ui.tscn" id="10_fdnlq"]
-[ext_resource type="PackedScene" uid="uid://hph4f4c84cdr" path="res://Scenes/upgrade_card.tscn" id="11_6iyac"]
+[ext_resource type="PackedScene" uid="uid://hph4f4c84cdr" path="res://Scenes/stat_card.tscn" id="11_6iyac"]
 [ext_resource type="Resource" uid="uid://dc3eqbrv7f6l" path="res://Resources/Waves/Wave1.tres" id="11_fdnlq"]
 [ext_resource type="Resource" uid="uid://cjs685s6rv7f8" path="res://Resources/Waves/Wave7.tres" id="11_gt3je"]
 [ext_resource type="Resource" uid="uid://b5x55bhl18lcx" path="res://Resources/Waves/Wave8.tres" id="12_3pmx8"]

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://bk3nwjg4uesqy"]
+
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_1nrfg"]
+[ext_resource type="Texture2D" uid="uid://cxgarhbcxvxx" path="res://Assets/Icons/10.png" id="1_j0ffg"]
+
+[resource]
+script = ExtResource("1_1nrfg")
+title = "Marked Charge"
+description = "The Bear marks a distant target and charges to it, dealing damage to everything in its way."
+icon = ExtResource("1_j0ffg")
+type = 1
+property_name = "unlock_charge"
+amount = 1.0
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

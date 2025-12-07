@@ -36,12 +36,35 @@ func start_attack():
 
 # Spawna o projétil no frame certo
 func apply_damage_snapshot():
-	if projectile_scene and is_instance_valid(target):
+	if projectile_scene:
 		var bullet = projectile_scene.instantiate()
 		bullet.damage = damage 
 		get_tree().current_scene.add_child(bullet)
-		bullet.launch(global_position, target.global_position)
+		
+		# --- KEY FIX: FIRE WHERE YOU LOOK ---
+		# Instead of "target.global_position" (Aim Bot),
+		# we use "hitbox.rotation" (Where the telegraph is pointing).
+		
+		var aim_dir = Vector2.RIGHT.rotated(hitbox.rotation)
+		var target_pos = global_position + (aim_dir * 1000.0) # Project a point far away
+		
+		bullet.launch(global_position, target_pos)
 
 # Usa a lógica de tempo do pai para o telegraph
 func start_telegraph():
 	super.start_telegraph()
+
+func update_orientation(target_pos: Vector2):
+	# 1. Let Base Enemy handle the body flipping (Left/Right)
+	super.update_orientation(target_pos)
+	
+	# 2. OVERRIDE the Hitbox (Telegraph) to aim 360 degrees
+	# This ensures the red arrow points straight at the target
+	var dir = global_position.direction_to(target_pos)
+	hitbox.rotation = dir.angle()
+	
+	# 3. Fix Offset Flipping
+	# The base script mirrors the X position when facing left. 
+	# We undo that for the telegraph because we are rotating it manually.
+	if telegraph:
+		telegraph.position.x = abs(telegraph.position.x)

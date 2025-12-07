@@ -11,6 +11,8 @@ z_index = -1
 collision_layer = 0
 collision_mask = 3
 script = ExtResource("1_eg5o4")
+total_heal = null
+heal_duration = null
 
 [node name="SpriteShadow" type="Sprite2D" parent="."]
 modulate = Color(0, 0, 0, 0.5254902)

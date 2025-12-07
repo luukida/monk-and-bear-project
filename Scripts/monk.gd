@@ -2,7 +2,11 @@ extends CharacterBody2D
 
 @export_group("Stats")
 @export var speed = 150.0
-@export var max_hp = 100.0
+@export var max_hp = 100.0:
+	set(value):
+		max_hp = value
+		if hp_bar:
+			hp_bar.max_value = max_hp
 @export var invulnerability_duration: float = 1.0
 
 @export_group("Visual")

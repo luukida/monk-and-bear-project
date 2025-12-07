@@ -1,7 +1,8 @@
 extends Area2D
 
+# --- HEAL OVER TIME VARIABLES ---
 @export var total_heal: float = 100.0 
-@export var heal_duration: float = 5.0 # Heals over 5 seconds
+@export var heal_duration: float = 5.0 
 
 func _ready():
 	body_entered.connect(_on_body_entered)
@@ -17,22 +18,38 @@ func notify_bear():
 func _on_body_entered(body):
 	var consumed = false
 	
-	# Check if body can receive Heal Over Time
-	if body.has_method("start_heal_over_time"):
-		if body.is_in_group("player"):
+	# Scenario 1: Monk picks it up
+	if body.is_in_group("player"):
+		# Try to call HoT function first
+		if body.has_method("start_heal_over_time"):
 			body.start_heal_over_time(total_heal, heal_duration)
 			consumed = true
-			print("Monk started healing over time!")
+		elif body.has_method("heal_self"):
+			body.heal_self(total_heal)
+			consumed = true
 			
-		elif body.is_in_group("bear"):
+		if consumed:
+			print("Monk stole the honey!")
+			# FIX: Tell Bear to stop chasing immediately!
+			var bears = get_tree().get_nodes_in_group("bear")
+			if bears.size() > 0:
+				var bear = bears[0]
+				if bear.has_method("stop_eating_honey"):
+					bear.stop_eating_honey()
+	
+	# Scenario 2: Bear eats it
+	elif body.is_in_group("bear"):
+		if body.has_method("start_heal_over_time"):
 			body.start_heal_over_time(total_heal, heal_duration)
-			
-			# Stop chasing this specific pot
+			consumed = true
+		elif body.has_method("heal_self"):
+			body.heal_self(total_heal)
+			consumed = true
+		
+		if consumed:
 			if body.has_method("stop_eating_honey"):
 				body.stop_eating_honey()
-				
-			consumed = true
-			print("Bear started healing over time!")
-	
+			print("Bear ate the honey!")
+		
 	if consumed:
 		queue_free()

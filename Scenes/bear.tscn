@@ -318,6 +318,7 @@ collision_mask = 32
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_2imu7")
+max_rotation_degrees = 40.0
 footstep_sounds = Array[AudioStream]([ExtResource("2_iwwop"), ExtResource("3_1n3x6"), ExtResource("4_f23w8"), ExtResource("5_1e87v"), ExtResource("6_00y8w"), ExtResource("7_bck8s")])
 attack_sound = ExtResource("2_mlyxe")
 

@@ -5,7 +5,12 @@ var current_state = State.FOLLOW
 
 @export_group("Stats")
 @export var move_speed = 180.0
-@export var max_hp = 200.0
+@export var max_hp = 200.0:
+	set(value):
+		max_hp = value
+		# Update the bar whenever Max HP changes (e.g. Upgrade)
+		if hp_bar:
+			hp_bar.max_value = max_hp
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
 # NEW: Give him better eyes!
@@ -95,6 +100,13 @@ var is_wandering: bool = false
 
 var lunge_velocity: Vector2 = Vector2.ZERO
 var lunge_friction: float = 2000.0 # How fast he stops
+
+# Add this with your other internal variables
+var charge_hit_list: Array[Node2D] = []
+
+# --- NEW: QUEUE SYSTEM ---
+var has_pending_honey: bool = false
+var pending_honey_pos: Vector2 = Vector2.ZERO
 
 # --- NODES ---
 @onready var sprite = $AnimatedSprite2D
@@ -206,8 +218,13 @@ func behavior_follow(delta):
 		var dist = global_position.distance_to(honey_target_pos)
 		if dist > 20.0:
 			var dir = global_position.direction_to(honey_target_pos)
-			velocity = dir * move_speed 
+			
+			# --- CHANGE: Apply 1.5x Speed Boost ---
+			velocity = dir * (move_speed * 1.5) 
 			sprite.play("run")
+			sprite.speed_scale = 1.5 # Run faster!
+			# --------------------------------------
+			
 			update_orientation(honey_target_pos)
 		else:
 			velocity = Vector2.ZERO
@@ -326,24 +343,28 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 func behavior_charging(delta):
 	charge_duration_timer -= delta
 	
-	# Move unstoppable
 	velocity = charge_velocity
 	move_and_slide()
 	
-	# Deal Damage to everyone we touch (Using AttackArea as the "bumper")
+	# Deal Damage (ONE TIME PER ENEMY)
 	var bodies = attack_area.get_overlapping_bodies()
 	for body in bodies:
-		if body.is_in_group("enemy") and body.has_method("take_damage"):
-			# Apply massive damage and knockback
-			body.take_damage(charge_damage * delta * 5) # DPS style or one-shot? 
-			# Better: Apply knockback away from charge direction
-			if body.has_method("apply_knockback"):
-				var knock_dir = charge_velocity.normalized().rotated(deg_to_rad(90)) # Push aside
-				body.apply_knockback(knock_dir * 300.0)
+		# CHECK: Is it an enemy AND is it NOT in the list yet?
+		if body.is_in_group("enemy") and body not in charge_hit_list:
+			
+			# MARK AS HIT: Add to list so we ignore it next frame
+			charge_hit_list.append(body)
+			
+			if body.has_method("take_damage"):
+				# Damage is applied once
+				body.take_damage(charge_damage) 
+				
+				# Knockback is applied once (No sliding!)
+				if body.has_method("apply_knockback"):
+					var knock_dir = charge_velocity.normalized().rotated(deg_to_rad(90))
+					body.apply_knockback(knock_dir * 500.0) 
 
-	# End Condition CHANGED:
 	if charge_duration_timer <= 0:
-		# Don't stop yet! Start braking.
 		current_state = State.CHARGE_STOPPING
 
 func behavior_charge_stopping(delta):
@@ -384,16 +405,38 @@ func play_attack_sound():
 
 func detect_honey(honey_position: Vector2):
 	if is_downed or is_frenzy_active: return
-	is_chasing_honey = true
-	honey_target_pos = honey_position
-	current_state = State.FOLLOW
-	target_enemy = null 
+	
+	# Check if busy with a locked animation/skill
+	var is_busy = current_state in [State.CHARGE_PREP, State.CHARGING, State.CHARGE_STOPPING, State.ATTACK]
+	
+	if is_busy:
+		print("Urso ocupado! Mel na fila de espera.")
+		has_pending_honey = true
+		pending_honey_pos = honey_position
+	else:
+		start_honey_chase(honey_position)
 
 func stop_eating_honey():
+	has_pending_honey = false
+	
 	if is_chasing_honey:
 		is_chasing_honey = false
 		wander_timer = 1.0 
+		
+		# --- CHANGE: Reset Animation Speed ---
+		if sprite: sprite.speed_scale = 1.0
 
+func start_honey_chase(target_pos: Vector2):
+	print("Urso indo pegar o mel!")
+	is_chasing_honey = true
+	honey_target_pos = target_pos
+	
+	# Clear queue
+	has_pending_honey = false
+	
+	current_state = State.FOLLOW
+	target_enemy = null
+	
 func start_heal_over_time(total_amount: float, duration: float):
 	if is_downed: return
 	heal_timer = duration
@@ -594,11 +637,14 @@ func _on_animation_finished():
 		if not damage_dealt_this_attack: apply_damage_snapshot()
 		
 		sprite.speed_scale = 1.0 
-		
-		# Scale is permanent, no need to reset it every attack!
-		# Just ensure consistency (optional safety call)
 		update_hitbox_scale()
 		
+		# --- CHECK QUEUE FIRST ---
+		if has_pending_honey:
+			start_honey_chase(pending_honey_pos)
+			return # Stop here, don't go back to follow/frenzy yet
+		
+		# Normal Logic
 		if is_frenzy_active:
 			current_state = State.FRENZY
 			target_enemy = null 
@@ -757,35 +803,43 @@ func start_charge_prep():
 	current_state = State.CHARGE_PREP
 	print("Bear is winding up a CHARGE!")
 	
-	# --- VISUAL PULSE (Blink Red + Scale Up/Down) ---
+	# 1. FACE TARGET IMMEDIATELY
+	if is_instance_valid(target_enemy):
+		update_orientation(target_enemy.global_position)
+	
+	# 2. REV UP ANIMATION (Start Slow -> End Fast)
+	sprite.play("run")
+	sprite.speed_scale = 0.5 # Start dragging paws
+	
+	var speed_tween = create_tween()
+	# Ramp up to 2.5x speed to match the Launch speed
+	speed_tween.tween_property(sprite, "speed_scale", 2.5, charge_prep_duration)\
+		.set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+	
+	# 3. VISUAL PULSE (Blink Red + Scale Up/Down)
 	var tween = create_tween().set_loops()
 	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	
-	# Step 1: Go Red and Big
-	# Color(3, 0.2, 0.2) is a very bright "Glowing" Red
+	# Pulse Red/Big
 	tween.tween_property(sprite, "modulate", Color(3.0, 0.2, 0.2), 0.2)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.2, 1.2), 0.2)
 	
-	# Step 2: Go Normal
+	# Pulse Normal
 	tween.tween_property(sprite, "modulate", Color.WHITE, 0.2)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.2)
 	
-	# -----------------------------------------------
-	
-	# Highlight Target
+	# 4. Highlight Target Marker
 	if is_instance_valid(target_enemy):
 		if target_marker_scene:
 			active_target_marker = target_marker_scene.instantiate()
 			target_enemy.add_child(active_target_marker)
 			active_target_marker.position = Vector2(0, -90) 
 	
-	# Wait for the specific Prep Duration
+	# 5. Wait then Launch
 	await get_tree().create_timer(charge_prep_duration).timeout
 	
-	# If we are still preparing (didn't get stunned/died), Launch!
 	if current_state == State.CHARGE_PREP:
-		# Kill the pulsing tween so it doesn't fight the Launch visuals
-		if tween: tween.kill()
+		if tween: tween.kill() # Stop pulsing
 		start_charge_launch()
 
 func start_charge_launch():
@@ -796,6 +850,9 @@ func start_charge_launch():
 
 	current_state = State.CHARGING
 	
+	# --- RESET HIT LIST ---
+	charge_hit_list.clear() # IMPORTANT: Fresh list for a new charge!
+	
 	# --- VISUAL LOCK ---
 	sprite.modulate = Color(3.0, 0.2, 0.2) 
 	sprite.scale = Vector2.ONE 
@@ -804,18 +861,11 @@ func start_charge_launch():
 	
 	var dir = global_position.direction_to(target_enemy.global_position)
 	var dist = global_position.distance_to(target_enemy.global_position)
-	
-	# --- DISTANCE CALCULATION UPDATE ---
-	# Calculate desired distance (Target + Overshoot)
 	var calculated_dist = dist + charge_overshoot
-	
-	# Force it to be at least 400px (or whatever you set in Inspector)
 	var final_dist = max(calculated_dist, charge_min_distance)
 	
 	charge_velocity = dir * charge_speed
 	charge_duration_timer = final_dist / charge_speed
-	
-	set_collision_mask_value(3, false) 
 	
 	play_attack_sound()
 
@@ -823,10 +873,11 @@ func end_charge():
 	current_state = State.FOLLOW
 	current_charge_cooldown = charge_cooldown
 	
-	# Restore Collision
-	set_collision_mask_value(3, true) # Re-enable enemy collision
-	
 	reset_visuals()
+	
+	# --- CHECK QUEUE ---
+	if has_pending_honey:
+		start_honey_chase(pending_honey_pos)
 
 func reset_visuals():
 	# Restore Color

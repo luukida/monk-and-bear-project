@@ -59,7 +59,6 @@ z_index = -1
 points = PackedVector2Array(-248, 281)
 player = NodePath("../Monk")
 bear = NodePath("../Bear")
-max_length = 600.0
 pull_strength = 25.0
 base_width = 300.0
 

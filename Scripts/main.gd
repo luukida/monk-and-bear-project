@@ -1,5 +1,7 @@
 extends Node2D
 
+var settings_scene = preload("res://Scenes/settings_menu.tscn")
+
 func _ready():
 	# Garante que as referências existam antes de conectar
 	if has_node("Monk") and has_node("Bear"):
@@ -97,3 +99,32 @@ func apply_upgrade(upgrade: UpgradeItem):
 					print("Skill Unlocked: Meteor Slam")
 	
 	get_tree().paused = false
+
+func _input(event):
+	# "ui_cancel" is mapped to ESC by default in Godot
+	if event.is_action_pressed("ui_cancel"):
+		toggle_settings()
+
+func toggle_settings():
+	# If we are already paused, assume we want to close (or handled by the menu itself)
+	# But checking if the menu exists avoids duplicates
+	if get_tree().paused:
+		return 
+
+	print("Opening Settings Popup...")
+	
+	# 1. Instantiate the Settings
+	var settings = settings_scene.instantiate()
+	
+	# 2. Configure it as a Popup
+	settings.is_gameplay_popup = true
+	
+	# 3. Create a temporary CanvasLayer 
+	# (This ensures the menu draws ON TOP of your HUD and everything else)
+	var layer = CanvasLayer.new()
+	layer.layer = 100 # Very high priority
+	layer.add_child(settings)
+	add_child(layer)
+	
+	# 4. Pause the Game
+	get_tree().paused = true

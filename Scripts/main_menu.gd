@@ -26,7 +26,7 @@ func _ready():
 	# Wait one frame for UI layout to calculate positions
 	await get_tree().process_frame
 	var first_btn = buttons_container.get_child(0)
-	first_btn.grab_focus()
+	#first_btn.grab_focus()
 	_on_button_focused(first_btn)
 
 func _on_button_focused(btn: Button):

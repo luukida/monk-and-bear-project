@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://dmbc0o4cy52u6"]
+[gd_scene load_steps=9 format=3 uid="uid://dmbc0o4cy52u6"]
 
 [ext_resource type="Script" uid="uid://bgu6wuc2w6o2c" path="res://Scripts/settings_menu.gd" id="1_icv2g"]
+[ext_resource type="Texture2D" uid="uid://cfxw4gcvktpev" path="res://Assets/UI/MagicalUI/Body/Scroll2.png" id="2_3etfd"]
+[ext_resource type="Texture2D" uid="uid://b4ddl76wxgfwm" path="res://Assets/UI/MagicalUI/Headers/Header7.png" id="3_rahb6"]
+[ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="4_fe37x"]
+[ext_resource type="Texture2D" uid="uid://5pvrpcd4os4i" path="res://Assets/UI/MagicalUI/Headers/Header2.png" id="5_jjs6x"]
+[ext_resource type="Texture2D" uid="uid://c16dae5msx8j" path="res://Assets/UI/MagicalUI/BodyAssets/ItemFrame.2.png" id="6_rahb6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fsgis"]
+
+[sub_resource type="Theme" id="Theme_fe37x"]
+HSlider/icons/grabber = ExtResource("6_rahb6")
+HSlider/icons/grabber_highlight = ExtResource("6_rahb6")
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -18,7 +29,112 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.16078432, 0.05490196, 0, 1)
+color = Color(0.16078432, 0.05490196, 0, 0.78431374)
+
+[node name="ScrollBG" type="TextureRect" parent="."]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 94.301636
+offset_top = 121.0
+offset_right = -94.301636
+offset_bottom = -159.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_3etfd")
+stretch_mode = 5
+
+[node name="Header" type="TextureRect" parent="."]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 310.10052
+offset_top = -11.0
+offset_right = -310.10052
+offset_bottom = -465.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_rahb6")
+stretch_mode = 5
+
+[node name="SettingsLabel" type="Label" parent="Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 125.899475
+offset_top = 81.0
+offset_right = -125.899475
+offset_bottom = -71.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_fe37x")
+theme_override_font_sizes/font_size = 85
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 185.0
+offset_top = 191.0
+offset_right = -185.0
+offset_bottom = 309.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 63
+alignment = 1
+
+[node name="SmallScrollBack" type="TextureRect" parent="HBoxContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+texture = ExtResource("5_jjs6x")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="BackButton" type="Button" parent="HBoxContainer/SmallScrollBack"]
+custom_minimum_size = Vector2(82.66, 50)
+layout_mode = 0
+offset_left = 152.0
+offset_top = 35.0
+offset_right = 244.0
+offset_bottom = 85.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("4_fe37x")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/focus = SubResource("StyleBoxEmpty_fsgis")
+text = "Back"
+flat = true
+
+[node name="SmallScrollMainMenu" type="TextureRect" parent="HBoxContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+texture = ExtResource("5_jjs6x")
+stretch_mode = 5
+
+[node name="QuitToTitleButton" type="Button" parent="HBoxContainer/SmallScrollMainMenu"]
+layout_mode = 0
+offset_left = 108.0
+offset_top = 35.0
+offset_right = 295.0
+offset_bottom = 85.0
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_fe37x")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/focus = SubResource("StyleBoxEmpty_fsgis")
+text = "Main Menu"
+flat = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -27,46 +143,57 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -130.0
-offset_top = -62.5
-offset_right = 130.0
-offset_bottom = 62.5
+offset_left = -175.0
+offset_top = -101.0
+offset_right = 175.0
+offset_bottom = 72.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MusicLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_fe37x")
+theme_override_font_sizes/font_size = 36
 text = "Music volume"
 horizontal_alignment = 1
 
 [node name="MusicSlider" type="HSlider" parent="VBoxContainer"]
-custom_minimum_size = Vector2(178.105, 0)
+custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+theme = SubResource("Theme_fe37x")
 max_value = 1.0
-step = 0.05
+step = 0.1
 value = 1.0
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="ReferenceRect" type="ReferenceRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 11.785)
+layout_mode = 2
 
 [node name="SFXLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_fe37x")
+theme_override_font_sizes/font_size = 36
 text = "SFX volume"
 horizontal_alignment = 1
 
 [node name="SFXSlider" type="HSlider" parent="VBoxContainer"]
-custom_minimum_size = Vector2(178.105, 0)
+custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_icons/grabber = ExtResource("6_rahb6")
+theme_override_icons/grabber_highlight = ExtResource("6_rahb6")
 max_value = 1.0
-step = 0.05
+step = 0.1
 value = 1.0
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
 
-[node name="BackButton" type="Button" parent="VBoxContainer"]
-custom_minimum_size = Vector2(82.66, 50)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "Back"
-
+[connection signal="pressed" from="HBoxContainer/SmallScrollBack/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/SmallScrollMainMenu/QuitToTitleButton" to="." method="_on_quit_to_title_button_pressed"]
 [connection signal="value_changed" from="VBoxContainer/MusicSlider" to="." method="_on_music_slider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
-[connection signal="pressed" from="VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

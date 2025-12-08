@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-@onready var info_label = $VBoxContainer/InfoLabel
-@onready var restart_button = $VBoxContainer/RestartButton
+@onready var info_label = $InfoLabel
+@onready var restart_button = $HBoxContainer/RestartScroll/RestartButton
 # 1. New Reference
 @onready var sfx_player = $GameOverSFX 
 

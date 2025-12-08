@@ -15,7 +15,7 @@ var survived_wave_number: int = 1
 @export var skill_upgrades: Array[UpgradeItem] = []
 
 # Chance for a card slot to become a Skill Card (e.g., 20%)
-@export var skill_card_chance: float = 1.0
+@export var skill_card_chance: float = 0.2
 
 signal xp_changed(current, required)
 signal level_up(new_level)

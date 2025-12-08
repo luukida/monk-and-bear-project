@@ -1,10 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://b3wkshjwwug7t"]
+[gd_scene load_steps=26 format=3 uid="uid://b3wkshjwwug7t"]
 
 [ext_resource type="Script" uid="uid://b0bx5ejfkyopg" path="res://Scripts/new_hud.gd" id="1_jd4hw"]
 [ext_resource type="Texture2D" uid="uid://d18ybvjmxbxjc" path="res://Assets/LifeAndEXPBars/BorderBG.png" id="2_e6lij"]
 [ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/skill_slot.tscn" id="3_0plam"]
 [ext_resource type="Texture2D" uid="uid://cpsfhdqfv3ykq" path="res://Assets/LifeAndEXPBars/REDColors.png" id="3_dllsv"]
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="4_bcuyj"]
+[ext_resource type="Texture2D" uid="uid://cpj66psa8oo03" path="res://Assets/Icons/Icon37_withBG.png" id="5_1mesj"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="5_a6cb5"]
 [ext_resource type="Texture2D" uid="uid://b7ko0jgxt7lit" path="res://Assets/Rope/rope_texture.png" id="5_cdm4t"]
 [ext_resource type="Texture2D" uid="uid://dhn51cepvcdo7" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Border-01.png" id="8_bcuyj"]
@@ -18,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://dr21e5oqjktg7" path="res://Assets/Icons/18.png" id="14_gpxep"]
 [ext_resource type="Texture2D" uid="uid://x2lk1c52de4p" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Fill-01.png" id="14_lgw6u"]
 [ext_resource type="Texture2D" uid="uid://ch2cm1gaa7g74" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Avatar-01.png" id="15_olccw"]
+[ext_resource type="Texture2D" uid="uid://ih7t0vht4ql2" path="res://Assets/Card/red_circleshape.png" id="16_gpxep"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y3i04"]
 atlas = ExtResource("2_e6lij")
@@ -35,9 +37,17 @@ region = Rect2(358, 678, 20, 20)
 atlas = ExtResource("5_cdm4t")
 region = Rect2(0, 123.074, 256, 14.252007)
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_msa0c"]
+load_path = "res://.godot/imported/blue_circleshape.png-726dc8c6fec2e05d2d3269052118df68.ctex"
+
 [node name="NewHUD" type="CanvasLayer"]
 script = ExtResource("1_jd4hw")
-metadata/_edit_horizontal_guides_ = [461.0]
+icon_lunge = ExtResource("12_olccw")
+icon_charge = ExtResource("13_1mesj")
+icon_meteor = ExtResource("14_gpxep")
+icon_honey = ExtResource("5_1mesj")
+metadata/_edit_vertical_guides_ = [640.0]
+metadata/_edit_horizontal_guides_ = [360.0]
 
 [node name="XPBar" type="TextureProgressBar" parent="."]
 texture_filter = 1
@@ -116,16 +126,42 @@ offset_top = 612.0
 offset_right = 419.0
 offset_bottom = 652.0
 
-[node name="Skills" type="HBoxContainer" parent="MonkPanel"]
-layout_mode = 0
-offset_left = 78.0
-offset_top = -81.0
-offset_right = 278.0
-offset_bottom = 12.0
-alignment = 1
+[node name="Skills" type="Control" parent="MonkPanel"]
+anchors_preset = 0
+offset_left = 17.0
+offset_top = 8.0
+offset_right = 57.0
+offset_bottom = 48.0
 
-[node name="SlotHoney" parent="MonkPanel/Skills" instance=ExtResource("3_0plam")]
-layout_mode = 2
+[node name="SkillSlot01" parent="MonkPanel/Skills" instance=ExtResource("3_0plam")]
+layout_mode = 0
+offset_left = 85.0
+offset_top = -53.0
+offset_right = 85.0
+offset_bottom = 40.0
+
+[node name="SkillSlot02" parent="MonkPanel/Skills" instance=ExtResource("3_0plam")]
+layout_mode = 0
+offset_left = 136.0
+offset_top = -113.0
+offset_right = 136.0
+offset_bottom = -20.0
+
+[node name="KeyLabel" parent="MonkPanel/Skills/SkillSlot02/TextureRect" index="0"]
+text = "2"
+
+[node name="SkillSlot03" parent="MonkPanel/Skills" instance=ExtResource("3_0plam")]
+layout_mode = 0
+offset_left = 188.0
+offset_top = -53.0
+offset_right = 188.0
+offset_bottom = 40.0
+
+[node name="CircleShapeBorder" parent="MonkPanel/Skills/SkillSlot03" index="3"]
+texture = SubResource("CompressedTexture2D_msa0c")
+
+[node name="KeyLabel" parent="MonkPanel/Skills/SkillSlot03/TextureRect" index="0"]
+text = "3"
 
 [node name="HPBar_Border" type="TextureRect" parent="MonkPanel"]
 layout_mode = 1
@@ -175,39 +211,48 @@ offset_top = 612.0
 offset_right = 879.0
 offset_bottom = 652.0
 
-[node name="SkillsBearContainer" type="HBoxContainer" parent="BearPanel"]
+[node name="Skills" type="Control" parent="BearPanel"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SkillSlot01" parent="BearPanel/Skills" instance=ExtResource("3_0plam")]
 layout_mode = 0
-offset_left = 125.0
-offset_top = -36.0
-offset_right = 263.0
-offset_bottom = 4.0
-theme_override_constants/separation = 69
+offset_left = -144.0
+offset_top = -45.0
+offset_right = -144.0
+offset_bottom = -5.0
 
-[node name="SlotLunge" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
-layout_mode = 2
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot01" index="3"]
+texture = ExtResource("16_gpxep")
 
-[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotLunge" index="0"]
-texture = ExtResource("12_olccw")
-
-[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotLunge" index="3"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot01" index="4"]
 visible = false
 
-[node name="SlotCharge" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
-layout_mode = 2
+[node name="SkillSlot02" parent="BearPanel/Skills" instance=ExtResource("3_0plam")]
+layout_mode = 0
+offset_left = -41.0
+offset_top = -45.0
+offset_right = -41.0
+offset_bottom = -5.0
 
-[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotCharge" index="0"]
-texture = ExtResource("13_1mesj")
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot02" index="3"]
+texture = ExtResource("16_gpxep")
 
-[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotCharge" index="3"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot02" index="4"]
 visible = false
 
-[node name="SlotMeteor" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
-layout_mode = 2
+[node name="SkillSlot03" parent="BearPanel/Skills" instance=ExtResource("3_0plam")]
+layout_mode = 0
+offset_left = -93.0
+offset_top = -105.0
+offset_right = -93.0
+offset_bottom = -65.0
 
-[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotMeteor" index="0"]
-texture = ExtResource("14_gpxep")
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot03" index="3"]
+texture = ExtResource("16_gpxep")
 
-[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotMeteor" index="3"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot03" index="4"]
 visible = false
 
 [node name="HPBar_Border" type="TextureRect" parent="BearPanel"]
@@ -244,6 +289,8 @@ scale = Vector2(0.44, 0.44)
 texture = ExtResource("15_olccw")
 stretch_mode = 4
 
-[editable path="BearPanel/SkillsBearContainer/SlotLunge"]
-[editable path="BearPanel/SkillsBearContainer/SlotCharge"]
-[editable path="BearPanel/SkillsBearContainer/SlotMeteor"]
+[editable path="MonkPanel/Skills/SkillSlot02"]
+[editable path="MonkPanel/Skills/SkillSlot03"]
+[editable path="BearPanel/Skills/SkillSlot01"]
+[editable path="BearPanel/Skills/SkillSlot02"]
+[editable path="BearPanel/Skills/SkillSlot03"]

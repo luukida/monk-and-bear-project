@@ -1,8 +1,8 @@
 extends Control
 
-@onready var icon_rect = $Icon
+@onready var icon_rect = $ClipShape/Icon
 @onready var cooldown_bar = $CooldownOverlay
-@onready var key_label = $KeyLabel
+@onready var key_label = $TextureRect/KeyLabel
 @onready var timer_label = $TimerLabel # Ensure you added this Label node in the scene!
 
 # Tween for the flashing effect

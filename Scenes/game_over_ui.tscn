@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://wnc7aowlugt1"]
+[gd_scene load_steps=7 format=3 uid="uid://wnc7aowlugt1"]
 
 [ext_resource type="Script" uid="uid://cjub8u7uhpw2h" path="res://Scripts/game_over_ui.gd" id="1_lth8f"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="2_qqn7r"]
-[ext_resource type="Texture2D" uid="uid://br60alsdiql37" path="res://Assets/UI/StoneUI/UI board Medium  stone.png" id="2_vec04"]
-[ext_resource type="Texture2D" uid="uid://t6ui44dnagt5" path="res://Assets/UI/StoneUI/IRONY TITLE  empty.png" id="3_v1ufb"]
+[ext_resource type="Texture2D" uid="uid://bgged5yl8mnqv" path="res://Assets/UI/MagicalUI/Body/Scroll4.png" id="2_v1ufb"]
+[ext_resource type="Texture2D" uid="uid://cfxw4gcvktpev" path="res://Assets/UI/MagicalUI/Body/Scroll2.png" id="4_xy24n"]
 [ext_resource type="AudioStream" uid="uid://cb3ny611b4xg3" path="res://Audio/SFX/GameOver/mixkit-game-over-trombone-1940.wav" id="5_v1ufb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1xoaq"]
 
 [node name="GameOverUI" type="CanvasLayer"]
 layer = 3
@@ -19,94 +21,123 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.5882353)
 
 [node name="TextureRect" type="TextureRect" parent="."]
+texture_filter = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -257.96283
-offset_top = -173.0
-offset_right = 257.96283
-offset_bottom = 173.0
+offset_left = -239.0
+offset_top = -346.0
+offset_right = 239.0
+offset_bottom = 196.92322
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_vec04")
-expand_mode = 1
+texture = ExtResource("2_v1ufb")
 stretch_mode = 5
 
-[node name="TextureRect2" type="TextureRect" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -197.0
-offset_top = -218.0
-offset_right = 197.0
-offset_bottom = -109.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_v1ufb")
-
-[node name="TitleLabel" type="Label" parent="TextureRect2"]
-layout_mode = 0
-offset_left = 47.0
-offset_top = 24.0
-offset_right = 347.0
-offset_bottom = 88.0
+[node name="TitleLabel" type="Label" parent="."]
+offset_left = 478.0
+offset_top = 155.0
+offset_right = 803.0
+offset_bottom = 358.0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_constants/paragraph_spacing = -12
 theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("2_qqn7r")
-theme_override_font_sizes/font_size = 60
-text = "GAME OVER"
+theme_override_font_sizes/font_size = 95
+text = "GAME
+OVER"
 horizontal_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-custom_minimum_size = Vector2(348.925, 0)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -143.0875
-offset_top = -79.0
-offset_right = 143.08752
-offset_bottom = 132.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="InfoLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
+[node name="InfoLabel" type="Label" parent="."]
+offset_left = 465.53754
+offset_top = 381.0
+offset_right = 813.53754
+offset_bottom = 460.0
 theme_override_fonts/font = ExtResource("2_qqn7r")
-theme_override_font_sizes/font_size = 35
+theme_override_font_sizes/font_size = 30
 text = "You survived until Wave X"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="ReferenceRect" type="ReferenceRect" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 24.88)
-layout_mode = 2
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -353.0
+offset_top = -184.0
+offset_right = 353.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 49
+alignment = 1
 
-[node name="RestartButton" type="Button" parent="VBoxContainer"]
+[node name="RestartScroll" type="TextureRect" parent="HBoxContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(303.865, 0)
+layout_mode = 2
+texture = ExtResource("4_xy24n")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RestartButton" type="Button" parent="HBoxContainer/RestartScroll"]
 custom_minimum_size = Vector2(80, 50)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -65.0
+offset_top = -22.0
+offset_right = 62.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2_qqn7r")
+theme_override_font_sizes/font_size = 31
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1xoaq")
 text = "Restart"
+flat = true
 
-[node name="QuitButton" type="Button" parent="VBoxContainer"]
-custom_minimum_size = Vector2(125, 50)
+[node name="QuitScroll" type="TextureRect" parent="HBoxContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(303.865, 0)
 layout_mode = 2
+texture = ExtResource("4_xy24n")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuitButton" type="Button" parent="HBoxContainer/QuitScroll"]
+custom_minimum_size = Vector2(125, 50)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -89.5
+offset_top = -22.0
+offset_right = 87.5
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2_qqn7r")
+theme_override_font_sizes/font_size = 31
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1xoaq")
 text = "Main Menu"
+flat = true
 
 [node name="GameOverSFX" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_v1ufb")
 volume_db = -1.0
 bus = &"SFX"
 
-[connection signal="pressed" from="VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/RestartScroll/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/QuitScroll/QuitButton" to="." method="_on_quit_button_pressed"]

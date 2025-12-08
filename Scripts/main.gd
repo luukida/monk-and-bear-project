@@ -80,12 +80,20 @@ func apply_upgrade(upgrade: UpgradeItem):
 
 		# LOGIC FOR SKILLS (Booleans)
 		elif upgrade.type == UpgradeItem.CardType.SKILL: 
-			# Custom logic for specific skills
-			if upgrade.property_name == "unlock_lunge" and target_node.has_method("set"):
-				target_node.can_lunge = true
-				print("Skill Unlocked: Lunge")
-			elif upgrade.property_name == "unlock_charge" and target_node.has_method("set"):
-				target_node.can_charge = true
-				print("Skill Unlocked: Charge")
+			if upgrade.property_name == "unlock_lunge":
+				# Safety Check: Does 'can_lunge' exist on this bear?
+				if "can_lunge" in target_node:
+					target_node.can_lunge = true
+					print("Skill Unlocked: Lunge")
+					
+			elif upgrade.property_name == "unlock_charge":
+				if "can_charge" in target_node:
+					target_node.can_charge = true
+					print("Skill Unlocked: Charge")
+					
+			elif upgrade.property_name == "unlock_meteor":
+				if "can_meteor" in target_node:
+					target_node.can_meteor = true
+					print("Skill Unlocked: Meteor Slam")
 	
 	get_tree().paused = false

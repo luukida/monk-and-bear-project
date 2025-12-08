@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://c7qvxr3fw26pb"]
+
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_0dssw"]
+[ext_resource type="Texture2D" uid="uid://dr21e5oqjktg7" path="res://Assets/Icons/18.png" id="1_itqvf"]
+
+[resource]
+script = ExtResource("1_0dssw")
+title = "Meteor Jump"
+description = "The Bear jumps into the crowdest area of enemies, dealing high damage and stunning who were still alive."
+icon = ExtResource("1_itqvf")
+type = 1
+property_name = "unlock_meteor"
+amount = 1.0
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="2_1sg17"]
 [ext_resource type="Texture2D" uid="uid://bfj6w6lo33kpn" path="res://Assets/Icons/15.png" id="3_2y322"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="4_ujfj0"]
-[ext_resource type="Script" uid="uid://c72kmftn22hui" path="res://Scenes/title_path_2d.gd" id="5_gska2"]
+[ext_resource type="Script" uid="uid://c72kmftn22hui" path="res://Scripts/title_path_2d.gd" id="5_gska2"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3hbvc"]
 atlas = ExtResource("2_1sg17")

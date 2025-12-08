@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dlv6gwtermvur" path="res://Scripts/stat_card.gd" id="1_5at7e"]
 [ext_resource type="Texture2D" uid="uid://dbk141h1n1v11" path="res://Assets/Icons/FHD (2).png" id="2_5at7e"]
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="2_8u55g"]
-[ext_resource type="Script" uid="uid://c72kmftn22hui" path="res://Scenes/title_path_2d.gd" id="4_3hbvc"]
+[ext_resource type="Script" uid="uid://c72kmftn22hui" path="res://Scripts/title_path_2d.gd" id="4_3hbvc"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="4_w0hou"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3hbvc"]

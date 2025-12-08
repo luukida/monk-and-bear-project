@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://b24xej33g12ye"]
+
+[ext_resource type="Script" uid="uid://436xm2iidqka" path="res://meteor_marker.gd" id="1_sfpjs"]
+
+[sub_resource type="Gradient" id="Gradient_8sifq"]
+offsets = PackedFloat32Array(0.33, 0.69, 0.70666665)
+colors = PackedColorArray(1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0u22m"]
+gradient = SubResource("Gradient_8sifq")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="MeteorMarker" type="Node2D"]
+z_index = -1
+script = ExtResource("1_sfpjs")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(7.90625, 7.90625)
+texture = SubResource("GradientTexture2D_0u22m")

@@ -24,6 +24,7 @@ var target: Node2D = null
 var default_shape_x: float = 0.0
 var default_telegraph_x: float = 0.0
 var knockback_velocity: Vector2 = Vector2.ZERO
+var is_stunned: bool = false
 
 # Nós Filhos
 @onready var sprite = $AnimatedSprite2D
@@ -58,6 +59,10 @@ func _ready():
 		bear_ref = bears[0]
 
 func _physics_process(delta):
+	# 1. STUN CHECK
+	if is_stunned:
+		return # Do nothing while stunned
+	
 	target = select_target()
 	
 	match current_state:
@@ -202,6 +207,21 @@ func apply_knockback(force_vector: Vector2):
 		current_state = State.CHASE
 		if telegraph: telegraph.visible = false
 		sprite.speed_scale = 1.0
+
+func apply_stun(duration: float):
+	is_stunned = true
+	sprite.modulate = Color(0.5, 0.5, 1.0) # Turn Blue-ish
+	sprite.pause() # Stop animation
+	
+	# Stop any current attacks/telegraphs
+	if telegraph: telegraph.visible = false
+	
+	# Wait and Recover
+	await get_tree().create_timer(duration).timeout
+	
+	is_stunned = false
+	sprite.modulate = Color.WHITE
+	sprite.play()
 
 func take_damage(amount):
 	hp -= amount

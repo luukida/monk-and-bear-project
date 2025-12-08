@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY, PREPARE, CHARGE_PREP, CHARGING, CHARGE_STOPPING }
+enum State { FOLLOW, CHASE, ATTACK, DOWNED, FRENZY, PREPARE, CHARGE_PREP, CHARGING, CHARGE_STOPPING, METEOR_JUMP }
 var current_state = State.FOLLOW
 
 @export_group("Stats")
@@ -41,7 +41,7 @@ var current_state = State.FOLLOW
 
 var current_step_timer: float = 0.0
 
-@export_group("Skills Config")
+@export_group("Skill Charge")
 @export var charge_cooldown: float = 8.0
 @export var charge_damage: float = 60.0
 @export var charge_speed: float = 400.0
@@ -54,11 +54,22 @@ var current_step_timer: float = 0.0
 # NEW: Multiplier for damage taken while charging up (0.3 = takes 30% damage)
 @export var charge_prep_damage_multiplier: float = 0.3
 
+@export_group("Skill Meteor Slam")
+@export var can_meteor: bool = false # Unlockable
+@export var meteor_cooldown: float = 12.0
+@export var meteor_damage: float = 80.0
+@export var meteor_radius: float = 250.0
+@export var meteor_jump_duration: float = 0.8
+@export var meteor_stun_duration: float = 2.0
+
+var current_meteor_cooldown: float = 0.0
+
 var current_charge_cooldown: float = 0.0
 var charge_velocity: Vector2 = Vector2.ZERO
 var charge_duration_timer: float = 0.0
 var active_target_marker: Node2D = null
-var target_marker_scene = preload("res://Scenes/BearSkills/target_marker.tscn") # Make sure to create this!
+var target_marker_scene = preload("res://Scenes/BearSkills/target_marker.tscn")
+var meteor_marker_scene = preload("res://Scenes/BearSkills/meteor_marker.tscn")
 
 # --- SKILL UNLOCKS ---
 var can_lunge: bool = false:
@@ -182,15 +193,26 @@ func _physics_process(delta):
 	else:
 		current_step_timer = 0.0
 
-	# 3. Cooldowns
+	# --- COOLDOWNS ---
 	if current_charge_cooldown > 0:
 		current_charge_cooldown -= delta
+		
+	# ADD THIS MISSING BLOCK:
+	if current_meteor_cooldown > 0:
+		current_meteor_cooldown -= delta
 
 	# 4. State Machine
 	match current_state:
 		State.FOLLOW:
 			behavior_follow(delta)
 		State.CHASE:
+			# --- METEOR LOGIC ---
+			if can_meteor and current_meteor_cooldown <= 0:
+				# CHECK REMOVED: He will jump even for 1 enemy now!
+				# We just check if there is AT LEAST one to aim at.
+				if not detection_area.get_overlapping_bodies().is_empty():
+					start_meteor_slam()
+					return
 			behavior_chase() # Now checks for Charge internally!
 		State.FRENZY:
 			behavior_frenzy(delta)
@@ -206,6 +228,9 @@ func _physics_process(delta):
 			behavior_charging(delta)
 		State.CHARGE_STOPPING:
 			behavior_charge_stopping(delta)
+		State.METEOR_JUMP:
+			# Do nothing, wait for tween
+			pass
 	
 	move_and_slide()
 
@@ -893,3 +918,115 @@ func reset_visuals():
 	# Remove Marker
 	if is_instance_valid(active_target_marker):
 		active_target_marker.queue_free()
+
+func find_best_meteor_target() -> Vector2:
+	var bodies = detection_area.get_overlapping_bodies()
+	var enemies = []
+	for b in bodies:
+		if b.is_in_group("enemy"): enemies.append(b)
+	
+	if enemies.is_empty(): return Vector2.ZERO
+	
+	# Optimization: Instead of checking every single enemy against every other (slow),
+	# we pick a few candidates and see who has the most neighbors.
+	var best_pos = enemies[0].global_position
+	var max_neighbors = -1
+	
+	# Check up to 10 random candidates
+	for i in range(min(10, enemies.size())):
+		var candidate = enemies.pick_random()
+		var count = 0
+		for other in enemies:
+			if candidate.global_position.distance_to(other.global_position) < meteor_radius:
+				count += 1
+		
+		if count > max_neighbors:
+			max_neighbors = count
+			best_pos = candidate.global_position
+			
+	return best_pos
+
+func start_meteor_slam():
+	var target_pos = find_best_meteor_target()
+	if target_pos == Vector2.ZERO: return
+	
+	current_state = State.METEOR_JUMP
+	current_meteor_cooldown = meteor_cooldown
+	print("Bear is Jumping!")
+	
+	# --- 1. VISUAL MARKER (NEW SCENE) ---
+	if meteor_marker_scene:
+		active_target_marker = meteor_marker_scene.instantiate()
+		get_tree().current_scene.add_child(active_target_marker)
+		active_target_marker.global_position = target_pos
+		# Note: Scale is handled by the marker's own script tween now, 
+		# or you can force it here if you want:
+		# active_target_marker.scale = Vector2(1.0, 1.0) 
+	
+	# 2. INVINCIBILITY & GHOST
+	is_invincible = true
+	
+	# 3. TWEEN THE JUMP (Arc Movement)
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Move X/Z to target
+	tween.tween_property(self, "global_position", target_pos, meteor_jump_duration)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		
+	# Jump Peak (Sprite Y)
+	var half_time = meteor_jump_duration / 2.0
+	var jump_tween = create_tween()
+	jump_tween.tween_property(sprite, "position:y", -300.0, half_time)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	jump_tween.tween_property(sprite, "position:y", 0.0, half_time)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	await tween.finished
+	execute_meteor_land()
+
+func execute_meteor_land():
+	# 1. IMPACT
+	is_invincible = false
+	
+	# Camera Shake (If you have a camera script)
+	# var cam = get_viewport().get_camera_2d()
+	# if cam and cam.has_method("shake"): cam.shake(10.0)
+	
+	# 2. DAMAGE & STUN AREA
+	# We manually check distances since we don't have a specific Area2D for this size
+	# Or we can reuse detection_area logic if radius matches. Let's do manual query for precision.
+	var space = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	var shape = CircleShape2D.new()
+	shape.radius = meteor_radius
+	query.shape = shape
+	query.transform = Transform2D(0, global_position)
+	query.collision_mask = 4 # Layer 3 (Enemies) = Bit 4 (Value 4)
+	
+	var results = space.intersect_shape(query)
+	
+	for result in results:
+		var body = result.collider
+		if body.is_in_group("enemy"):
+			# Damage
+			if body.has_method("take_damage"):
+				body.take_damage(meteor_damage)
+			
+			# Stun
+			if body.has_method("apply_stun"):
+				body.apply_stun(meteor_stun_duration)
+				
+			# Knockback (Away from impact center)
+			if body.has_method("apply_knockback"):
+				var dir = global_position.direction_to(body.global_position)
+				body.apply_knockback(dir * 400.0)
+
+	# Cleanup
+	if is_instance_valid(active_target_marker):
+		active_target_marker.queue_free()
+		
+	# Play Boom Sound
+	play_attack_sound() # Or a specific explosion sound
+	
+	current_state = State.FOLLOW

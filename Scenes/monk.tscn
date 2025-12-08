@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3 uid="uid://d1r7n8jp0qu0a"]
+[gd_scene load_steps=63 format=3 uid="uid://d1r7n8jp0qu0a"]
 
 [ext_resource type="Script" uid="uid://bhj0eqdah5a6n" path="res://Scripts/monk.gd" id="1_eeelv"]
 [ext_resource type="Texture2D" uid="uid://cp2pe2gyhq4qh" path="res://Assets/Monk/Heal.png" id="2_71f2a"]
@@ -11,6 +11,16 @@
 [ext_resource type="AudioStream" uid="uid://dnbt4murxvy5y" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_49.wav" id="6_vmnho"]
 [ext_resource type="AudioStream" uid="uid://cbvjn21mgv1pq" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_39.wav" id="6_yy2sa"]
 [ext_resource type="AudioStream" uid="uid://b50rksm1b60qa" path="res://Audio/SFX/Monk/Footsteps_Walk_Grass_Mono_50.wav" id="7_8guux"]
+[ext_resource type="AudioStream" uid="uid://b6tx6n0u8v41h" path="res://Audio/SFX/Monk/damage_1_alex.wav" id="8_d7o6x"]
+[ext_resource type="AudioStream" uid="uid://cafvcg7iouimb" path="res://Audio/SFX/Monk/damage_2_alex.wav" id="8_yy2sa"]
+[ext_resource type="AudioStream" uid="uid://cpl3ekhh5mk1" path="res://Audio/SFX/Monk/damage_6_alex.wav" id="9_soedu"]
+[ext_resource type="AudioStream" uid="uid://bmvbqluq48ag8" path="res://Audio/SFX/Monk/damage_10_alex.wav" id="10_hujni"]
+[ext_resource type="AudioStream" uid="uid://euijgs23x23p" path="res://Audio/SFX/Monk/damage_3_alex.wav" id="10_jjwih"]
+[ext_resource type="AudioStream" uid="uid://bxgfb3ma7vho0" path="res://Audio/SFX/Monk/damage_4_alex.wav" id="11_hyvra"]
+[ext_resource type="AudioStream" uid="uid://dh10vxbhhscsq" path="res://Audio/SFX/Monk/damage_5_alex.wav" id="12_k1gut"]
+[ext_resource type="AudioStream" uid="uid://mrmpeagrx78o" path="res://Audio/SFX/Monk/damage_7_alex.wav" id="14_yip6h"]
+[ext_resource type="AudioStream" uid="uid://kpo38vj7y662" path="res://Audio/SFX/Monk/damage_8_alex.wav" id="15_lh7nl"]
+[ext_resource type="AudioStream" uid="uid://cghsog8ll5dof" path="res://Audio/SFX/Monk/damage_9_alex.wav" id="16_5un4t"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gtfb7"]
 atlas = ExtResource("2_71f2a")
@@ -307,6 +317,7 @@ wall_min_slide_angle = 0.0
 script = ExtResource("1_eeelv")
 honey_throw_range = 500.0
 footstep_sounds = Array[AudioStream]([ExtResource("4_vmnho"), ExtResource("5_8guux"), ExtResource("6_yy2sa"), ExtResource("5_gbuo7"), ExtResource("6_vmnho"), ExtResource("7_8guux")])
+hurt_sounds = Array[AudioStream]([ExtResource("8_d7o6x"), ExtResource("8_yy2sa"), ExtResource("10_jjwih"), ExtResource("11_hyvra"), ExtResource("12_k1gut"), ExtResource("9_soedu"), ExtResource("14_yip6h"), ExtResource("15_lh7nl"), ExtResource("16_5un4t"), ExtResource("10_hujni")])
 
 [node name="HealCooldown" type="Timer" parent="."]
 one_shot = true
@@ -369,6 +380,10 @@ debug_color = Color(5.631298e-06, 0.64278364, 0.31714502, 0.41960785)
 
 [node name="FootstepPlayer" type="AudioStreamPlayer2D" parent="."]
 volume_db = -5.0
+bus = &"SFX"
+
+[node name="HurtPlayer" type="AudioStreamPlayer2D" parent="."]
+volume_db = -2.0
 bus = &"SFX"
 
 [connection signal="area_entered" from="MagnetArea" to="." method="_on_magnet_area_entered"]

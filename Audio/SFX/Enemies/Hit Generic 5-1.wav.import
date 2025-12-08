@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ciw2qc0nqanq"
+path="res://.godot/imported/Hit Generic 5-1.wav-12c5cbbc4a12ad238c728b0a634025f0.sample"
+
+[deps]
+
+source_file="res://Audio/SFX/Enemies/Hit Generic 5-1.wav"
+dest_files=["res://.godot/imported/Hit Generic 5-1.wav-12c5cbbc4a12ad238c728b0a634025f0.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

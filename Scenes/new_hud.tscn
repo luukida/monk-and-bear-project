@@ -1,8 +1,8 @@
-[gd_scene load_steps=20 format=3 uid="uid://b3wkshjwwug7t"]
+[gd_scene load_steps=23 format=3 uid="uid://b3wkshjwwug7t"]
 
 [ext_resource type="Script" uid="uid://b0bx5ejfkyopg" path="res://Scripts/new_hud.gd" id="1_jd4hw"]
 [ext_resource type="Texture2D" uid="uid://d18ybvjmxbxjc" path="res://Assets/LifeAndEXPBars/BorderBG.png" id="2_e6lij"]
-[ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/MonkSkills/skill_slot.tscn" id="3_0plam"]
+[ext_resource type="PackedScene" uid="uid://bs8rv5p0dbfq0" path="res://Scenes/skill_slot.tscn" id="3_0plam"]
 [ext_resource type="Texture2D" uid="uid://cpsfhdqfv3ykq" path="res://Assets/LifeAndEXPBars/REDColors.png" id="3_dllsv"]
 [ext_resource type="Texture2D" uid="uid://dbh4nuv6nk0gy" path="res://Assets/Card/sprite_sheet.png" id="4_bcuyj"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="5_a6cb5"]
@@ -12,7 +12,10 @@
 [ext_resource type="Texture2D" uid="uid://cte78o7moehfe" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Fill-01.png" id="10_ty2b2"]
 [ext_resource type="Texture2D" uid="uid://b0dc16kbwnjh" path="res://Assets/LifeAndEXPBars/Monk_LifeBar_Avatar-01.png" id="11_a6cb5"]
 [ext_resource type="Texture2D" uid="uid://bwgnong3g2vo3" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Border-01.png" id="12_a6cb5"]
+[ext_resource type="Texture2D" uid="uid://bfj6w6lo33kpn" path="res://Assets/Icons/15.png" id="12_olccw"]
+[ext_resource type="Texture2D" uid="uid://cxgarhbcxvxx" path="res://Assets/Icons/10.png" id="13_1mesj"]
 [ext_resource type="Texture2D" uid="uid://rk2081lh1dr3" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Under-01.png" id="13_y8mjb"]
+[ext_resource type="Texture2D" uid="uid://dr21e5oqjktg7" path="res://Assets/Icons/18.png" id="14_gpxep"]
 [ext_resource type="Texture2D" uid="uid://x2lk1c52de4p" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Fill-01.png" id="14_lgw6u"]
 [ext_resource type="Texture2D" uid="uid://ch2cm1gaa7g74" path="res://Assets/LifeAndEXPBars/Bear_LifeBar_Avatar-01.png" id="15_olccw"]
 
@@ -172,10 +175,40 @@ offset_top = 612.0
 offset_right = 879.0
 offset_bottom = 652.0
 
-[node name="Skills" type="HBoxContainer" parent="BearPanel"]
+[node name="SkillsBearContainer" type="HBoxContainer" parent="BearPanel"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 125.0
+offset_top = -36.0
+offset_right = 263.0
+offset_bottom = 4.0
+theme_override_constants/separation = 69
+
+[node name="SlotLunge" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
+layout_mode = 2
+
+[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotLunge" index="0"]
+texture = ExtResource("12_olccw")
+
+[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotLunge" index="3"]
+visible = false
+
+[node name="SlotCharge" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
+layout_mode = 2
+
+[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotCharge" index="0"]
+texture = ExtResource("13_1mesj")
+
+[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotCharge" index="3"]
+visible = false
+
+[node name="SlotMeteor" parent="BearPanel/SkillsBearContainer" instance=ExtResource("3_0plam")]
+layout_mode = 2
+
+[node name="Icon" parent="BearPanel/SkillsBearContainer/SlotMeteor" index="0"]
+texture = ExtResource("14_gpxep")
+
+[node name="KeyLabel" parent="BearPanel/SkillsBearContainer/SlotMeteor" index="3"]
+visible = false
 
 [node name="HPBar_Border" type="TextureRect" parent="BearPanel"]
 layout_mode = 1
@@ -210,3 +243,7 @@ offset_bottom = 364.0
 scale = Vector2(0.44, 0.44)
 texture = ExtResource("15_olccw")
 stretch_mode = 4
+
+[editable path="BearPanel/SkillsBearContainer/SlotLunge"]
+[editable path="BearPanel/SkillsBearContainer/SlotCharge"]
+[editable path="BearPanel/SkillsBearContainer/SlotMeteor"]

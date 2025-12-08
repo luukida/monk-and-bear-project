@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://436xm2iidqka" path="res://meteor_marker.gd" id="1_sfpjs"]
 
 [sub_resource type="Gradient" id="Gradient_8sifq"]
-offsets = PackedFloat32Array(0.33, 0.69, 0.70666665)
-colors = PackedColorArray(1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0.34333333, 0.69, 0.71)
+colors = PackedColorArray(1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_0u22m"]
 gradient = SubResource("Gradient_8sifq")

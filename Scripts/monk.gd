@@ -25,6 +25,7 @@ var honey_projectile_scene = preload("res://Scenes/MonkSkills/honey_pot_projecti
 @export_group("Audio")
 @export var footstep_sounds: Array[AudioStream] = [] 
 @export var footstep_interval: float = 0.18
+@export var hurt_sounds: Array[AudioStream] = []
 
 var current_step_timer: float = 0.0
 
@@ -48,6 +49,7 @@ var bear_node: CharacterBody2D = null
 @onready var heal_vfx = $HealVFX
 @onready var magnet_area = $MagnetArea/CollisionShape2D
 @onready var footstep_player = $FootstepPlayer
+@onready var hurt_player = $HurtPlayer
 
 func _ready():
 	add_to_group("player")
@@ -184,21 +186,23 @@ func update_hud_cooldowns():
 func take_damage(amount):
 	if is_invincible: return
 	
+	# --- PLAY HURT SOUND ---
+	if hurt_player and not hurt_sounds.is_empty():
+		hurt_player.stream = hurt_sounds.pick_random()
+		# Random pitch (0.9 to 1.1) makes it sound natural/varied
+		hurt_player.pitch_scale = randf_range(1.1, 1.3)
+		hurt_player.play()
+	
 	current_hp -= amount
 	hp_bar.value = current_hp
 	
 	if current_hp <= 0:
 		print("GAME OVER")
-		
-		# --- GET CURRENT WAVE ---
-		# We try to find the WaveManager to know which wave we are on.
 		var current_wave = 1
 		var wave_manager = get_tree().current_scene.get_node_or_null("WaveManager")
 		if wave_manager:
-			# wave_index is 0-based, so +1 for display
 			current_wave = wave_manager.current_wave_index + 1
 		
-		# Trigger the Global Game Over
 		GameManager.trigger_game_over(current_wave)
 		return
 
@@ -206,9 +210,11 @@ func take_damage(amount):
 	var tween = create_tween()
 	sprite.modulate = Color.RED
 	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	
 	for i in range(5):
 		tween.tween_property(sprite, "modulate", Color(1, 1, 1, 0.5), 0.1)
 		tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	
 	tween.finished.connect(func(): is_invincible = false)
 
 # --- MAGNET LOGIC ---

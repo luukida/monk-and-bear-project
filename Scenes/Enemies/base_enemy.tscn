@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cquhbsnjgo5dd"]
+[gd_scene load_steps=7 format=3 uid="uid://cquhbsnjgo5dd"]
 
 [ext_resource type="Script" uid="uid://i7dnqvqe4pwd" path="res://Scripts/base_enemy.gd" id="1_wsate"]
+[ext_resource type="AudioStream" uid="uid://ciw2qc0nqanq" path="res://Audio/SFX/Enemies/Hit Generic 5-1.wav" id="2_oof5d"]
+[ext_resource type="AudioStream" uid="uid://4qsdxcgkx8ko" path="res://Audio/SFX/Enemies/Hit Generic 2-1.wav" id="3_t83mw"]
 
 [sub_resource type="Gradient" id="Gradient_wsate"]
 colors = PackedColorArray(1, 0, 0, 0.39215687, 1, 0, 0, 1)
@@ -36,6 +38,8 @@ collision_mask = 36
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_wsate")
+hit_sounds = Array[AudioStream]([ExtResource("2_oof5d")])
+death_sound = ExtResource("3_t83mw")
 
 [node name="EnemyHitbox" type="Area2D" parent="."]
 monitorable = false
@@ -57,3 +61,7 @@ collision_layer = 4
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ContactArea"]
+
+[node name="HitPlayer" type="AudioStreamPlayer2D" parent="."]
+max_distance = 1000.0
+bus = &"SFX"

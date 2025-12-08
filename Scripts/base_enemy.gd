@@ -15,6 +15,11 @@ var current_state = State.CHASE
 @export var max_rotation_degrees: float = 40.0
 @export var attack_impact_frame: int = 1 
 
+@export_group("Audio")
+@export var hit_sounds: Array[AudioStream] = [] # Drag Hit variations here
+@export var death_sound: AudioStream # Drag Death sound here
+@export var hit_pitch_variation: float = 0.2 # Variation (0.1 = +/- 10%)
+
 # Referências Globais
 var player_ref: Node2D = null
 var bear_ref: CharacterBody2D = null
@@ -32,6 +37,7 @@ var is_stunned: bool = false
 @onready var hitbox_shape = $EnemyHitbox/CollisionShape2D
 @onready var telegraph = $EnemyHitbox/TelegraphSprite 
 @onready var contact_area = $ContactArea
+@onready var hit_player = $HitPlayer
 
 var gem_scene = preload("res://Scenes/experience_gem.tscn")
 
@@ -225,13 +231,43 @@ func apply_stun(duration: float):
 
 func take_damage(amount):
 	hp -= amount
+	
+	# --- VISUAL FEEDBACK ---
 	sprite.modulate = Color.RED
 	var tween = create_tween()
 	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
 	
+	# --- AUDIO FEEDBACK (HIT) ---
+	# Play only if still alive (Death sound handles the kill)
+	if hp > 0 and hit_player and not hit_sounds.is_empty():
+		hit_player.stream = hit_sounds.pick_random()
+		hit_player.pitch_scale = randf_range(1.0 - hit_pitch_variation, 1.0 + hit_pitch_variation)
+		hit_player.play()
+	
 	if hp <= 0:
+		play_death_sound_detached()
 		spawn_gem()
 		queue_free()
+
+func play_death_sound_detached():
+	if not death_sound: return
+	
+	# Create a temporary node to play the sound even after this enemy dies
+	var temp_player = AudioStreamPlayer2D.new()
+	temp_player.stream = death_sound
+	temp_player.bus = "SFX"
+	temp_player.global_position = global_position
+	
+	# Slight pitch variation for death too
+	temp_player.pitch_scale = randf_range(0.9, 1.1)
+	
+	# Add to the main scene (so it survives the enemy's queue_free)
+	get_tree().current_scene.add_child(temp_player)
+	
+	temp_player.play()
+	
+	# Auto-destroy the player when sound finishes
+	temp_player.finished.connect(temp_player.queue_free)
 
 func spawn_gem():
 	if gem_scene:

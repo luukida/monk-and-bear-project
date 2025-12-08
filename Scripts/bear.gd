@@ -13,7 +13,6 @@ var current_state = State.FOLLOW
 			hp_bar.max_value = max_hp
 @export var damage = 35.0
 @export var auto_revive_time: float = 10.0
-# NEW: Give him better eyes!
 @export var detection_radius: float = 400.0
 
 # --- CHASE LIMITS (Parallel) ---
@@ -41,6 +40,11 @@ var current_state = State.FOLLOW
 
 var current_step_timer: float = 0.0
 
+@export_group("Lunge Skill")
+@export var lunge_speed: float = 800.0
+@export var lunge_friction: float = 2000.0
+@export var lunge_range_multiplier: float = 2.0
+
 @export_group("Skill Charge")
 @export var charge_cooldown: float = 8.0
 @export var charge_damage: float = 60.0
@@ -55,7 +59,6 @@ var current_step_timer: float = 0.0
 @export var charge_prep_damage_multiplier: float = 0.3
 
 @export_group("Skill Meteor Slam")
-@export var can_meteor: bool = false # Unlockable
 @export var meteor_cooldown: float = 12.0
 @export var meteor_damage: float = 80.0
 @export var meteor_radius: float = 250.0
@@ -77,6 +80,7 @@ var can_lunge: bool = false:
 		can_lunge = value
 		update_hitbox_scale() # Apply range increase immediately!
 var can_charge: bool = false
+var can_meteor: bool = false # Unlockable
 
 # --- VARIABLES ---
 var current_hp = max_hp
@@ -110,9 +114,7 @@ var wander_target: Vector2 = Vector2.ZERO
 var is_wandering: bool = false
 
 var lunge_velocity: Vector2 = Vector2.ZERO
-var lunge_friction: float = 2000.0 # How fast he stops
 
-# Add this with your other internal variables
 var charge_hit_list: Array[Node2D] = []
 
 # --- NEW: QUEUE SYSTEM ---
@@ -568,16 +570,14 @@ func update_orientation(target_pos: Vector2):
 func update_hitbox_scale():
 	if not attack_area: return
 	
-	# Start fresh from base
 	var final_scale = base_attack_scale
 	
-	# Apply Frenzy Multiplier
 	if is_frenzy_active:
 		final_scale *= frenzy_range_multiplier
 	
-	# Apply Lunge Multiplier (Permanent Range Increase)
+	# Apply Lunge Multiplier using the new variable
 	if can_lunge:
-		final_scale.x *= 2.2
+		final_scale.x *= lunge_range_multiplier 
 		
 	attack_area.scale = final_scale
 
@@ -636,11 +636,12 @@ func _on_frame_changed():
 	if sprite.animation == "attack" and sprite.frame == attack_impact_frame:
 		if telegraph: telegraph.visible = false
 		
-		# --- LUNGE MOVEMENT ONLY ---
-		# Range is already handled permanently!
+		# --- LUNGE MOVEMENT ---
 		if can_lunge and is_instance_valid(target_enemy):
 			var lunge_dir = global_position.direction_to(target_enemy.global_position)
-			lunge_velocity = lunge_dir * 800.0
+			
+			# CHANGED: Use the exported variable instead of 800.0
+			lunge_velocity = lunge_dir * lunge_speed 
 		
 		apply_damage_snapshot()
 

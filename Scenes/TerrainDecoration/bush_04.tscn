@@ -1,0 +1,86 @@
+[gd_scene load_steps=13 format=3 uid="uid://dbjxoyoi1qd4m"]
+
+[ext_resource type="Script" uid="uid://bhv8kljtm27n1" path="res://Scripts/tree_01.gd" id="1_rdoyx"]
+[ext_resource type="Texture2D" uid="uid://bq86v4an8hq1x" path="res://Assets/Terrain Decoration/Bushes/Bushe4.png" id="2_rdoyx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7lxym"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ia6qx"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_245wo"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2oovv"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nspb1"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4bww3"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1bpuk"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(768, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_873x5"]
+atlas = ExtResource("2_rdoyx")
+region = Rect2(896, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sosmg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7lxym")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ia6qx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_245wo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2oovv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nspb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4bww3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1bpuk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_873x5")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_e3cr6"]
+radius = 8.0
+
+[node name="Bush_04" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("1_rdoyx")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_sosmg")
+autoplay = "default"
+offset = Vector2(0, -6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_e3cr6")

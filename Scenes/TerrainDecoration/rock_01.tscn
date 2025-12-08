@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpryo7se5lr38"]
+
+[ext_resource type="Texture2D" uid="uid://bvekwub4nsvim" path="res://Assets/Terrain Decoration/Rocks/Rock1.png" id="1_72qvv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_h8gid"]
+radius = 11.0
+
+[node name="Rock_01" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 32
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_72qvv")
+offset = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_h8gid")

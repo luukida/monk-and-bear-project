@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://t6ui44dnagt5"
-path="res://.godot/imported/IRONY TITLE  empty.png-bc2dd8701e802ca8233f3f278f366d38.ctex"
+uid="uid://dogo54rqng6cr"
+path="res://.godot/imported/UI board Small  stone.png-5c53887a03068b4625895a320c633002.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/IRONY TITLE  empty.png"
-dest_files=["res://.godot/imported/IRONY TITLE  empty.png-bc2dd8701e802ca8233f3f278f366d38.ctex"]
+source_file="res://Assets/UI/StoneUI/UI board Small  stone.png"
+dest_files=["res://.godot/imported/UI board Small  stone.png-5c53887a03068b4625895a320c633002.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cp24qvqriiuue"
-path="res://.godot/imported/UI board Medium  parchment.png-077f7aa0001963dea910a8c2f819661a.ctex"
+uid="uid://b0a1ohkjuqqhy"
+path="res://.godot/imported/Line.png-f3cd5aaa7a37512c3c4344716ae0be34.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/UI board Medium  parchment.png"
-dest_files=["res://.godot/imported/UI board Medium  parchment.png-077f7aa0001963dea910a8c2f819661a.ctex"]
+source_file="res://Assets/UI/MagicalUI/BodyAssets/Line.png"
+dest_files=["res://.godot/imported/Line.png-f3cd5aaa7a37512c3c4344716ae0be34.ctex"]
 
 [params]
 

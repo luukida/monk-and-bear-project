@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bkjvcvnwm6wq3"
-path="res://.godot/imported/UI board Large  parchment.png-4ad2cc5a0b4364eb5f5bf53b22cb1d52.ctex"
+uid="uid://bieb1avyk237d"
+path="res://.godot/imported/Header3.1.png-cb3f8aa1e5e8983e78adb2f692b213a2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/UI board Large  parchment.png"
-dest_files=["res://.godot/imported/UI board Large  parchment.png-4ad2cc5a0b4364eb5f5bf53b22cb1d52.ctex"]
+source_file="res://Assets/UI/MagicalUI/Headers/Header3.1.png"
+dest_files=["res://.godot/imported/Header3.1.png-cb3f8aa1e5e8983e78adb2f692b213a2.ctex"]
 
 [params]
 

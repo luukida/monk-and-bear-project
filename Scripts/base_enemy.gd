@@ -100,7 +100,7 @@ func select_target() -> Node2D:
 	return bear_ref if dist_bear < dist_player else player_ref
 
 func behavior_chase():
-	# Ensure speed scale is normal when running (Thief overrides this, which is fine)
+	# Update animation speed override (Thief might change this, which is fine)
 	sprite.speed_scale = 1.0 
 	
 	if not is_instance_valid(target):
@@ -115,10 +115,29 @@ func behavior_chase():
 	if hitbox.overlaps_body(target):
 		start_telegraph()
 	else:
-		var dir = global_position.direction_to(target.global_position)
-		velocity = dir * speed
+		# --- OBSTACLE AVOIDANCE LOGIC ---
+		var desired_dir = global_position.direction_to(target.global_position)
+		var final_dir = desired_dir
+		
+		# 1. Check if the direct path is blocked by a Tree/Rock
+		if is_path_blocked(desired_dir):
+			# 2. Try glancing Left (45 degrees)
+			var left_dir = desired_dir.rotated(deg_to_rad(45))
+			# 3. Try glancing Right (-45 degrees)
+			var right_dir = desired_dir.rotated(deg_to_rad(-45))
+			
+			if not is_path_blocked(left_dir):
+				final_dir = left_dir # Steer Left
+			elif not is_path_blocked(right_dir):
+				final_dir = right_dir # Steer Right
+			else:
+				# If both blocked, try harder turn (90 degrees)
+				final_dir = desired_dir.rotated(deg_to_rad(90))
+
+		# Apply movement
+		velocity = final_dir * speed
 		sprite.play("run")
-		update_orientation(target.global_position)
+		update_orientation(target.global_position) # Keep looking at target even if strafing
 
 func update_orientation(target_pos: Vector2):
 	var dir = global_position.direction_to(target_pos)
@@ -274,3 +293,13 @@ func spawn_gem():
 		var gem = gem_scene.instantiate()
 		gem.global_position = global_position
 		get_tree().current_scene.call_deferred("add_child", gem)
+
+func is_path_blocked(dir: Vector2) -> bool:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(
+		global_position,
+		global_position + (dir * 50.0), # Check 50 pixels ahead (Whisker length)
+		32 # Collision Mask 32 = Layer 6 (World/Obstacles)
+	)
+	var result = space_state.intersect_ray(query)
+	return not result.is_empty() # Returns true if we hit a wall

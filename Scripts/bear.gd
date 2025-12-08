@@ -112,6 +112,7 @@ var current_chase_timer: float = 0.0
 var wander_timer: float = 0.0
 var wander_target: Vector2 = Vector2.ZERO
 var is_wandering: bool = false
+var roam_patience_timer: float = 0.0
 
 var lunge_velocity: Vector2 = Vector2.ZERO
 
@@ -347,26 +348,61 @@ func behavior_frenzy(delta):
 		update_orientation(target_enemy.global_position)
 
 func behavior_roam_logic(delta, is_frenzy_mode):
+	# 1. IDLE PHASE
 	if wander_timer > 0:
 		wander_timer -= delta
 		velocity = Vector2.ZERO
 		sprite.play("idle")
 		sprite.rotation = move_toward(sprite.rotation, 0, 0.1)
 		attack_area.rotation = sprite.rotation
+		
 	else:
+		# 2. PICK NEW TARGET
 		if not is_wandering:
-			var random_angle = randf() * TAU
-			var random_dist = randf_range(100.0, 300.0) 
-			wander_target = global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
-			is_wandering = true
+			var valid_found = false
 			
+			# Try 10 times to find a spot that isn't inside a tree
+			for i in range(10):
+				var random_angle = randf() * TAU
+				var random_dist = randf_range(100.0, 300.0) 
+				var test_target = global_position + Vector2(cos(random_angle), sin(random_angle)) * random_dist
+				
+				if is_valid_roam_pos(test_target):
+					wander_target = test_target
+					valid_found = true
+					break
+			
+			# If we failed to find a valid spot (crowded?), just stay put
+			if not valid_found:
+				wander_timer = 2.0
+				return
+
+			is_wandering = true
+			roam_patience_timer = 4.0 # Give him 4 seconds max to get there
+			
+		# 3. MOVEMENT PHASE
+		roam_patience_timer -= delta
+		
+		# Abort conditions:
+		# A: Took too long (stuck on something)
+		# B: Bumped into a wall (Slide collision count > 0)
+		if roam_patience_timer <= 0 or get_slide_collision_count() > 0:
+			is_wandering = false
+			wander_timer = randf_range(2.0, 4.0)
+			return
+
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
+		
 		var speed_factor = 1.0 if is_frenzy_mode else 0.4
+		
+		# Apply Speed + Slow Multiplier
 		velocity = dir * (move_speed * speed_factor) * speed_multiplier
+		
 		sprite.play("run")
 		update_orientation(wander_target)
 		
+		# 4. ARRIVAL
 		if dist_to_target < 10.0:
 			is_wandering = false
 			wander_timer = randf_range(0.5, 1.0) if is_frenzy_mode else randf_range(2.0, 4.0)
@@ -1044,3 +1080,15 @@ func execute_meteor_land():
 	play_attack_sound() # Or a specific explosion sound
 	
 	current_state = State.FOLLOW
+
+func is_valid_roam_pos(pos: Vector2) -> bool:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = pos
+	
+	# Check collision with Layer 6 (World/Obstacles)
+	# Bit 6 = 32
+	query.collision_mask = 32 
+	
+	var result = space_state.intersect_point(query)
+	return result.is_empty() # Valid if empty (no wall)

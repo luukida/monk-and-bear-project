@@ -1,11 +1,23 @@
-[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://dkgrxdj3c4ywf"]
+[gd_resource type="TileSet" load_steps=20 format=3 uid="uid://dkgrxdj3c4ywf"]
 
-[ext_resource type="Texture2D" uid="uid://bowf6xwfh15bc" path="res://Assets/Terrain/Tilemap_color3.png" id="1_237pd"]
-[ext_resource type="Texture2D" uid="uid://bkktxs8c32mu5" path="res://Assets/Terrain/Water Background color.png" id="2_5t0oa"]
-[ext_resource type="Texture2D" uid="uid://0b1qkis2c3un" path="res://Assets/Terrain/Water Foam.png" id="3_s571x"]
+[ext_resource type="Texture2D" uid="uid://bowf6xwfh15bc" path="res://Assets/Terrain/Tilemap_color3.png" id="1_oapvr"]
+[ext_resource type="Texture2D" uid="uid://bkktxs8c32mu5" path="res://Assets/Terrain/Water Background color.png" id="2_spga6"]
+[ext_resource type="PackedScene" uid="uid://dusixqloea2fv" path="res://Scenes/TerrainDecoration/bush_01.tscn" id="3_j66l3"]
+[ext_resource type="PackedScene" uid="uid://cxbs2uddjrggb" path="res://Scenes/TerrainDecoration/tree_02.tscn" id="4_2ub8c"]
+[ext_resource type="PackedScene" uid="uid://bjwwqy0tyautc" path="res://Scenes/TerrainDecoration/tree_03.tscn" id="5_byujr"]
+[ext_resource type="PackedScene" uid="uid://d126agns0nlv5" path="res://Scenes/TerrainDecoration/tree_04.tscn" id="6_ms10o"]
+[ext_resource type="PackedScene" uid="uid://306hyyxipyk2" path="res://Scenes/TerrainDecoration/bush_02.tscn" id="7_nomrs"]
+[ext_resource type="PackedScene" uid="uid://bmtxwwd5y75t5" path="res://Scenes/TerrainDecoration/bush_03.tscn" id="8_h7u0b"]
+[ext_resource type="PackedScene" uid="uid://dbjxoyoi1qd4m" path="res://Scenes/TerrainDecoration/bush_04.tscn" id="9_su82j"]
+[ext_resource type="PackedScene" uid="uid://bpryo7se5lr38" path="res://Scenes/TerrainDecoration/rock_01.tscn" id="10_qcwrk"]
+[ext_resource type="PackedScene" uid="uid://dmkx8l2dhqltx" path="res://Scenes/TerrainDecoration/rock_02.tscn" id="11_rkcct"]
+[ext_resource type="PackedScene" uid="uid://bq742lwramvap" path="res://Scenes/TerrainDecoration/rock_03.tscn" id="12_g6fmc"]
+[ext_resource type="PackedScene" uid="uid://6sabfvt8pe35" path="res://Scenes/TerrainDecoration/rock_04.tscn" id="13_hpucr"]
+[ext_resource type="PackedScene" uid="uid://n4ivn65b3syt" path="res://Scenes/TerrainDecoration/tree_01.tscn" id="14_a2hfj"]
+[ext_resource type="Texture2D" uid="uid://0b1qkis2c3un" path="res://Assets/Terrain/Water Foam.png" id="15_4uwxo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lqihc"]
-texture = ExtResource("1_237pd")
+texture = ExtResource("1_oapvr")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 0:0/0/terrain_set = 0
@@ -430,7 +442,7 @@ texture_region_size = Vector2i(64, 64)
 8:5/0/terrains_peering_bit/top_right_corner = 3
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_176b7"]
-texture = ExtResource("2_5t0oa")
+texture = ExtResource("2_spga6")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 0:0/0/terrain_set = 0
@@ -445,8 +457,22 @@ texture_region_size = Vector2i(64, 64)
 0:0/0/terrains_peering_bit/top_side = 2
 0:0/0/terrains_peering_bit/top_right_corner = 2
 
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_o3sbs"]
+scenes/1/scene = ExtResource("3_j66l3")
+scenes/2/scene = ExtResource("7_nomrs")
+scenes/3/scene = ExtResource("8_h7u0b")
+scenes/4/scene = ExtResource("9_su82j")
+scenes/5/scene = ExtResource("10_qcwrk")
+scenes/6/scene = ExtResource("11_rkcct")
+scenes/7/scene = ExtResource("12_g6fmc")
+scenes/8/scene = ExtResource("13_hpucr")
+scenes/9/scene = ExtResource("14_a2hfj")
+scenes/10/scene = ExtResource("4_2ub8c")
+scenes/11/scene = ExtResource("5_byujr")
+scenes/12/scene = ExtResource("6_ms10o")
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ens4w"]
-texture = ExtResource("3_s571x")
+texture = ExtResource("15_4uwxo")
 texture_region_size = Vector2i(64, 64)
 0:1/animation_columns = 16
 0:1/animation_separation = Vector2i(2, 0)
@@ -704,3 +730,4 @@ terrain_set_0/terrain_3/color = Color(0.5522701, 0.7017433, 0.99520093, 1)
 sources/0 = SubResource("TileSetAtlasSource_lqihc")
 sources/1 = SubResource("TileSetAtlasSource_176b7")
 sources/5 = SubResource("TileSetAtlasSource_ens4w")
+sources/2 = SubResource("TileSetScenesCollectionSource_o3sbs")

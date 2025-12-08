@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqsv4pt5at8sx"
-path="res://.godot/imported/IRONY TITLE  Large.png-1cf61ba4821f9f4b1c3d3284e7f13a59.ctex"
+uid="uid://c0pu74gu2vyy8"
+path="res://.godot/imported/Tree1.png-9ed8fd98b004a3239c5f67e0632b902b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/IRONY TITLE  Large.png"
-dest_files=["res://.godot/imported/IRONY TITLE  Large.png-1cf61ba4821f9f4b1c3d3284e7f13a59.ctex"]
+source_file="res://Assets/Terrain Decoration/Trees/Tree1.png"
+dest_files=["res://.godot/imported/Tree1.png-9ed8fd98b004a3239c5f67e0632b902b.ctex"]
 
 [params]
 

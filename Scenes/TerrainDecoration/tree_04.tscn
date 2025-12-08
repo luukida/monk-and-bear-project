@@ -1,0 +1,85 @@
+[gd_scene load_steps=13 format=3 uid="uid://d126agns0nlv5"]
+
+[ext_resource type="Script" uid="uid://bhv8kljtm27n1" path="res://Scripts/tree_01.gd" id="1_7soyf"]
+[ext_resource type="Texture2D" uid="uid://cur10jsyejuky" path="res://Assets/Terrain Decoration/Trees/Tree4.png" id="2_7soyf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hbwhq"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kluvl"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wkcmm"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ticu2"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w7iff"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vavh2"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nn4pf"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wqqtd"]
+atlas = ExtResource("2_7soyf")
+region = Rect2(1344, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sosmg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hbwhq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kluvl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wkcmm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ticu2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w7iff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vavh2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nn4pf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wqqtd")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2i8hg"]
+radius = 6.0
+
+[node name="Tree_04" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("1_7soyf")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_sosmg")
+autoplay = "default"
+offset = Vector2(0, -61)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_2i8hg")

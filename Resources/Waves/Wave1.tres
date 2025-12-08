@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://bebjxp5oeovat" path="res://Scripts/SpawnInfo.gd" id="1_4q48n"]
 [ext_resource type="Script" uid="uid://c2wkjpup854b0" path="res://Scripts/WaveData.gd" id="2_1sc38"]
-[ext_resource type="PackedScene" uid="uid://c1fiwyln4wdc5" path="res://Scenes/Enemies/spider.tscn" id="3_jl2wl"]
+[ext_resource type="PackedScene" uid="uid://brt2e0larbfgd" path="res://Scenes/Enemies/skeleton.tscn" id="2_jl2wl"]
 
 [sub_resource type="Resource" id="Resource_tohge"]
 script = ExtResource("1_4q48n")
-enemy = ExtResource("3_jl2wl")
+enemy = ExtResource("2_jl2wl")
 metadata/_custom_type_script = "uid://bebjxp5oeovat"
 
 [resource]

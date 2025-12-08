@@ -7,12 +7,14 @@ extends Area2D
 @export_group("Visuals & Animation")
 @export var jump_height: float = -80.0 
 @export var anim_duration: float = 0.6
-@export var start_scale: float = 0.1
-@export var shadow_target_scale: float = 1.0
+@export var start_scale: float = 3.5
+@export var shadow_target_scale: float = 4.15
 @export var random_rotation: bool = true
-# NEW: Spread Radius
 @export var spread_min: float = 40.0
 @export var spread_max: float = 90.0
+
+# NEW: Shadow Offset Variable
+@export var shadow_y_offset: float = 0.8 
 
 @onready var sprite = $Sprite2D
 @onready var shadow = $ShadowSprite 
@@ -26,20 +28,26 @@ func _ready():
 	get_tree().create_timer(duration).timeout.connect(start_decay)
 
 func play_spawn_animation():
-	# 1. RANDOM ROTATION
+	# 1. RANDOM ROTATION (Applied to Sprites ONLY)
+	# We do NOT rotate 'self' (the root), so the shadow offset stays "down"
 	if random_rotation:
-		rotation_degrees = randf_range(0.0, 360.0)
+		var rand_rot = randf_range(0.0, 360.0)
+		sprite.rotation_degrees = rand_rot
+		if shadow: shadow.rotation_degrees = rand_rot
 	
 	# 2. SETUP
 	sprite.position.y = 0.0 
 	scale = Vector2(start_scale, start_scale)
-	if shadow: shadow.scale = Vector2.ZERO
+	
+	if shadow:
+		shadow.scale = Vector2.ZERO
+		# Apply the fixed Y offset here!
+		shadow.position.y = shadow_y_offset
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	# 3. SPREAD MOVEMENT (Fly to random spot nearby)
-	# This prevents them from stacking if multiple drop at once
+	# 3. SPREAD MOVEMENT
 	var random_dir = Vector2.RIGHT.rotated(randf() * TAU)
 	var random_dist = randf_range(spread_min, spread_max)
 	var target_pos = global_position + (random_dir * random_dist)
@@ -51,7 +59,7 @@ func play_spawn_animation():
 	tween.tween_property(self, "scale", Vector2.ONE, anim_duration)\
 		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 	
-	# 5. VERTICAL ARC (Throw effect)
+	# 5. VERTICAL ARC
 	var jump_tween = create_tween()
 	var half_time = anim_duration / 2.0
 	jump_tween.tween_property(sprite, "position:y", jump_height, half_time)\
@@ -59,7 +67,7 @@ func play_spawn_animation():
 	jump_tween.tween_property(sprite, "position:y", 0.0, half_time)\
 		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
-	# 6. SHADOW
+	# 6. SHADOW SCALING
 	if shadow:
 		var shadow_tween = create_tween()
 		shadow_tween.tween_property(shadow, "scale", Vector2(shadow_target_scale, shadow_target_scale), anim_duration)\

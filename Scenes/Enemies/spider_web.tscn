@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cdcrxpjlbe407"]
 
-[ext_resource type="Script" uid="uid://damds0xjcpg4w" path="res://spider_web.gd" id="1_6kl7d"]
+[ext_resource type="Script" uid="uid://damds0xjcpg4w" path="res://Scripts/spider_web.gd" id="1_6kl7d"]
 [ext_resource type="Texture2D" uid="uid://bycwnjv3gl3rr" path="res://Assets/Icons/FHD (219.1).png" id="2_r5spj"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_i0wjd"]
@@ -16,7 +16,6 @@ anim_duration = 0.8
 
 [node name="ShadowSprite" type="Sprite2D" parent="."]
 modulate = Color(0, 0, 0, 0.39215687)
-position = Vector2(0, 3.55)
 scale = Vector2(4.15, 4.15)
 texture = ExtResource("2_r5spj")
 

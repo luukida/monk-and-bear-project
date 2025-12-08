@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dmkx8l2dhqltx"]
+
+[ext_resource type="Texture2D" uid="uid://yek0kob6c3bi" path="res://Assets/Terrain Decoration/Rocks/Rock2.png" id="1_6rukl"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_py31d"]
+height = 44.0
+
+[node name="Rock_02" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 32
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_6rukl")
+offset = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_py31d")

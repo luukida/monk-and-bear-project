@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeItem" load_steps=3 format=3 uid="uid://boxucdyta538s"]
+
+[ext_resource type="Texture2D" uid="uid://clwus6jcy7e03" path="res://Assets/Icons/Icon37.png" id="1_ny4jd"]
+[ext_resource type="Script" uid="uid://bcs1n4uf0l6i" path="res://Scripts/UpgradeItem.gd" id="1_s1rd0"]
+
+[resource]
+script = ExtResource("1_s1rd0")
+title = "Sacred Honey"
+description = "Unlocks the ability to throw a healing honey pot. The Bear always chase the pot!"
+icon = ExtResource("1_ny4jd")
+type = 1
+target = "monk"
+property_name = "honey_pot"
+amount = 1.0
+metadata/_custom_type_script = "uid://bcs1n4uf0l6i"

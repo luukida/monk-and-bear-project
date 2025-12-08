@@ -19,20 +19,28 @@ extends CharacterBody2D
 @export var honey_cooldown_time = 5.0
 @export var honey_throw_range = 300.0
 
-var honey_current_cooldown = 0.0
-var honey_projectile_scene = preload("res://Scenes/MonkSkills/honey_pot_projectile.tscn")
-
 @export_group("Audio")
 @export var footstep_sounds: Array[AudioStream] = [] 
 @export var footstep_interval: float = 0.18
 @export var hurt_sounds: Array[AudioStream] = []
 
+var honey_current_cooldown = 0.0
+var honey_projectile_scene = preload("res://Scenes/MonkSkills/honey_pot_projectile.tscn")
+
 var current_step_timer: float = 0.0
+
+# --- SKILL SYSTEM ---
+# Stores the names of unlocked skills in order: ["honey_pot", "fireball", etc.]
+var active_skills: Array[String] = []
 
 # ESTADOS
 var current_hp = max_hp
 var is_invincible = false
 var is_aiming_skill_1 = false 
+
+# --- SKILL FLAGS ---
+# Locked by default!
+var can_throw_honey: bool = false
 
 # --- HEAL OVER TIME VARIABLES ---
 var heal_timer: float = 0.0
@@ -153,11 +161,31 @@ func remove_slow():
 		speed_multiplier = 1.0
 
 func handle_skill_activation():
+	# Check inputs dynamically based on slot position
 	if Input.is_action_just_pressed("skill_1"):
+		use_skill_at_index(0)
+	elif Input.is_action_just_pressed("skill_2"):
+		use_skill_at_index(1)
+	elif Input.is_action_just_pressed("skill_3"):
+		use_skill_at_index(2)
+	elif Input.is_action_just_pressed("skill_4"):
+		use_skill_at_index(3)
+
+func use_skill_at_index(idx: int):
+	# Do we have a skill in this slot?
+	if idx >= active_skills.size():
+		return
+	
+	var skill_name = active_skills[idx]
+	
+	# Dispatcher for specific skills
+	if skill_name == "honey_pot":
 		if honey_current_cooldown <= 0:
 			start_aiming()
 		else:
-			print("Skill Cooldown!")
+			print("Honey Pot Cooldown!")
+			
+	# Add future skills here (e.g., "fireball")
 
 func start_aiming():
 	is_aiming_skill_1 = true
@@ -203,7 +231,7 @@ func take_damage(amount):
 	if hurt_player and not hurt_sounds.is_empty():
 		hurt_player.stream = hurt_sounds.pick_random()
 		# Random pitch (0.9 to 1.1) makes it sound natural/varied
-		hurt_player.pitch_scale = randf_range(1.1, 1.3)
+		hurt_player.pitch_scale = randf_range(0.9, 1.1)
 		hurt_player.play()
 	
 	current_hp -= amount

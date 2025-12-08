@@ -97,6 +97,16 @@ func apply_upgrade(upgrade: UpgradeItem):
 				if "can_meteor" in target_node:
 					target_node.can_meteor = true
 					print("Skill Unlocked: Meteor Slam")
+					
+			# MONK SKILLS (Append to Array)
+			elif upgrade.target == "monk":
+				# property_name should be the skill code, e.g., "honey_pot"
+				var skill_code = upgrade.property_name 
+				if "active_skills" in target_node:
+					# Prevent duplicates
+					if not target_node.active_skills.has(skill_code):
+						target_node.active_skills.append(skill_code)
+						print("Monk learned new skill: ", skill_code)
 	
 	get_tree().paused = false
 

@@ -157,7 +157,7 @@ offset_top = -53.0
 offset_right = 188.0
 offset_bottom = 40.0
 
-[node name="CircleShapeBorder" parent="MonkPanel/Skills/SkillSlot03" index="3"]
+[node name="CircleShapeBorder" parent="MonkPanel/Skills/SkillSlot03" index="4"]
 texture = SubResource("CompressedTexture2D_msa0c")
 
 [node name="KeyLabel" parent="MonkPanel/Skills/SkillSlot03/TextureRect" index="0"]
@@ -223,10 +223,10 @@ offset_top = -45.0
 offset_right = -144.0
 offset_bottom = -5.0
 
-[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot01" index="3"]
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot01" index="4"]
 texture = ExtResource("16_gpxep")
 
-[node name="TextureRect" parent="BearPanel/Skills/SkillSlot01" index="4"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot01" index="5"]
 visible = false
 
 [node name="SkillSlot02" parent="BearPanel/Skills" instance=ExtResource("3_0plam")]
@@ -236,10 +236,10 @@ offset_top = -45.0
 offset_right = -41.0
 offset_bottom = -5.0
 
-[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot02" index="3"]
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot02" index="4"]
 texture = ExtResource("16_gpxep")
 
-[node name="TextureRect" parent="BearPanel/Skills/SkillSlot02" index="4"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot02" index="5"]
 visible = false
 
 [node name="SkillSlot03" parent="BearPanel/Skills" instance=ExtResource("3_0plam")]
@@ -249,10 +249,10 @@ offset_top = -105.0
 offset_right = -93.0
 offset_bottom = -65.0
 
-[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot03" index="3"]
+[node name="CircleShapeBorder" parent="BearPanel/Skills/SkillSlot03" index="4"]
 texture = ExtResource("16_gpxep")
 
-[node name="TextureRect" parent="BearPanel/Skills/SkillSlot03" index="4"]
+[node name="TextureRect" parent="BearPanel/Skills/SkillSlot03" index="5"]
 visible = false
 
 [node name="HPBar_Border" type="TextureRect" parent="BearPanel"]
@@ -289,6 +289,7 @@ scale = Vector2(0.44, 0.44)
 texture = ExtResource("15_olccw")
 stretch_mode = 4
 
+[editable path="MonkPanel/Skills/SkillSlot01"]
 [editable path="MonkPanel/Skills/SkillSlot02"]
 [editable path="MonkPanel/Skills/SkillSlot03"]
 [editable path="BearPanel/Skills/SkillSlot01"]

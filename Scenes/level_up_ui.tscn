@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://do8ef7onh8fjk"]
+[gd_scene load_steps=10 format=3 uid="uid://do8ef7onh8fjk"]
 
 [ext_resource type="Script" uid="uid://wd6xx1jdiw5i" path="res://Scripts/level_up_ui.gd" id="1_qmifi"]
 [ext_resource type="PackedScene" uid="uid://hph4f4c84cdr" path="res://Scenes/stat_card.tscn" id="2_biy4n"]
 [ext_resource type="Texture2D" uid="uid://bkjvcvnwm6wq3" path="res://Assets/UI/StoneUI/UI board Large  parchment.png" id="3_5fr50"]
 [ext_resource type="PackedScene" uid="uid://bqa3okt2qe3op" path="res://Scenes/bear_skill_card.tscn" id="3_5vxra"]
+[ext_resource type="PackedScene" uid="uid://bgi50wg7xhqr" path="res://Scenes/monk_skill_card.tscn" id="4_5vxra"]
 [ext_resource type="Texture2D" uid="uid://knf4kp4byx5m" path="res://Assets/UI/MagicalUI/Body/Blank.png" id="4_biy4n"]
 [ext_resource type="FontFile" uid="uid://ddjhh1juon5oe" path="res://Fonts/Bear Days.ttf" id="5_5fr50"]
 [ext_resource type="Texture2D" uid="uid://clssyycdiitx1" path="res://Assets/UI/MagicalUI/Headers/Header4.png" id="6_5vxra"]
@@ -15,6 +16,7 @@ layer = 3
 script = ExtResource("1_qmifi")
 stat_card_template = ExtResource("2_biy4n")
 skill_card_template = ExtResource("3_5vxra")
+monk_card_template = ExtResource("4_5vxra")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15

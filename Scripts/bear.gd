@@ -121,6 +121,10 @@ var charge_hit_list: Array[Node2D] = []
 var has_pending_honey: bool = false
 var pending_honey_pos: Vector2 = Vector2.ZERO
 
+# --- MOVEMENT MODIFIERS ---
+var speed_multiplier: float = 1.0
+var slow_sources: int = 0 # Count how many webs we are standing on
+
 # --- NODES ---
 @onready var sprite = $AnimatedSprite2D
 @onready var body_shape = $CollisionShape2D
@@ -247,7 +251,7 @@ func behavior_follow(delta):
 			var dir = global_position.direction_to(honey_target_pos)
 			
 			# --- CHANGE: Apply 1.5x Speed Boost ---
-			velocity = dir * (move_speed * 1.5) 
+			velocity = dir * (move_speed * 1.5) * speed_multiplier
 			sprite.play("run")
 			sprite.speed_scale = 1.5 # Run faster!
 			# --------------------------------------
@@ -310,7 +314,7 @@ func behavior_chase():
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
-		velocity = dir * (move_speed * 1.2)
+		velocity = dir * (move_speed * 1.2) * speed_multiplier
 		sprite.play("run")
 		update_orientation(target_enemy.global_position)
 
@@ -338,7 +342,7 @@ func behavior_frenzy(delta):
 		start_attack()
 	else:
 		var dir = global_position.direction_to(target_enemy.global_position)
-		velocity = dir * move_speed
+		velocity = dir * (move_speed * speed_multiplier)
 		sprite.play("run")
 		update_orientation(target_enemy.global_position)
 
@@ -359,7 +363,7 @@ func behavior_roam_logic(delta, is_frenzy_mode):
 		var dir = global_position.direction_to(wander_target)
 		var dist_to_target = global_position.distance_to(wander_target)
 		var speed_factor = 1.0 if is_frenzy_mode else 0.4
-		velocity = dir * (move_speed * speed_factor)
+		velocity = dir * (move_speed * speed_factor) * speed_multiplier
 		sprite.play("run")
 		update_orientation(wander_target)
 		
@@ -429,6 +433,15 @@ func play_attack_sound():
 	attack_player.play()
 
 # --- OTHER LOGIC ---
+
+func apply_slow(amount: float):
+	slow_sources += 1
+	speed_multiplier = amount # e.g., 0.5 for 50% speed
+	
+func remove_slow():
+	slow_sources = max(0, slow_sources - 1)
+	if slow_sources == 0:
+		speed_multiplier = 1.0
 
 func detect_honey(honey_position: Vector2):
 	if is_downed or is_frenzy_active: return

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cgigdkuym1o6"]
 
-[ext_resource type="Script" uid="uid://bakcm5x2gct5h" path="res://target_marker.gd" id="1_owalg"]
-[ext_resource type="Texture2D" uid="uid://bv0kh6u3lntg" path="res://Assets/Icons/FHD (207).png" id="2_6trpe"]
+[ext_resource type="Script" uid="uid://bakcm5x2gct5h" path="res://Scripts/target_marker.gd" id="1_owalg"]
+[ext_resource type="Texture2D" uid="uid://qy7tdk1gnl2b" path="res://Assets/Icons/FHD (207.1).png" id="2_es768"]
 
 [node name="TargetMarker" type="Node2D"]
 z_index = 5
@@ -10,4 +10,4 @@ script = ExtResource("1_owalg")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
 scale = Vector2(2, 2)
-texture = ExtResource("2_6trpe")
+texture = ExtResource("2_es768")

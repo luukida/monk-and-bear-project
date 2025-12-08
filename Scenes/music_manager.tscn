@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dauy8pxl8jinb"]
 
-[ext_resource type="Script" uid="uid://b4er7i0osdt5q" path="res://music_manager.gd" id="1_760hw"]
+[ext_resource type="Script" uid="uid://b4er7i0osdt5q" path="res://Scripts/music_manager.gd" id="1_760hw"]
 [ext_resource type="AudioStream" uid="uid://bd4rriv03f0up" path="res://Audio/Musics/Golden Serpant Tavern (LOOP).wav" id="1_hsxb6"]
 [ext_resource type="AudioStream" uid="uid://vqb60wq7chwc" path="res://Audio/Musics/Tournier Of The Knights.wav" id="3_sdmu8"]
 

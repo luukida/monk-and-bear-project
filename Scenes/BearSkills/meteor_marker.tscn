@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b24xej33g12ye"]
 
-[ext_resource type="Script" uid="uid://436xm2iidqka" path="res://meteor_marker.gd" id="1_sfpjs"]
+[ext_resource type="Script" uid="uid://436xm2iidqka" path="res://Scripts/meteor_marker.gd" id="1_sfpjs"]
 
 [sub_resource type="Gradient" id="Gradient_8sifq"]
 offsets = PackedFloat32Array(0.34333333, 0.69, 0.71)

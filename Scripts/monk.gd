@@ -42,6 +42,10 @@ var heal_rate: float = 0.0
 var external_velocity: Vector2 = Vector2.ZERO
 var bear_node: CharacterBody2D = null
 
+# --- MOVEMENT MODIFIERS ---
+var speed_multiplier: float = 1.0
+var slow_sources: int = 0 # Count how many webs we are standing on
+
 # REFERÊNCIAS
 @onready var sprite = $AnimatedSprite2D
 @onready var hp_bar = $HpBar     
@@ -119,11 +123,11 @@ func _stop_vfx_loop():
 	# Restore color
 	sprite.modulate = Color.WHITE
 
-# --- MOVEMENT & SKILLS (Unchanged) ---
+# --- MOVEMENT & SKILLS ---
 
 func handle_movement_logic(delta):
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var player_velocity = input_dir * speed
+	var player_velocity = input_dir * speed * speed_multiplier
 	velocity = player_velocity + external_velocity
 	external_velocity = external_velocity.move_toward(Vector2.ZERO, 300 * delta)
 	
@@ -138,6 +142,15 @@ func handle_movement_logic(delta):
 
 func apply_rope_pull(pull_vector: Vector2):
 	external_velocity = pull_vector
+
+func apply_slow(amount: float):
+	slow_sources += 1
+	speed_multiplier = amount # e.g., 0.5 for 50% speed
+	
+func remove_slow():
+	slow_sources = max(0, slow_sources - 1)
+	if slow_sources == 0:
+		speed_multiplier = 1.0
 
 func handle_skill_activation():
 	if Input.is_action_just_pressed("skill_1"):

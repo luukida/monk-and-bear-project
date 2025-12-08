@@ -1,8 +1,9 @@
-[gd_scene load_steps=28 format=3 uid="uid://t0mw1xp8yc5i"]
+[gd_scene load_steps=29 format=3 uid="uid://t0mw1xp8yc5i"]
 
 [ext_resource type="PackedScene" uid="uid://cquhbsnjgo5dd" path="res://Scenes/Enemies/base_enemy.tscn" id="1_q0ja6"]
 [ext_resource type="Script" uid="uid://dqovi70g4qmrf" path="res://Scripts/thief.gd" id="2_xgawa"]
 [ext_resource type="Texture2D" uid="uid://b1d0pgmyjiw0n" path="res://Assets/Enemies/Thief/Thief_Attack.png" id="3_5gijj"]
+[ext_resource type="AudioStream" uid="uid://wnt1h2yfnsjk" path="res://Audio/SFX/Enemies/Invisibility Smoke Sound by The AmbientFort.wav" id="3_uguwf"]
 [ext_resource type="Texture2D" uid="uid://c4ldej6axhbdd" path="res://Assets/Enemies/Thief/Thief_Idle.png" id="4_ptjg1"]
 [ext_resource type="Texture2D" uid="uid://bbicuomxvm6li" path="res://Assets/Enemies/Thief/Thief_Run.png" id="5_ib4di"]
 
@@ -166,6 +167,7 @@ bear_detection_range = 350.0
 bear_safe_distance = 500.0
 stalk_duration = 2.0
 bravery_chance = 0.25
+vanish_sound = ExtResource("3_uguwf")
 hp = 15.0
 speed = 140.0
 damage = 20.0
@@ -200,3 +202,7 @@ position = Vector2(0, -27)
 
 [node name="CollisionShape2D" parent="ContactArea" index="0"]
 shape = SubResource("CircleShape2D_q0ja6")
+
+[node name="VanishPlayer" type="AudioStreamPlayer2D" parent="." index="5"]
+volume_db = 5.0
+bus = &"SFX"

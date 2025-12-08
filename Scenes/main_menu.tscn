@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dyq27j5vj04a4"]
 
-[ext_resource type="Script" uid="uid://clbh37xo2fgwa" path="res://main_menu.gd" id="1_48xlc"]
+[ext_resource type="Script" uid="uid://clbh37xo2fgwa" path="res://Scripts/main_menu.gd" id="1_48xlc"]
 [ext_resource type="FontFile" uid="uid://she0a0h1u8l6" path="res://Fonts/Baby Bears.ttf" id="2_1ehe0"]
 
 [node name="MainMenu" type="Control"]
